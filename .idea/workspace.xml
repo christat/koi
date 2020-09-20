@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="mvp render loop">
+      <change afterPath="$PROJECT_DIR$/build.rs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="fos4nf7i" />
+  </component>
+  <component name="ProjectId" id="1hYgXM1jZyEa0ZFyYa5cL8oRSAh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/build.rs" value="true" />
+    <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/utils/logger.rs" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chris\CLionProjects\koi" />
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\handles\device" />
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\handles" />
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend" />
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\config" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Cargo.Debug">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="run --package koi --bin koi" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs>
+        <env name="LOG_LEVEL" value="debug" />
+      </envs>
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Release" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="run --package koi --bin koi --release" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs>
+        <env name="LOG_LEVEL" value="error" />
+      </envs>
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Cargo.Debug" />
+      <item itemvalue="Cargo.Release" />
+    </list>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="runRustfmtOnSave" value="true" />
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="version" value="2" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="" />
+      <created>1600193477706</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1600193477706</updated>
+      <workItem from="1600193479148" duration="16714000" />
+      <workItem from="1600279719852" duration="9398000" />
+      <workItem from="1600291735934" duration="3495000" />
+      <workItem from="1600372965361" duration="2997000" />
+      <workItem from="1600505622923" duration="34000" />
+      <workItem from="1600505682875" duration="15082000" />
+      <workItem from="1600550655812" duration="559000" />
+      <workItem from="1600551247989" duration="2988000" />
+      <workItem from="1600554314988" duration="8670000" />
+      <workItem from="1600609210323" duration="6826000" />
+      <workItem from="1600621768015" duration="430000" />
+      <workItem from="1600622291447" duration="9329000" />
+      <workItem from="1600722400809" duration="11000" />
+      <workItem from="1600722427211" duration="9359000" />
+      <workItem from="1600809662967" duration="24000" />
+      <workItem from="1600809754361" duration="633000" />
+      <workItem from="1600968814940" duration="1885000" />
+      <workItem from="1600971845449" duration="6025000" />
+      <workItem from="1601107367127" duration="5085000" />
+      <workItem from="1601116441471" duration="1382000" />
+      <workItem from="1601132855651" duration="5371000" />
+      <workItem from="1601207621808" duration="25819000" />
+      <workItem from="1601404526632" duration="4106000" />
+      <workItem from="1601487907920" duration="20000" />
+      <workItem from="1601487955198" duration="365000" />
+      <workItem from="1601488344535" duration="413000" />
+      <workItem from="1601488780444" duration="2159000" />
+      <workItem from="1601564790768" duration="1784000" />
+      <workItem from="1601570456356" duration="1143000" />
+    </task>
+    <task id="LOCAL−00001" summary="Initial commit">
+      <created>1600592591676</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1600592591676</updated>
+    </task>
+    <task id="LOCAL−00002" summary="mvp render loop">
+      <created>1600975261317</created>
+      <option name="number" value="LOCAL−00002" />
+      <option name="presentableId" value="LOCAL−00002" />
+      <updated>1600975261317</updated>
+    </task>
+    <task id="LOCAL−00003" summary="mvp render loop">
+      <created>1600975393798</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1600975393798</updated>
+    </task>
+    <task id="LOCAL−00004" summary="mvp render loop">
+      <created>1601230709467</created>
+      <option name="number" value="LOCAL−00004" />
+      <option name="presentableId" value="LOCAL−00004" />
+      <updated>1601230709467</updated>
+    </task>
+    <task id="LOCAL−00005" summary="mvp render loop">
+      <created>1601236599166</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1601236599166</updated>
+    </task>
+    <task id="LOCAL−00006" summary="mvp render loop">
+      <created>1601236637511</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1601236637511</updated>
+    </task>
+    <task id="LOCAL−00007" summary="mvp render loop">
+      <created>1601397259686</created>
+      <option name="number" value="LOCAL−00007" />
+      <option name="presentableId" value="LOCAL−00007" />
+      <updated>1601397259686</updated>
+    </task>
+    <task id="LOCAL−00008" summary="mvp render loop">
+      <created>1601403276399</created>
+      <option name="number" value="LOCAL−00008" />
+      <option name="presentableId" value="LOCAL−00008" />
+      <updated>1601403276399</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial commit" />
+    <MESSAGE value="mvp render loop" />
+    <option name="LAST_COMMIT_MESSAGE" value="mvp render loop" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1375" y="355" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601564854226">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1375" y="355" key="#com.intellij.execution.impl.EditConfigurationsDialog/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601564854226" />
+    <state x="1021" y="318" key="#com.intellij.ide.util.MemberChooser" timestamp="1601325529480">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="766" y="236" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1601114233227" />
+    <state x="1021" y="318" key="#com.intellij.ide.util.MemberChooser/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601325529480" />
+    <state x="1702" y="445" key="FileChooserDialogImpl" timestamp="1600592561734">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1702" y="445" key="FileChooserDialogImpl/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600592561734" />
+    <state x="1800" y="601" key="Github.ShareDialog" timestamp="1600592632785">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1800" y="601" key="Github.ShareDialog/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600592632785" />
+    <state width="1234" height="580" key="GridCell.Tab.0.bottom" timestamp="1601571613901">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1878" height="247" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085840" />
+    <state width="1234" height="580" key="GridCell.Tab.0.bottom/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601571613901" />
+    <state width="1234" height="580" key="GridCell.Tab.0.center" timestamp="1601571613901">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1878" height="247" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085839" />
+    <state width="1234" height="580" key="GridCell.Tab.0.center/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601571613901" />
+    <state width="1234" height="580" key="GridCell.Tab.0.left" timestamp="1601571613900">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1878" height="247" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085839" />
+    <state width="1234" height="580" key="GridCell.Tab.0.left/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601571613900" />
+    <state width="1234" height="580" key="GridCell.Tab.0.right" timestamp="1601571613901">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1878" height="247" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085840" />
+    <state width="1234" height="580" key="GridCell.Tab.0.right/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601571613901" />
+    <state width="1878" height="348" key="GridCell.Tab.1.bottom" timestamp="1601116281235">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
+    <state width="2517" height="492" key="GridCell.Tab.1.bottom/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
+    <state width="1878" height="348" key="GridCell.Tab.1.center" timestamp="1601116281235">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
+    <state width="2517" height="492" key="GridCell.Tab.1.center/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
+    <state width="1878" height="348" key="GridCell.Tab.1.left" timestamp="1601116281235">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
+    <state width="2517" height="492" key="GridCell.Tab.1.left/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
+    <state width="1878" height="348" key="GridCell.Tab.1.right" timestamp="1601116281235">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1878" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
+    <state width="2517" height="492" key="GridCell.Tab.1.right/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
+    <state x="1422" y="345" key="SettingsEditor" timestamp="1600375985189">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1422" y="345" key="SettingsEditor/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600375985189" />
+    <state x="1664" y="436" width="587" height="592" key="find.popup" timestamp="1601397077232">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1248" y="324" width="549" height="534" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1601113554985" />
+    <state x="1664" y="436" width="587" height="592" key="find.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601397077232" />
+    <state x="1577" y="334" key="run.anything.popup" timestamp="1600375091295">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1577" y="334" key="run.anything.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600375091295" />
+    <state x="1583" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1601404635368">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1583" y="319" width="672" height="678" key="search.everywhere.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601404635368" />
+  </component>
+</project>
