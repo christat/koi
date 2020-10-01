@@ -45,8 +45,8 @@ fn compile_shaders() {
     let mut src_pathbuf = shaders_pathbuf.clone();
     src_pathbuf.push("src");
 
-    let mut out_pathbuf = shaders_pathbuf.clone();
-    out_pathbuf.push("spv");
+    let mut dist_pathbuf = shaders_pathbuf.clone();
+    dist_pathbuf.push("dist");
 
     let shader_direntries = fs::read_dir(src_pathbuf).expect("Failed to read shaders src folder!");
     let shaders = shader_direntries
@@ -59,7 +59,7 @@ fn compile_shaders() {
             "cargo:rerun-if-changed={}",
             shader.path().into_os_string().into_string().unwrap()
         );
-        &compile_shader(&shader, out_pathbuf.clone());
+        &compile_shader(&shader, dist_pathbuf.clone());
     }
 
     println!("Shader compilation successful.")
