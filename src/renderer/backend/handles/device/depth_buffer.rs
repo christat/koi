@@ -6,7 +6,7 @@ use vk_mem;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::handles::{
-    device::DeviceAllocatorDrop, InstanceHandle, PhysicalDeviceHandle, SwapchainHandle,
+    device::DeviceAllocatorCleanup, InstanceHandle, PhysicalDeviceHandle, SwapchainHandle,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -116,8 +116,8 @@ impl DepthBufferHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceAllocatorDrop for DepthBufferHandle {
-    fn drop(&mut self, device: &Device, allocator: &vk_mem::Allocator) {
+impl DeviceAllocatorCleanup for DepthBufferHandle {
+    fn cleanup(&mut self, device: &Device, allocator: &vk_mem::Allocator) {
         unsafe {
             device.destroy_image_view(self.image_view, None);
             allocator

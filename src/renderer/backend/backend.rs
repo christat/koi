@@ -5,6 +5,7 @@ use crate::renderer::backend::{
     handles::{DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle},
     BackendConfig, DebugUtilsManager,
 };
+use crate::utils::traits::Cleanup;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct RendererBackend {
@@ -24,7 +25,7 @@ impl RendererBackend {
     pub fn init(app_name: &str, window: &WinitWindow) -> Self {
         info!("----- RendererBackend::init -----");
 
-        let (instance_handle, config) = InstanceHandle::init(app_name);
+        let (instance_handle, mut config) = InstanceHandle::init(app_name);
 
         #[cfg(debug_assertions)]
         let debug_utils_manager = DebugUtilsManager::init(&instance_handle);
@@ -32,7 +33,7 @@ impl RendererBackend {
         let surface_handle = SurfaceHandle::init(&instance_handle, window);
 
         let physical_device_handle =
-            PhysicalDeviceHandle::init(&instance_handle, &surface_handle, &config);
+            PhysicalDeviceHandle::init(&instance_handle, &surface_handle, &mut config);
 
         let device_handle = DeviceHandle::init(
             &instance_handle,
@@ -55,5 +56,15 @@ impl RendererBackend {
         }
     }
     //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl Drop for RendererBackend {
+    fn drop(&mut self) {
+        self.device_handle.cleanup();
+        self.surface_handle.cleanup();
+        self.debug_utils_manager.cleanup();
+        self.instance_handle.cleanup();
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------

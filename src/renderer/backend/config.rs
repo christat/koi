@@ -14,7 +14,7 @@ use crate::{renderer::backend::platform, utils::ffi};
 pub struct BackendConfig {
     pub instance_extensions: Vec<ffi::CString>,
     pub device_extensions: Vec<ffi::CString>,
-    pub buffer_count: u32,
+    pub buffering: u32,
 
     #[cfg(debug_assertions)]
     pub validation_layers: Vec<ffi::CString>,
@@ -30,7 +30,7 @@ impl BackendConfig {
 
         let device_extensions = vec![ffi::cstr_to_cstring(Swapchain::name())];
 
-        let buffer_count: u32 = 2;
+        let buffering: u32 = 3; // triple buffering by default (if supported; checked on instance creation)
 
         #[cfg(debug_assertions)]
         {
@@ -43,10 +43,14 @@ impl BackendConfig {
             let instance_debug_extensions = vec![ffi::cstr_to_cstring(DebugUtils::name())];
             instance_extensions.extend_from_slice(&instance_debug_extensions);
 
+            if !Self::check_instance_extension_support(entry, &instance_extensions) {
+                panic!("BackendConfig::init - requested instance extensions not supported!");
+            }
+
             Self {
                 instance_extensions,
                 device_extensions,
-                buffer_count,
+                buffering,
 
                 validation_layers,
                 instance_debug_extensions,
@@ -54,12 +58,44 @@ impl BackendConfig {
         }
         #[cfg(not(debug_assertions))]
         {
+            if !Self::check_instance_extension_support(entry, &instance_extensions) {
+                panic!("BackendConfig::init - requested instance extensions not supported!");
+            }
+
             Self {
                 instance_extensions,
                 device_extensions,
                 buffering,
             }
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn set_buffering(&mut self, buffering: u32) {
+        self.buffering = buffering;
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    fn check_instance_extension_support(
+        entry: &Entry,
+        requested_instance_extensions: &[ffi::CString],
+    ) -> bool {
+        let instance_extensions =
+            entry.enumerate_instance_extension_properties()
+                .expect("BackendConfig::check_instance_extension_support - Failed to enumerate instance extension properties!");
+
+        let supported_extension_names = instance_extensions
+            .iter()
+            .map(|ie| ffi::char_array_to_cstring(ie.extension_name))
+            .collect::<Vec<ffi::CString>>();
+
+        for requested_extension in requested_instance_extensions.iter() {
+            if !supported_extension_names.contains(requested_extension) {
+                return false;
+            }
+        }
+
+        true
     }
     //------------------------------------------------------------------------------------------------------------------
 

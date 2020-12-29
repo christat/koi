@@ -15,8 +15,18 @@ use crate::{
         },
         BackendConfig,
     },
-    utils::ffi,
+    utils::{ffi, traits::Cleanup},
 };
+//----------------------------------------------------------------------------------------------------------------------
+
+pub(super) trait DeviceCleanup {
+    fn cleanup(&mut self, device: &Device);
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub(super) trait DeviceAllocatorCleanup {
+    fn cleanup(&mut self, device: &Device, allocator: &vk_mem::Allocator);
+}
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct QueueHandle {
@@ -106,28 +116,20 @@ impl DeviceHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Drop for DeviceHandle {
-    fn drop(&mut self) {
+impl Cleanup for DeviceHandle {
+    fn cleanup(&mut self) {
         unsafe {
-            self.framebuffer_handle.drop(&self.device);
-            self.render_pass_handle.drop(&self.device);
-            self.swapchain_handle.drop(&self.device);
-            self.semaphore_handle.drop(&self.device);
+            self.framebuffer_handle.cleanup(&self.device);
+            self.render_pass_handle.cleanup(&self.device);
+            self.depth_buffer_handle
+                .cleanup(&self.device, &self.allocator);
+            self.swapchain_handle.cleanup(&self.device);
+            self.semaphore_handle.cleanup(&self.device);
             self.allocator.destroy();
-            self.command_buffer_handle.drop(&self.device);
+            self.command_buffer_handle.cleanup(&self.device);
             self.device.destroy_device(None);
         }
     }
-}
-//----------------------------------------------------------------------------------------------------------------------
-
-pub(super) trait DeviceDrop {
-    fn drop(&mut self, device: &Device);
-}
-//----------------------------------------------------------------------------------------------------------------------
-
-pub(super) trait DeviceAllocatorDrop {
-    fn drop(&mut self, device: &Device, allocator: &vk_mem::Allocator);
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -160,6 +162,7 @@ fn init_device_and_queue_handle(
 
     #[cfg(debug_assertions)]
     {
+        // NB! Logical device-specific layers deprecated in 1.2.155 - keep for compat for now.
         let enabled_validation_layers = ffi::vec_cstring_to_char_ptr(&config.validation_layers);
         device_create_info = device_create_info.enabled_layer_names(&enabled_validation_layers);
         get_device_and_queue_handle(instance, physical_device_handle, &device_create_info)
@@ -214,7 +217,7 @@ fn init_allocator(
         instance: instance_handle.instance.to_owned(),
         flags: vk_mem::AllocatorCreateFlags::NONE,
         preferred_large_heap_block_size: 0,
-        frame_in_use_count: config.buffer_count,
+        frame_in_use_count: config.buffering,
         heap_size_limits: None,
     };
 

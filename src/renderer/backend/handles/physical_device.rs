@@ -6,7 +6,7 @@ use crate::{
         handles::{InstanceHandle, SurfaceHandle},
         BackendConfig,
     },
-    utils::ffi,
+    utils::{ffi, math},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ impl PhysicalDeviceHandle {
     pub fn init(
         instance_handle: &InstanceHandle,
         surface_handle: &SurfaceHandle,
-        config: &BackendConfig,
+        config: &mut BackendConfig,
     ) -> Self {
         let InstanceHandle { instance, .. } = instance_handle;
 
@@ -49,6 +49,12 @@ impl PhysicalDeviceHandle {
 
         for (physical_device, physical_device_attributes) in physical_devices_attributes.into_iter()
         {
+            if physical_device_attributes.properties.device_type
+                != vk::PhysicalDeviceType::DISCRETE_GPU
+            {
+                continue;
+            }
+
             if !physical_device_attributes.check_physical_device_extension_support(config) {
                 continue;
             }
@@ -86,6 +92,7 @@ impl PhysicalDeviceHandle {
                 .iter()
                 .enumerate()
             {
+                // TODO add score or "preference" to family instead of xor graphics
                 if queue_family_properties.queue_count == 0
                     || queue_index as i32 == graphics_queue_index
                 {
@@ -109,6 +116,16 @@ impl PhysicalDeviceHandle {
             }
 
             if graphics_queue_index >= 0 && present_queue_index >= 0 {
+                config.set_buffering(math::clamp(
+                    config.buffering,
+                    physical_device_attributes
+                        .surface_capabilities
+                        .min_image_count,
+                    physical_device_attributes
+                        .surface_capabilities
+                        .max_image_count,
+                ));
+
                 return Self {
                     physical_device,
                     physical_device_attributes,

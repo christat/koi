@@ -13,18 +13,17 @@ pub mod renderer;
 pub mod utils;
 //-----------------------------------------------------------------------------
 
+use renderer::Renderer;
+//-----------------------------------------------------------------------------
+
 fn main() {
     utils::Logger::init().unwrap();
     info!("----- Logger::init -----");
 
-    let app_name = "Vullkan MVP";
+    let app_name = "Vulkan MVP";
+    let mut window = app::window::Window::init(app_name, 800, 600);
+    let mut renderer = Renderer::init(app_name, &window);
 
-    let mut window = app::Window::init(app_name, 800, 600);
-
-    let _renderer_backend = renderer::RendererBackend::init(app_name, window.get_window_handle());
-
-    window
-        .run_loop()
-        .expect("Main - window threw an error while running loop!");
+    renderer.run(&mut window);
 }
 //-----------------------------------------------------------------------------

@@ -3,7 +3,7 @@ use ash::{extensions::khr::Swapchain, version::DeviceV1_0, vk, Device};
 
 use crate::renderer::backend::{
     handles::{
-        device::DeviceDrop, InstanceHandle, PhysicalDeviceAttributes, PhysicalDeviceHandle,
+        device::DeviceCleanup, InstanceHandle, PhysicalDeviceAttributes, PhysicalDeviceHandle,
         SurfaceHandle,
     },
     BackendConfig,
@@ -16,6 +16,7 @@ pub struct SwapchainHandle {
     pub surface_extent: vk::Extent2D,
     pub surface_format: vk::SurfaceFormatKHR,
     pub present_mode: vk::PresentModeKHR,
+    pub swapchain_images: Vec<vk::Image>,
     pub swapchain_image_views: Vec<vk::ImageView>,
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ impl SwapchainHandle {
 
         let mut create_info = vk::SwapchainCreateInfoKHR::builder()
             .surface(surface_handle.surface_khr)
-            .min_image_count(config.buffer_count)
+            .min_image_count(config.buffering)
             .image_format(surface_format.format)
             .image_color_space(surface_format.color_space)
             .image_extent(surface_extent)
@@ -62,6 +63,7 @@ impl SwapchainHandle {
             present_queue_index.to_owned(),
         ];
 
+        // NB! Different indices forced in physical_device::init atm; would be better to add "preference" selection there.
         if graphics_queue_index != present_queue_index {
             create_info = create_info
                 .image_sharing_mode(vk::SharingMode::CONCURRENT)
@@ -84,10 +86,10 @@ impl SwapchainHandle {
         };
 
         let swapchain_image_views = swapchain_images
-            .into_iter()
+            .iter()
             .map(|image| {
                 let create_info = vk::ImageViewCreateInfo::builder()
-                    .image(image)
+                    .image(*image)
                     .view_type(vk::ImageViewType::TYPE_2D)
                     .format(surface_format.format)
                     .components(vk::ComponentMapping {
@@ -119,14 +121,15 @@ impl SwapchainHandle {
             surface_extent,
             surface_format,
             present_mode,
+            swapchain_images,
             swapchain_image_views,
         }
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceDrop for SwapchainHandle {
-    fn drop(&mut self, device: &Device) {
+impl DeviceCleanup for SwapchainHandle {
+    fn cleanup(&mut self, device: &Device) {
         unsafe {
             self.swapchain_image_views
                 .iter()
@@ -149,7 +152,7 @@ fn select_surface_format(
     };
 
     for surface_format in surface_formats.iter() {
-        if surface_format.format == vk::Format::B8G8R8A8_UNORM
+        if surface_format.format == vk::Format::B8G8R8A8_SRGB
             && surface_format.color_space == vk::ColorSpaceKHR::SRGB_NONLINEAR
         {
             return surface_format.to_owned();
@@ -165,12 +168,16 @@ fn select_present_mode(
 ) -> vk::PresentModeKHR {
     let PhysicalDeviceAttributes { present_modes, .. } = physical_device_attributes;
 
-    for present_mode in present_modes.iter() {
-        if *present_mode == vk::PresentModeKHR::MAILBOX {
-            return present_mode.to_owned();
+    // Force to FIFO_RELAXED in dev to cap framerate; otherwise run triple buffering without hard VSync.
+    #[cfg(not(debug_assertions))]
+    {
+        for present_mode in present_modes.iter() {
+            if *present_mode == vk::PresentModeKHR::MAILBOX {
+                return present_mode.to_owned();
+            }
         }
     }
 
-    vk::PresentModeKHR::FIFO
+    vk::PresentModeKHR::FIFO_RELAXED
 }
 //----------------------------------------------------------------------------------------------------------------------

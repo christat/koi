@@ -1,7 +1,7 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::device::DeviceDrop;
+use crate::renderer::backend::handles::device::DeviceCleanup;
 use crate::renderer::backend::BackendConfig;
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ impl SemaphoreHandle {
 
         let create_info = vk::SemaphoreCreateInfo::default();
 
-        for _ in (0..config.buffer_count).into_iter() {
+        for _ in (0..config.buffering).into_iter() {
             unsafe {
                 acquire_image_semaphores.push(
                     device.create_semaphore(&create_info, None).expect(
@@ -43,8 +43,8 @@ impl SemaphoreHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceDrop for SemaphoreHandle {
-    fn drop(&mut self, device: &Device) {
+impl DeviceCleanup for SemaphoreHandle {
+    fn cleanup(&mut self, device: &Device) {
         unsafe {
             self.acquire_image_semaphores
                 .iter()

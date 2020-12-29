@@ -14,7 +14,7 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" ENABLED="true" />
     </configurations>
   </component>
   <component name="CargoProjects">
@@ -22,10 +22,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="mvp render loop">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/shaders/src/hardcoded.frag" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/shaders/src/hardcoded.vert" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/math.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/traits.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/build.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/mod.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/window.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/debug_utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/debug_utils.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/command_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/depth_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/framebuffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/render_pass.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/semaphore.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/swapchain.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/instance.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/instance.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/physical_device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/physical_device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/surface.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/mod.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +75,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -66,45 +87,49 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chris\CLionProjects\koi\src\app" />
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer" />
       <recent name="C:\Users\chris\CLionProjects\koi" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\handles\device" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\handles" />
-      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend" />
-      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\config" />
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package koi --bin koi" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs>
         <env name="LOG_LEVEL" value="debug" />
       </envs>
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
     <configuration name="Release" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package koi --bin koi --release" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs>
         <env name="LOG_LEVEL" value="error" />
       </envs>
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -153,7 +178,15 @@
       <workItem from="1601488344535" duration="413000" />
       <workItem from="1601488780444" duration="2159000" />
       <workItem from="1601564790768" duration="1784000" />
-      <workItem from="1601570456356" duration="2179000" />
+      <workItem from="1601570456356" duration="3538000" />
+      <workItem from="1601577634555" duration="636000" />
+      <workItem from="1601662554316" duration="634000" />
+      <workItem from="1601708131452" duration="4269000" />
+      <workItem from="1601718129699" duration="68000" />
+      <workItem from="1601801832166" duration="672000" />
+      <workItem from="1609245226275" duration="17000" />
+      <workItem from="1609245388926" duration="14000" />
+      <workItem from="1609245517929" duration="8319000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -209,7 +242,13 @@
       <option name="presentableId" value="LOCAL−00009" />
       <updated>1601571683292</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL−00010" summary="mvp render loop">
+      <created>1601572692919</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1601572692919</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,6 +256,16 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.frag" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -234,85 +283,5 @@
     <MESSAGE value="Initial commit" />
     <MESSAGE value="mvp render loop" />
     <option name="LAST_COMMIT_MESSAGE" value="mvp render loop" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="1375" y="355" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601564854226">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1375" y="355" key="#com.intellij.execution.impl.EditConfigurationsDialog/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601564854226" />
-    <state x="1021" y="318" key="#com.intellij.ide.util.MemberChooser" timestamp="1601325529480">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="766" y="236" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1601114233227" />
-    <state x="1021" y="318" key="#com.intellij.ide.util.MemberChooser/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601325529480" />
-    <state x="1702" y="445" key="FileChooserDialogImpl" timestamp="1600592561734">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1702" y="445" key="FileChooserDialogImpl/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600592561734" />
-    <state x="1800" y="601" key="Github.ShareDialog" timestamp="1600592632785">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1800" y="601" key="Github.ShareDialog/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600592632785" />
-    <state width="1234" height="580" key="GridCell.Tab.0.bottom" timestamp="1601572626526">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1878" height="247" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085840" />
-    <state width="1234" height="580" key="GridCell.Tab.0.bottom/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572626526" />
-    <state width="1234" height="580" key="GridCell.Tab.0.center" timestamp="1601572626526">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1878" height="247" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085839" />
-    <state width="1234" height="580" key="GridCell.Tab.0.center/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572626526" />
-    <state width="1234" height="580" key="GridCell.Tab.0.left" timestamp="1601572626526">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1878" height="247" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085839" />
-    <state width="1234" height="580" key="GridCell.Tab.0.left/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572626526" />
-    <state width="1234" height="580" key="GridCell.Tab.0.right" timestamp="1601572626526">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1878" height="247" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601121085840" />
-    <state width="1234" height="580" key="GridCell.Tab.0.right/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572626526" />
-    <state width="1878" height="348" key="GridCell.Tab.1.bottom" timestamp="1601116281235">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1878" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
-    <state width="2517" height="492" key="GridCell.Tab.1.bottom/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
-    <state width="1878" height="348" key="GridCell.Tab.1.center" timestamp="1601116281235">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1878" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
-    <state width="2517" height="492" key="GridCell.Tab.1.center/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
-    <state width="1878" height="348" key="GridCell.Tab.1.left" timestamp="1601116281235">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1878" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
-    <state width="2517" height="492" key="GridCell.Tab.1.left/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
-    <state width="1878" height="348" key="GridCell.Tab.1.right" timestamp="1601116281235">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1878" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601116281235" />
-    <state width="2517" height="492" key="GridCell.Tab.1.right/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600809599218" />
-    <state x="1422" y="345" key="SettingsEditor" timestamp="1601572045354">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1422" y="345" key="SettingsEditor/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572045354" />
-    <state x="1513" y="436" key="Vcs.Push.Dialog.v2" timestamp="1601572072198">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1513" y="436" key="Vcs.Push.Dialog.v2/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601572072198" />
-    <state x="1664" y="436" width="587" height="592" key="find.popup" timestamp="1601397077232">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1248" y="324" width="549" height="534" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1601113554985" />
-    <state x="1664" y="436" width="587" height="592" key="find.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601397077232" />
-    <state x="1577" y="334" key="run.anything.popup" timestamp="1600375091295">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1577" y="334" key="run.anything.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1600375091295" />
-    <state x="1583" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1601404635368">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1583" y="319" width="672" height="678" key="search.everywhere.popup/3840.0.1920.1050/0.0.2560.1400@0.0.2560.1400" timestamp="1601404635368" />
   </component>
 </project>

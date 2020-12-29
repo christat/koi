@@ -1,5 +1,5 @@
 extern crate winit;
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 use std::error::Error;
 //----------------------------------------------------------------------------------------------------------------------
@@ -39,25 +39,8 @@ impl Window {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn run_loop(&mut self) -> Result<(), Box<dyn Error>> {
-        self.event_loop
-            .run_return(|event, _, control_flow| match event {
-                Event::WindowEvent { event, .. } => match event {
-                    WindowEvent::Resized(resolution) => {
-                        let (width, height): (u32, u32) = resolution.into();
-                        if width == 0 || height == 0 {
-                            *control_flow = ControlFlow::Wait;
-                        } else {
-                            *control_flow = ControlFlow::Poll;
-                        }
-                    }
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                    _ => *control_flow = ControlFlow::Poll,
-                },
-                _ => *control_flow = ControlFlow::Poll,
-            });
-
-        Ok(())
+    pub fn get_event_loop_handle(&mut self) -> &mut EventLoop<()> {
+        &mut self.event_loop
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

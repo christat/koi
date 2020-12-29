@@ -1,6 +1,7 @@
 use ash::{extensions::ext::DebugUtils, vk};
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::utils::traits::Cleanup;
 use crate::{renderer::backend::handles::InstanceHandle, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +49,8 @@ impl DebugUtilsManager {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Drop for DebugUtilsManager {
-    fn drop(&mut self) {
+impl Cleanup for DebugUtilsManager {
+    fn cleanup(&mut self) {
         unsafe {
             self.debug_utils
                 .destroy_debug_utils_messenger(self.debug_utils_messenger_ext, None);
@@ -73,13 +74,13 @@ unsafe extern "system" fn pfn_user_callback(
     };
 
     let msg = format!(
-        "[VULKAN][{}] - {}",
+        "[{}] - {}",
         msg_type,
         ffi::char_ptr_to_str_ref((*p_callback_data).p_message)
     );
 
     match message_severity {
-        vk::DebugUtilsMessageSeverityFlagsEXT::VERBOSE => debug!("{}", msg),
+        // vk::DebugUtilsMessageSeverityFlagsEXT::VERBOSE => debug!("{}", msg),
         // vk::DebugUtilsMessageSeverityFlagsEXT::INFO => info!("{}", msg),
         vk::DebugUtilsMessageSeverityFlagsEXT::WARNING => warn!("{}", msg),
         vk::DebugUtilsMessageSeverityFlagsEXT::ERROR => error!("{}", msg),

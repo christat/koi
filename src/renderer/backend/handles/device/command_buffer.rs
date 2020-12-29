@@ -2,7 +2,7 @@ use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::{
-    handles::{device::DeviceDrop, PhysicalDeviceHandle},
+    handles::{device::DeviceCleanup, PhysicalDeviceHandle},
     BackendConfig,
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ impl CommandBufferHandle {
             ))
         };
 
-        let command_buffer_count = config.buffer_count;
+        let command_buffer_count = config.buffering;
 
         let command_buffer_allocate_info = vk::CommandBufferAllocateInfo::builder()
             .level(vk::CommandBufferLevel::PRIMARY)
@@ -76,8 +76,8 @@ impl CommandBufferHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceDrop for CommandBufferHandle {
-    fn drop(&mut self, device: &Device) {
+impl DeviceCleanup for CommandBufferHandle {
+    fn cleanup(&mut self, device: &Device) {
         unsafe {
             self.command_buffer_fences
                 .iter()

@@ -1,5 +1,7 @@
 pub mod ffi;
 mod logger;
+pub mod math;
+pub(crate) mod traits;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub use logger::Logger;

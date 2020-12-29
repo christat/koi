@@ -1,7 +1,9 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::{device::DeviceDrop, DepthBufferHandle, SwapchainHandle};
+use crate::renderer::backend::handles::{
+    device::DeviceCleanup, DepthBufferHandle, SwapchainHandle,
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct RenderPassHandle {
@@ -70,8 +72,8 @@ impl RenderPassHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceDrop for RenderPassHandle {
-    fn drop(&mut self, device: &Device) {
+impl DeviceCleanup for RenderPassHandle {
+    fn cleanup(&mut self, device: &Device) {
         unsafe {
             device.destroy_render_pass(self.render_pass, None);
         }

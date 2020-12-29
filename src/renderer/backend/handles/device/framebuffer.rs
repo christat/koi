@@ -2,9 +2,8 @@ use ash::{version::DeviceV1_0, vk, Device};
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{
-    handles::{device::DeviceDrop, DepthBufferHandle, RenderPassHandle, SwapchainHandle},
-    BackendConfig,
+use crate::renderer::backend::handles::{
+    device::DeviceCleanup, DepthBufferHandle, RenderPassHandle, SwapchainHandle,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -52,8 +51,8 @@ impl FramebufferHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceDrop for FramebufferHandle {
-    fn drop(&mut self, device: &Device) {
+impl DeviceCleanup for FramebufferHandle {
+    fn cleanup(&mut self, device: &Device) {
         unsafe {
             self.framebuffers
                 .iter()
