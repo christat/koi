@@ -256,10 +256,10 @@ impl DeviceHandle {
                 .expect("RendererBackend::DeviceHandle::draw - Failed to begin command buffer!")
         };
 
-        let flash = f32::abs(f32::sin(frame_index as f32 / f32::to_radians(120.0)));
+        let flash = f32::abs(f32::sin(frame_index as f32 / f32::to_radians(900.0)));
         let clear_values = [vk::ClearValue {
             color: vk::ClearColorValue {
-                float32: [0.0, flash, 0.0, 1.0],
+                float32: [flash, flash, flash, 1.0],
             },
         }];
 
