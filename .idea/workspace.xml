@@ -21,33 +21,8 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="fixed drop logic (implicit trait does not seem to execute as desired)">
-      <change afterPath="$PROJECT_DIR$/src/core/app.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/fence.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/shader.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add render pass setting clearColor; slight refactor to extract structs from mod.rs files">
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/build.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/window.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/command_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/framebuffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/render_pass.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/semaphore.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/swapchain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/physical_device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/physical_device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/ffi.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ffi.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/traits.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/traits.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +164,7 @@
       <workItem from="1609245226275" duration="17000" />
       <workItem from="1609245388926" duration="14000" />
       <workItem from="1609245517929" duration="23280000" />
-      <workItem from="1609325985762" duration="8938000" />
+      <workItem from="1609325985762" duration="9057000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -257,7 +232,13 @@
       <option name="presentableId" value="LOCAL−00011" />
       <updated>1609254397324</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL−00012" summary="add render pass setting clearColor; slight refactor to extract structs from mod.rs files">
+      <created>1609338148844</created>
+      <option name="number" value="LOCAL−00012" />
+      <option name="presentableId" value="LOCAL−00012" />
+      <updated>1609338148844</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -292,6 +273,7 @@
     <MESSAGE value="Initial commit" />
     <MESSAGE value="mvp render loop" />
     <MESSAGE value="fixed drop logic (implicit trait does not seem to execute as desired)" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed drop logic (implicit trait does not seem to execute as desired)" />
+    <MESSAGE value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
+    <option name="LAST_COMMIT_MESSAGE" value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
   </component>
 </project>
