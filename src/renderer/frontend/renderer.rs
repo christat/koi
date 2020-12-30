@@ -1,19 +1,11 @@
-use std::error::Error;
-//----------------------------------------------------------------------------------------------------------------------
-
-use winit::{
-    event::{Event, WindowEvent},
-    event_loop::ControlFlow,
-    platform::desktop::EventLoopExtDesktop,
-};
-//----------------------------------------------------------------------------------------------------------------------
-
-use crate::core::window::Window;
+use crate::core::Window;
 use crate::renderer::RendererBackend;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Renderer {
     backend: RendererBackend,
+
+    pipelines_initialized: bool,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -23,11 +15,18 @@ impl Renderer {
 
         let backend = RendererBackend::init(app_name, window.get_window_handle());
 
-        Self { backend }
+        Self {
+            backend,
+            pipelines_initialized: false,
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn run(&mut self) {
+        if !self.pipelines_initialized {
+            self.backend.init_pipelines();
+            self.pipelines_initialized = true;
+        }
         self.backend.draw();
     }
     //------------------------------------------------------------------------------------------------------------------

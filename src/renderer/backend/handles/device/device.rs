@@ -1,3 +1,6 @@
+use std::path::Path;
+//----------------------------------------------------------------------------------------------------------------------
+
 use ash::{
     extensions::khr::Swapchain,
     version::{DeviceV1_0, InstanceV1_0},
@@ -10,6 +13,7 @@ use winit::window::Window as WinitWindow;
 use crate::{
     renderer::backend::{
         handles::{
+            device::resources::{pipeline_layout, PipelineResource, ShaderResource},
             CommandBufferHandle, DepthBufferHandle, FenceHandle, FramebufferHandle, InstanceHandle,
             PhysicalDeviceHandle, RenderPassHandle, SemaphoreHandle, SurfaceHandle,
             SwapchainHandle,
@@ -37,16 +41,19 @@ pub struct QueueHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct DeviceHandle {
-    pub device: Device,
-    pub queue_handle: QueueHandle,
-    pub fence_handle: FenceHandle,
-    pub semaphore_handle: SemaphoreHandle,
-    pub command_buffer_handle: CommandBufferHandle,
-    pub allocator: Allocator,
-    pub swapchain_handle: SwapchainHandle,
-    pub depth_buffer_handle: DepthBufferHandle,
-    pub render_pass_handle: RenderPassHandle,
-    pub framebuffer_handle: FramebufferHandle,
+    device: Device,
+    queue_handle: QueueHandle,
+    fence_handle: FenceHandle,
+    semaphore_handle: SemaphoreHandle,
+    command_buffer_handle: CommandBufferHandle,
+    allocator: Allocator,
+    swapchain_handle: SwapchainHandle,
+    depth_buffer_handle: DepthBufferHandle,
+    render_pass_handle: RenderPassHandle,
+    framebuffer_handle: FramebufferHandle,
+
+    pipeline: Option<vk::Pipeline>,
+    pipeline_layout: Option<vk::PipelineLayout>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -114,7 +121,86 @@ impl DeviceHandle {
             depth_buffer_handle,
             render_pass_handle,
             framebuffer_handle,
+
+            pipeline: None,
+            pipeline_layout: None,
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn init_pipelines(&mut self) {
+        let device = &self.device;
+
+        let vert_shader = ShaderResource::create(
+            device,
+            Path::new("resources/shaders/dist/hardcoded.vert.spv"),
+        );
+        let frag_shader = ShaderResource::create(
+            device,
+            Path::new("resources/shaders/dist/hardcoded.frag.spv"),
+        );
+
+        let pipeline_layout_info = pipeline_layout();
+
+        let pipeline_layout = unsafe {
+            device
+                .create_pipeline_layout(&pipeline_layout_info, None)
+                .expect("RendererBackend::init_pipelines - Failed to create pipeline layout!")
+        };
+
+        let shader_entry_point = ffi::CString::new("main").unwrap();
+        let viewport_extent = self.swapchain_handle.surface_extent;
+        let viewport_width = viewport_extent.width as f32;
+        let viewport_height = viewport_extent.height as f32;
+
+        let pipeline_resource = PipelineResource::builder()
+            .shader_stage(
+                vert_shader.shader,
+                vk::ShaderStageFlags::VERTEX,
+                &shader_entry_point,
+            )
+            .shader_stage(
+                frag_shader.shader,
+                vk::ShaderStageFlags::FRAGMENT,
+                &shader_entry_point,
+            )
+            .vertex_input_state()
+            .input_assembly_state(vk::PrimitiveTopology::TRIANGLE_LIST)
+            .viewport(
+                vk::Viewport::builder()
+                    .x(0.0)
+                    .y(0.0)
+                    .width(viewport_width)
+                    .height(viewport_height)
+                    .min_depth(0.0)
+                    .max_depth(1.0)
+                    .build(),
+            )
+            .scissor(
+                vk::Rect2D::builder()
+                    .offset(vk::Offset2D::default())
+                    .extent(viewport_extent)
+                    .build(),
+            )
+            .rasterization_state(vk::PolygonMode::FILL)
+            .multisampling_state()
+            .color_blend_attachment_state()
+            .pipeline_layout(pipeline_layout);
+
+        let triangle_pipeline =
+            pipeline_resource.build_pipeline(&self.device, self.render_pass_handle.render_pass);
+
+        let pipeline = match triangle_pipeline {
+            Ok(pipeline) => pipeline,
+            Err(_) => panic!("Failed to generate triangle pipeline!"),
+        };
+
+        self.pipeline = Some(pipeline);
+        self.pipeline_layout = Some(pipeline_layout);
+        // unsafe {
+        //     device.destroy_shader_module(vert_shader.shader, None);
+        //     device.destroy_shader_module(frag_shader.shader, None);
+        // }
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -200,6 +286,13 @@ impl DeviceHandle {
                 &render_pass_begin_info,
                 vk::SubpassContents::INLINE,
             );
+
+            device.cmd_bind_pipeline(
+                command_buffer,
+                vk::PipelineBindPoint::GRAPHICS,
+                self.pipeline.unwrap(),
+            );
+            device.cmd_draw(command_buffer, 3, 1, 0, 0);
 
             device.cmd_end_render_pass(command_buffer);
             device

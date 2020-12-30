@@ -61,6 +61,10 @@ impl RendererBackend {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn init_pipelines(&mut self) {
+        self.device_handle.init_pipelines();
+    }
+
     pub fn draw(&mut self) {
         self.device_handle.draw(self.frame_index);
         self.frame_index += 1;

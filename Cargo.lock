@@ -411,6 +411,7 @@ name = "koi"
 version = "0.1.0"
 dependencies = [
  "ash",
+ "byteorder",
  "chrono",
  "env_logger",
  "gilrs",

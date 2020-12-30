@@ -21,8 +21,16 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add render pass setting clearColor; slight refactor to extract structs from mod.rs files">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="removed spirv-builder for now">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/pipeline.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/shader.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +172,7 @@
       <workItem from="1609245226275" duration="17000" />
       <workItem from="1609245388926" duration="14000" />
       <workItem from="1609245517929" duration="23280000" />
-      <workItem from="1609325985762" duration="9057000" />
+      <workItem from="1609325985762" duration="22295000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -238,7 +246,13 @@
       <option name="presentableId" value="LOCAL−00012" />
       <updated>1609338148844</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL−00013" summary="removed spirv-builder for now">
+      <created>1609338191896</created>
+      <option name="number" value="LOCAL−00013" />
+      <option name="presentableId" value="LOCAL−00013" />
+      <updated>1609338191896</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +288,7 @@
     <MESSAGE value="mvp render loop" />
     <MESSAGE value="fixed drop logic (implicit trait does not seem to execute as desired)" />
     <MESSAGE value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
-    <option name="LAST_COMMIT_MESSAGE" value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
+    <MESSAGE value="removed spirv-builder for now" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed spirv-builder for now" />
   </component>
 </project>
