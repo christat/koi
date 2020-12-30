@@ -13,7 +13,7 @@ impl Renderer {
     pub fn init(app_name: &str, window: &Window) -> Self {
         info!("----- Renderer::init -----");
 
-        let backend = RendererBackend::init(app_name, window.get_window_handle());
+        let backend = RendererBackend::init(app_name, &window.window_handle);
 
         Self {
             backend,
@@ -28,6 +28,11 @@ impl Renderer {
             self.pipelines_initialized = true;
         }
         self.backend.draw();
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn await_device_idle(&mut self) {
+        self.backend.await_device_idle();
     }
     //------------------------------------------------------------------------------------------------------------------
 }

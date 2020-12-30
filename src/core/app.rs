@@ -1,9 +1,11 @@
 use std::error::Error;
 //----------------------------------------------------------------------------------------------------------------------
 
-use winit::event::{Event, WindowEvent};
-use winit::event_loop::ControlFlow;
-use winit::platform::desktop::EventLoopExtDesktop;
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::ControlFlow,
+    platform::desktop::EventLoopExtDesktop,
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{core::window::Window, renderer::Renderer};
@@ -28,21 +30,28 @@ impl App {
     pub fn run(&mut self) -> Result<(), Box<dyn Error>> {
         info!("----- App::run -----");
 
-        let window = &mut self.window;
+        let Window {
+            window_handle,
+            event_loop_handle,
+        } = &mut self.window;
+
         let renderer = &mut self.renderer;
 
-        window
-            .get_event_loop_handle()
-            .run_return(|event, _, control_flow| {
-                match event {
-                    Event::WindowEvent { event, .. } => match event {
-                        WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                        _ => *control_flow = ControlFlow::Poll,
-                    },
+        event_loop_handle.run_return(|event, _, control_flow| {
+            match event {
+                Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::CloseRequested => {
+                        renderer.await_device_idle();
+                        *control_flow = ControlFlow::Exit;
+                    }
                     _ => *control_flow = ControlFlow::Poll,
-                }
-                renderer.run();
-            });
+                },
+                Event::MainEventsCleared => window_handle.request_redraw(),
+                Event::RedrawRequested(_window_id) => renderer.run(),
+                Event::LoopDestroyed => renderer.await_device_idle(),
+                _ => *control_flow = ControlFlow::Poll,
+            };
+        });
 
         Ok(())
     }

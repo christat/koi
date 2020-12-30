@@ -9,8 +9,8 @@ use winit::{
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Window {
-    event_loop: EventLoop<()>,
-    window: WinitWindow,
+    pub event_loop_handle: EventLoop<()>,
+    pub window_handle: WinitWindow,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -18,24 +18,18 @@ impl Window {
     pub fn init(title: &str, width: usize, height: usize) -> Self {
         info!("----- Window::init -----");
 
-        let event_loop = EventLoop::new();
-        let window = WindowBuilder::new()
+        let event_loop_handle = EventLoop::new();
+        let window_handle = WindowBuilder::new()
             .with_inner_size(LogicalSize::new(width as f64, height as f64))
             .with_title(title)
-            .build(&event_loop)
+            .build(&event_loop_handle)
             .expect("Window::init - Failed to build window!");
 
-        Self { event_loop, window }
+        Self {
+            event_loop_handle,
+            window_handle,
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
-
-    pub fn get_window_handle(&self) -> &WinitWindow {
-        &self.window
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn get_event_loop_handle(&mut self) -> &mut EventLoop<()> {
-        &mut self.event_loop
-    }
 }
 //----------------------------------------------------------------------------------------------------------------------

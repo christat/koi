@@ -336,6 +336,15 @@ impl DeviceHandle {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn await_idle(&mut self) {
+        unsafe {
+            self.device
+                .device_wait_idle()
+                .expect("RendererBackend::DeviceHandle::await_idle - Failed to wait for device to become idle!");
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     fn get_device(&self) -> &Device {
         &self.device
     }
