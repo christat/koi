@@ -1,8 +1,5 @@
-extern crate ash;
-//----------------------------------------------------------------------------------------------------------------------
-
 use backend::*;
-pub use frontend::Renderer;
+pub use frontend::renderer::Renderer;
 
 mod backend;
 mod frontend;

@@ -18,6 +18,8 @@ pub struct RendererBackend {
     surface_handle: SurfaceHandle,
     physical_device_handle: PhysicalDeviceHandle,
     device_handle: DeviceHandle,
+
+    frame_index: u32,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +55,15 @@ impl RendererBackend {
             surface_handle,
             physical_device_handle,
             device_handle,
+
+            frame_index: 0,
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn draw(&mut self) {
+        self.device_handle.draw(self.frame_index);
+        self.frame_index += 1;
     }
     //------------------------------------------------------------------------------------------------------------------
 }

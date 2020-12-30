@@ -1,18 +1,16 @@
-extern crate ash;
+use ash::vk::ShaderModule;
 //----------------------------------------------------------------------------------------------------------------------
 
-mod backend;
-mod config;
-mod handles;
-mod platform;
-
-#[cfg(debug_assertions)]
-mod debug_utils;
+struct ShaderResource {
+    pub shader: ShaderModule,
+}
 //----------------------------------------------------------------------------------------------------------------------
 
-pub use backend::*;
-pub use config::*;
-
-#[cfg(debug_assertions)]
-pub use debug_utils::*;
+impl ShaderResource {
+    pub fn init(file_path: &str) -> Self {
+        Self {
+            shader: ShaderModule::null(),
+        }
+    }
+}
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 use ash::{
+    extensions::khr::Swapchain,
     version::{DeviceV1_0, InstanceV1_0},
     vk, Device, Instance,
 };
@@ -9,7 +10,7 @@ use winit::window::Window as WinitWindow;
 use crate::{
     renderer::backend::{
         handles::{
-            CommandBufferHandle, DepthBufferHandle, FramebufferHandle, InstanceHandle,
+            CommandBufferHandle, DepthBufferHandle, FenceHandle, FramebufferHandle, InstanceHandle,
             PhysicalDeviceHandle, RenderPassHandle, SemaphoreHandle, SurfaceHandle,
             SwapchainHandle,
         },
@@ -38,6 +39,7 @@ pub struct QueueHandle {
 pub struct DeviceHandle {
     pub device: Device,
     pub queue_handle: QueueHandle,
+    pub fence_handle: FenceHandle,
     pub semaphore_handle: SemaphoreHandle,
     pub command_buffer_handle: CommandBufferHandle,
     pub allocator: Allocator,
@@ -59,6 +61,7 @@ impl DeviceHandle {
         let (device, queue_handle) =
             init_device_and_queue_handle(instance_handle, physical_device_handle, config);
 
+        let fence_handle = FenceHandle::init(&device);
         let semaphore_handle = SemaphoreHandle::init(&device, config);
 
         let command_buffer_handle =
@@ -103,6 +106,7 @@ impl DeviceHandle {
         Self {
             device,
             queue_handle,
+            fence_handle,
             semaphore_handle,
             command_buffer_handle,
             allocator,
@@ -111,6 +115,156 @@ impl DeviceHandle {
             render_pass_handle,
             framebuffer_handle,
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn draw(&mut self, frame_index: u32) {
+        let device = self.get_device();
+        let render_fences = self.get_render_fences();
+
+        unsafe {
+            // wait for the GPU to finish rendering last frame. Timeout of 1s - fences need to be explicitly rest after use.
+            device
+                .wait_for_fences(&render_fences, true, 1000000000)
+                .expect("RendererBackend::DeviceHandle::draw - Failed to wait for fences!");
+            device
+                .reset_fences(&render_fences)
+                .expect("RendererBackend::DeviceHandle::draw - Failed to reset fences!");
+        };
+
+        let swapchain = self.get_swapchain();
+
+        // Request image from swapchain. Timeout of 1s.
+        let (swapchain_image_index, _is_suboptimal) = unsafe {
+            swapchain
+                .acquire_next_image(
+                    self.swapchain_handle.swapchain_khr,
+                    1000000000,
+                    self.semaphore_handle.present_semaphore,
+                    vk::Fence::null(),
+                )
+                .expect(
+                    "RendererBackend::DeviceHandle::draw - failed to acquire next swapchain image!",
+                )
+        };
+
+        // Cmd buffer should only be cleared once it is safe (i.e. GPU is done with it)
+        let command_buffer = *self
+            .command_buffer_handle
+            .command_buffers
+            .first()
+            .expect("RendererBackend::DeviceHandle::draw - No command buffers allocated!");
+
+        unsafe {
+            device
+                .reset_command_buffer(command_buffer, vk::CommandBufferResetFlags::empty())
+                .expect("RendererBackend::DeviceHandle::draw - Failed to reset command buffer!");
+        };
+
+        let begin_info = vk::CommandBufferBeginInfo::builder()
+            .flags(vk::CommandBufferUsageFlags::ONE_TIME_SUBMIT);
+
+        unsafe {
+            device
+                .begin_command_buffer(command_buffer, &begin_info)
+                .expect("RendererBackend::DeviceHandle::draw - Failed to begin command buffer!")
+        };
+
+        let flash = f32::abs(f32::sin(frame_index as f32 / f32::to_radians(120.0)));
+        let clear_values = [vk::ClearValue {
+            color: vk::ClearColorValue {
+                float32: [0.0, flash, 0.0, 1.0],
+            },
+        }];
+
+        let render_pass_begin_info = vk::RenderPassBeginInfo::builder()
+            .render_pass(self.render_pass_handle.render_pass)
+            .render_area(
+                vk::Rect2D::builder()
+                    .offset(vk::Offset2D::builder().x(0).y(0).build())
+                    .extent(self.swapchain_handle.surface_extent)
+                    .build(),
+            )
+            .framebuffer(
+                *self
+                    .framebuffer_handle
+                    .framebuffers
+                    .get(swapchain_image_index as usize)
+                    .expect("RendererBackend::DeviceHandle::draw - Failed to retrieve framebuffer by swapchain index!"),
+            )
+            .clear_values(&clear_values);
+
+        unsafe {
+            device.cmd_begin_render_pass(
+                command_buffer,
+                &render_pass_begin_info,
+                vk::SubpassContents::INLINE,
+            );
+
+            device.cmd_end_render_pass(command_buffer);
+            device
+                .end_command_buffer(command_buffer)
+                .expect("RendererBackend::DeviceHandle::draw - Failed to end command buffer!");
+        }
+
+        let wait_dst_stage_mask = [vk::PipelineStageFlags::COLOR_ATTACHMENT_OUTPUT];
+        let present_semaphores = self.get_present_semaphores();
+        let render_semaphores = self.get_render_semaphores();
+
+        let submits = [vk::SubmitInfo::builder()
+            .wait_dst_stage_mask(&wait_dst_stage_mask)
+            .wait_semaphores(&present_semaphores)
+            .signal_semaphores(&render_semaphores)
+            .command_buffers(&[command_buffer])
+            .build()];
+
+        unsafe {
+            device
+                .queue_submit(
+                    self.queue_handle.graphics_queue,
+                    &submits,
+                    self.fence_handle.render_fence,
+                )
+                .expect("RendererBackend::DeviceHandle::draw - Failed to submit to queue!")
+        }
+
+        let swapchains = [self.swapchain_handle.swapchain_khr];
+        let image_indices = [swapchain_image_index];
+        let present_info = vk::PresentInfoKHR::builder()
+            .swapchains(&swapchains)
+            .wait_semaphores(&render_semaphores)
+            .image_indices(&image_indices);
+
+        unsafe {
+            swapchain
+                .queue_present(self.queue_handle.graphics_queue, &present_info)
+                .expect("RendererBackend::DeviceHandle::draw - Failed to present swapchain image!");
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    fn get_device(&self) -> &Device {
+        &self.device
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_render_fences(&self) -> [vk::Fence; 1] {
+        [self.fence_handle.render_fence]
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_present_semaphores(&self) -> [vk::Semaphore; 1] {
+        [self.semaphore_handle.present_semaphore]
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_render_semaphores(&self) -> [vk::Semaphore; 1] {
+        [self.semaphore_handle.render_semaphore]
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_swapchain(&self) -> &Swapchain {
+        &self.swapchain_handle.swapchain
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -125,6 +279,7 @@ impl Cleanup for DeviceHandle {
                 .cleanup(&self.device, &self.allocator);
             self.swapchain_handle.cleanup(&self.device);
             self.semaphore_handle.cleanup(&self.device);
+            self.fence_handle.cleanup(&self.device);
             self.allocator.destroy();
             self.command_buffer_handle.cleanup(&self.device);
             self.device.destroy_device(None);

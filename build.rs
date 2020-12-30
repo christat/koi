@@ -2,7 +2,7 @@ use std::fs::DirEntry;
 use std::{env, fs, path::PathBuf, process::Command};
 //-----------------------------------------------------------------------------
 
-fn compile_shader(file: &DirEntry, mut out_pathbuf: PathBuf) {
+fn compile_glsl_shader(file: &DirEntry, mut out_pathbuf: PathBuf) {
     // get filename
     let file_name = file.file_name().into_string().unwrap();
 
@@ -36,7 +36,7 @@ fn compile_shader(file: &DirEntry, mut out_pathbuf: PathBuf) {
 //-----------------------------------------------------------------------------
 
 fn compile_shaders() {
-    println!("Compiling shaders...");
+    println!("build - Compiling shaders...");
 
     let shaders_pathbuf: PathBuf = [env!("CARGO_MANIFEST_DIR"), "resources", "shaders"]
         .iter()
@@ -48,21 +48,17 @@ fn compile_shaders() {
     let mut dist_pathbuf = shaders_pathbuf.clone();
     dist_pathbuf.push("dist");
 
-    let shader_direntries = fs::read_dir(src_pathbuf).expect("Failed to read shaders src folder!");
-    let shaders = shader_direntries
+    let shader_entries = fs::read_dir(src_pathbuf).expect("Failed to read shaders src folder!");
+    let shaders = shader_entries
         .into_iter()
         .map(|entry| entry.unwrap())
         .collect::<Vec<DirEntry>>();
 
     for shader in shaders {
-        println!(
-            "cargo:rerun-if-changed={}",
-            shader.path().into_os_string().into_string().unwrap()
-        );
-        &compile_shader(&shader, dist_pathbuf.clone());
+        compile_glsl_shader(&shader, dist_pathbuf.clone());
     }
 
-    println!("Shader compilation successful.")
+    println!("build - Shader compilation successful.")
 }
 //-----------------------------------------------------------------------------
 

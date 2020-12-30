@@ -8,22 +8,20 @@
 extern crate log;
 //-----------------------------------------------------------------------------
 
-pub mod app;
+pub mod core;
 pub mod renderer;
 pub mod utils;
 //-----------------------------------------------------------------------------
 
-use renderer::Renderer;
+use crate::core::app::App;
 //-----------------------------------------------------------------------------
 
 fn main() {
-    utils::Logger::init().unwrap();
     info!("----- Logger::init -----");
+    utils::Logger::init().unwrap();
 
-    let app_name = "Vulkan MVP";
-    let mut window = app::window::Window::init(app_name, 800, 600);
-    let mut renderer = Renderer::init(app_name, &window);
-
-    renderer.run(&mut window);
+    App::init("Vulkan MVP")
+        .run()
+        .expect("main - App::run threw an error!");
 }
 //-----------------------------------------------------------------------------

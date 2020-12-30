@@ -166,11 +166,11 @@ fn select_surface_format(
 fn select_present_mode(
     physical_device_attributes: &PhysicalDeviceAttributes,
 ) -> vk::PresentModeKHR {
-    let PhysicalDeviceAttributes { present_modes, .. } = physical_device_attributes;
-
     // Force to FIFO_RELAXED in dev to cap framerate; otherwise run triple buffering without hard VSync.
     #[cfg(not(debug_assertions))]
     {
+        let PhysicalDeviceAttributes { present_modes, .. } = physical_device_attributes;
+
         for present_mode in present_modes.iter() {
             if *present_mode == vk::PresentModeKHR::MAILBOX {
                 return present_mode.to_owned();

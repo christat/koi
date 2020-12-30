@@ -77,6 +77,20 @@ impl PhysicalDeviceHandle {
                     continue;
                 }
 
+                let surface_supported = unsafe {
+                    surface
+                        .get_physical_device_surface_support(
+                            physical_device,
+                            queue_index as u32,
+                            *surface_khr,
+                        )
+                        .expect("PhysicalDeviceHandle::init - Failed to get physical device surface support!")
+                };
+
+                if !surface_supported {
+                    continue;
+                }
+
                 if queue_family_properties
                     .queue_flags
                     .contains(vk::QueueFlags::GRAPHICS)

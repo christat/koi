@@ -12,6 +12,7 @@ chrono = "0.4.15"
 env_logger = "0.7.1"
 gilrs = "0.7.2"
 log = "0.4.0"
+spirv-builder = "0.1.0"
 vk-mem = "0.2.2"
 winit = "0.22.2"
 

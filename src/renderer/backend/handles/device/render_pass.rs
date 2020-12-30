@@ -17,12 +17,12 @@ impl RenderPassHandle {
         depth_buffer_handle: &DepthBufferHandle,
         device: &Device,
     ) -> Self {
-        let attachments: [vk::AttachmentDescription; 2] = [
+        let attachments: [vk::AttachmentDescription; 1] = [
             // color attachment
             vk::AttachmentDescription::builder()
                 .format(swapchain_handle.surface_format.format)
                 .samples(vk::SampleCountFlags::TYPE_1)
-                .load_op(vk::AttachmentLoadOp::DONT_CARE)
+                .load_op(vk::AttachmentLoadOp::CLEAR)
                 .store_op(vk::AttachmentStoreOp::STORE)
                 .stencil_load_op(vk::AttachmentLoadOp::DONT_CARE)
                 .stencil_store_op(vk::AttachmentStoreOp::DONT_CARE)
@@ -30,16 +30,16 @@ impl RenderPassHandle {
                 .final_layout(vk::ImageLayout::PRESENT_SRC_KHR)
                 .build(),
             // depth attachment
-            vk::AttachmentDescription::builder()
-                .format(depth_buffer_handle.format)
-                .samples(vk::SampleCountFlags::TYPE_1)
-                .load_op(vk::AttachmentLoadOp::DONT_CARE)
-                .store_op(vk::AttachmentStoreOp::STORE)
-                .stencil_load_op(vk::AttachmentLoadOp::DONT_CARE)
-                .stencil_store_op(vk::AttachmentStoreOp::DONT_CARE)
-                .initial_layout(vk::ImageLayout::UNDEFINED)
-                .final_layout(vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
-                .build(),
+            // vk::AttachmentDescription::builder()
+            //     .format(depth_buffer_handle.format)
+            //     .samples(vk::SampleCountFlags::TYPE_1)
+            //     .load_op(vk::AttachmentLoadOp::DONT_CARE)
+            //     .store_op(vk::AttachmentStoreOp::STORE)
+            //     .stencil_load_op(vk::AttachmentLoadOp::DONT_CARE)
+            //     .stencil_store_op(vk::AttachmentStoreOp::DONT_CARE)
+            //     .initial_layout(vk::ImageLayout::UNDEFINED)
+            //     .final_layout(vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+            //     .build(),
         ];
 
         let color_attachments = [vk::AttachmentReference::builder()
@@ -47,14 +47,14 @@ impl RenderPassHandle {
             .layout(vk::ImageLayout::COLOR_ATTACHMENT_OPTIMAL)
             .build()];
 
-        let depth_stencil_attachment = vk::AttachmentReference::builder()
-            .attachment(1)
-            .layout(vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+        // let depth_stencil_attachment = vk::AttachmentReference::builder()
+        //     .attachment(1)
+        //     .layout(vk::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
         let subpasses = [vk::SubpassDescription::builder()
             .pipeline_bind_point(vk::PipelineBindPoint::GRAPHICS)
             .color_attachments(&color_attachments)
-            .depth_stencil_attachment(&depth_stencil_attachment)
+            //.depth_stencil_attachment(&depth_stencil_attachment)
             .build()];
 
         let create_info = vk::RenderPassCreateInfo::builder()

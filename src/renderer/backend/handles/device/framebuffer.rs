@@ -26,9 +26,9 @@ impl FramebufferHandle {
             .swapchain_image_views
             .iter()
             .map(|image_view| {
-                let attachments: [vk::ImageView; 2] = [
+                let attachments: [vk::ImageView; 1] = [
                     image_view.to_owned(),
-                    depth_buffer_handle.image_view.to_owned(),
+                    // depth_buffer_handle.image_view.to_owned(),
                 ];
 
                 let create_info = vk::FramebufferCreateInfo::builder()

@@ -30,7 +30,7 @@ impl BackendConfig {
 
         let device_extensions = vec![ffi::cstr_to_cstring(Swapchain::name())];
 
-        let buffering: u32 = 3; // triple buffering by default (if supported; checked on instance creation)
+        let buffering: u32 = 1;
 
         #[cfg(debug_assertions)]
         {

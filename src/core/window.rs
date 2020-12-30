@@ -1,14 +1,9 @@
 extern crate winit;
 //----------------------------------------------------------------------------------------------------------------------
 
-use std::error::Error;
-//----------------------------------------------------------------------------------------------------------------------
-
 use winit::{
     dpi::LogicalSize,
-    event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
-    platform::desktop::EventLoopExtDesktop,
+    event_loop::EventLoop,
     window::{Window as WinitWindow, WindowBuilder},
 };
 //----------------------------------------------------------------------------------------------------------------------
