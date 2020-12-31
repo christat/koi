@@ -1,7 +1,7 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::{
+use crate::renderer::backend::vk::handles::{
     device::DeviceCleanup, DepthBufferHandle, SwapchainHandle,
 };
 //----------------------------------------------------------------------------------------------------------------------

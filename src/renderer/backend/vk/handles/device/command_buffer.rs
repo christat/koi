@@ -1,9 +1,9 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{
+use crate::renderer::backend::vk::{
     handles::{device::DeviceCleanup, PhysicalDeviceHandle},
-    BackendConfig,
+    VkBackendConfig,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ impl CommandBufferHandle {
     pub fn init(
         physical_device_handle: &PhysicalDeviceHandle,
         device: &Device,
-        config: &BackendConfig,
+        config: &VkBackendConfig,
     ) -> Self {
         let PhysicalDeviceHandle {
             physical_device_attributes,

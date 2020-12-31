@@ -5,7 +5,7 @@ use ash::{
 use vk_mem;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::{
+use crate::renderer::backend::vk::handles::{
     device::DeviceAllocatorCleanup, InstanceHandle, PhysicalDeviceHandle, SwapchainHandle,
 };
 //----------------------------------------------------------------------------------------------------------------------

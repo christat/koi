@@ -1,7 +1,7 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{handles::device::DeviceCleanup, BackendConfig};
+use crate::renderer::backend::vk::{handles::device::DeviceCleanup, VkBackendConfig};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct SemaphoreHandle {
@@ -11,7 +11,7 @@ pub struct SemaphoreHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl SemaphoreHandle {
-    pub fn init(device: &Device, config: &BackendConfig) -> Self {
+    pub fn init(device: &Device, config: &VkBackendConfig) -> Self {
         let create_info = vk::SemaphoreCreateInfo::default();
 
         unsafe {

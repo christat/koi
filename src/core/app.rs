@@ -8,12 +8,13 @@ use winit::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::{core::window::Window, renderer::Renderer};
+use crate::renderer::{Renderer, VkBackend};
+use crate::{core::window::Window, renderer::init_vk};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct App {
     window: Window,
-    renderer: Renderer,
+    renderer: Renderer<VkBackend>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ impl App {
     pub fn init(name: &str) -> Self {
         info!("----- App::init -----");
         let window = Window::init(name, 800, 600);
-        let renderer = Renderer::init(name, &window);
+        let renderer = init_vk(name, &window);
 
         Self { window, renderer }
     }

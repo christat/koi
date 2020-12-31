@@ -11,7 +11,7 @@ extern crate byteorder;
 use byteorder::{ByteOrder, LittleEndian};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::device::DeviceCleanup;
+use crate::renderer::backend::vk::handles::device::DeviceCleanup;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct ShaderResource {
@@ -39,7 +39,7 @@ impl DeviceCleanup for ShaderResource {
 
 fn read_shader(file_path: &Path) -> Vec<u32> {
     let shader_file = File::open(file_path).expect(&format!(
-        "RendererBackend::ShaderResource - Failed to read shader: {}",
+        "VkBackend::ShaderResource - Failed to read shader: {}",
         file_path.display()
     ));
 
@@ -67,11 +67,11 @@ fn create_shader_module(device: &Device, file_path: &Path) -> ShaderModule {
     let shader_module = unsafe {
         device
             .create_shader_module(&create_info, None)
-            .expect("RendererBackend::ShaderResource - Failed to create shader module!")
+            .expect("VkBackend::ShaderResource - Failed to create shader module!")
     };
 
     info!(
-        "RendererBackend::ShaderResource - Successfully loaded shader {}",
+        "VkBackend::ShaderResource - Successfully loaded shader {}",
         file_path.to_str().unwrap()
     );
 

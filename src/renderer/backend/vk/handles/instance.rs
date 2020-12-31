@@ -5,7 +5,10 @@ use ash::{
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::utils::traits::Cleanup;
-use crate::{renderer::backend::BackendConfig, utils::ffi};
+use crate::{
+    renderer::backend::vk::{DebugUtilsManager, VkBackendConfig},
+    utils::ffi,
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct InstanceHandle {
@@ -15,9 +18,9 @@ pub struct InstanceHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl InstanceHandle {
-    pub fn init(app_name: &str) -> (Self, BackendConfig) {
+    pub fn init(app_name: &str) -> (Self, VkBackendConfig) {
         let entry = Entry::new().expect("InstanceHandle::init - Failed to instantiate library!");
-        let config = BackendConfig::init(&entry);
+        let config = VkBackendConfig::init(&entry);
         let instance = create_configured_instance(&entry, app_name, &config);
         (Self { entry, instance }, config)
     }
@@ -33,7 +36,7 @@ impl Cleanup for InstanceHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-fn create_configured_instance(entry: &Entry, app_name: &str, config: &BackendConfig) -> Instance {
+fn create_configured_instance(entry: &Entry, app_name: &str, config: &VkBackendConfig) -> Instance {
     let application_name = ffi::CString::new(app_name).unwrap();
     let engine_name = ffi::CString::new("Koi").unwrap();
 
@@ -54,7 +57,7 @@ fn create_configured_instance(entry: &Entry, app_name: &str, config: &BackendCon
     {
         let enabled_layer_names = ffi::vec_cstring_to_char_ptr(&config.validation_layers);
 
-        use crate::renderer::backend::DebugUtilsManager;
+        use crate::renderer::backend::vk::DebugUtilsManager;
         let mut debug_messenger_create_info = DebugUtilsManager::get_debug_messenger_create_info();
 
         create_info = create_info
@@ -74,7 +77,7 @@ fn create_instance(entry: &Entry, create_info: vk::InstanceCreateInfoBuilder) ->
     unsafe {
         entry
             .create_instance(&create_info, None)
-            .expect("RendererBackend::create_instance - Failed to create Vulkan instance!")
+            .expect("VkBackend::create_instance - Failed to create Vulkan instance!")
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

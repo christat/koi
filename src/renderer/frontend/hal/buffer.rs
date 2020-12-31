@@ -1,4 +1,4 @@
-pub(super) mod entities;
-pub(super) mod hal;
-pub(super) mod renderer;
+pub trait Buffer {
+    fn allocate() -> Self;
+}
 //----------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@ use ash::{version::DeviceV1_0, vk, Device};
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::{
+use crate::renderer::backend::vk::handles::{
     device::DeviceCleanup, DepthBufferHandle, RenderPassHandle, SwapchainHandle,
 };
 //----------------------------------------------------------------------------------------------------------------------

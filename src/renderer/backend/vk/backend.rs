@@ -1,15 +1,16 @@
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{
+use crate::renderer::backend::vk::{
     handles::{DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle},
-    BackendConfig, DebugUtilsManager,
+    DebugUtilsManager, VkBackendConfig,
 };
+use crate::renderer::frontend::hal::RendererBackend;
 use crate::utils::traits::Cleanup;
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct RendererBackend {
-    config: BackendConfig,
+pub struct VkBackend {
+    config: VkBackendConfig,
     instance_handle: InstanceHandle,
 
     #[cfg(debug_assertions)]
@@ -20,12 +21,13 @@ pub struct RendererBackend {
     device_handle: DeviceHandle,
 
     frame_index: u32,
+    pipelines_initialized: bool,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl RendererBackend {
+impl VkBackend {
     pub fn init(app_name: &str, window: &WinitWindow) -> Self {
-        info!("----- RendererBackend::init -----");
+        info!("----- VkBackend::init -----");
 
         let (instance_handle, mut config) = InstanceHandle::init(app_name);
 
@@ -57,34 +59,14 @@ impl RendererBackend {
             device_handle,
 
             frame_index: 0,
+            pipelines_initialized: false,
         }
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn init_pipelines(&mut self) {
-        self.device_handle.init_pipelines();
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn swap_pipelines(&mut self) {
-        self.device_handle.swap_pipelines();
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn draw(&mut self) {
-        self.device_handle.draw(self.frame_index);
-        self.frame_index += 1;
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn await_device_idle(&mut self) {
-        self.device_handle.await_idle();
     }
     //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Drop for RendererBackend {
+impl Drop for VkBackend {
     fn drop(&mut self) {
         self.device_handle.cleanup();
         self.surface_handle.cleanup();
@@ -93,3 +75,27 @@ impl Drop for RendererBackend {
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
+
+impl RendererBackend for VkBackend {
+    fn draw(&mut self) {
+        if !self.pipelines_initialized {
+            self.device_handle.init_pipelines();
+            self.pipelines_initialized = true;
+        }
+
+        self.device_handle.draw(self.frame_index);
+        self.frame_index += 1;
+    }
+
+    fn await_device_idle(&mut self) {
+        self.device_handle.await_idle();
+    }
+
+    fn swap_pipelines(&mut self) {
+        self.device_handle.swap_pipelines();
+    }
+
+    fn load_mesh(&mut self) {
+        unimplemented!()
+    }
+}

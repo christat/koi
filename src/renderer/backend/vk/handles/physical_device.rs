@@ -2,9 +2,9 @@ use ash::{version::InstanceV1_0, vk, Instance};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
-    renderer::backend::{
+    renderer::backend::vk::{
         handles::{InstanceHandle, SurfaceHandle},
-        BackendConfig,
+        VkBackendConfig,
     },
     utils::{ffi, math},
 };
@@ -22,7 +22,7 @@ impl PhysicalDeviceHandle {
     pub fn init(
         instance_handle: &InstanceHandle,
         surface_handle: &SurfaceHandle,
-        config: &mut BackendConfig,
+        config: &mut VkBackendConfig,
     ) -> Self {
         let InstanceHandle { instance, .. } = instance_handle;
 
@@ -187,17 +187,17 @@ impl PhysicalDeviceAttributes {
             let extensions_properties =
                 instance
                     .enumerate_device_extension_properties(physical_device)
-                    .expect(&format!("RendererBackend::enumerate_physical_devices - Failed to query device {} extension properties!", name));
+                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} extension properties!", name));
 
             let surface_capabilities =
                 surface.get_physical_device_surface_capabilities(physical_device, *surface_khr)
-                    .expect(&format!("RendererBackend::enumerate_physical_devices - Failed to query device {} surface capabilities!", name));
+                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} surface capabilities!", name));
 
             let surface_formats =
-                surface.get_physical_device_surface_formats(physical_device, *surface_khr).expect(&format!("RendererBackend::enumerate_physical_devices - Failed to query device {} surface formats!", name));
+                surface.get_physical_device_surface_formats(physical_device, *surface_khr).expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} surface formats!", name));
 
             let present_modes =
-                surface.get_physical_device_surface_present_modes(physical_device, *surface_khr).expect(&format!("RendererBackend::enumerate_physical_devices - Failed to query device {} present modes!", name));
+                surface.get_physical_device_surface_present_modes(physical_device, *surface_khr).expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} present modes!", name));
 
             Self {
                 name: String::from(name),
@@ -214,7 +214,7 @@ impl PhysicalDeviceAttributes {
     }
     //----------------------------------------------------------------------------------------------
 
-    pub fn check_physical_device_extension_support(&self, config: &BackendConfig) -> bool {
+    pub fn check_physical_device_extension_support(&self, config: &VkBackendConfig) -> bool {
         let supported_device_extensions = self
             .extensions_properties
             .iter()

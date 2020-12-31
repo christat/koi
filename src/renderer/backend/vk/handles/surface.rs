@@ -2,7 +2,7 @@ use ash::{extensions::khr::Surface, vk};
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{handles::InstanceHandle, platform};
+use crate::renderer::backend::vk::{handles::InstanceHandle, platform};
 use crate::utils::traits::Cleanup;
 //----------------------------------------------------------------------------------------------------------------------
 

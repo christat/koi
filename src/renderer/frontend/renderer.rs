@@ -1,32 +1,20 @@
 use crate::core::Window;
-use crate::renderer::RendererBackend;
+use crate::renderer::{backend::vk::VkBackend, frontend::hal::RendererBackend};
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct Renderer {
-    backend: RendererBackend,
-
-    pipelines_initialized: bool,
+pub struct Renderer<T: RendererBackend> {
+    backend: T,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Renderer {
-    pub fn init(app_name: &str, window: &Window) -> Self {
+impl<T: RendererBackend> Renderer<T> {
+    pub fn init(backend: T) -> Self {
         info!("----- Renderer::init -----");
-
-        let backend = RendererBackend::init(app_name, &window.window_handle);
-
-        Self {
-            backend,
-            pipelines_initialized: false,
-        }
+        Self { backend }
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn run(&mut self) {
-        if !self.pipelines_initialized {
-            self.backend.init_pipelines();
-            self.pipelines_initialized = true;
-        }
         self.backend.draw();
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -38,6 +26,11 @@ impl Renderer {
 
     pub fn swap_pipelines(&mut self) {
         self.backend.swap_pipelines();
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn load_mesh(&mut self) {
+        self.backend.load_mesh();
     }
     //------------------------------------------------------------------------------------------------------------------
 }

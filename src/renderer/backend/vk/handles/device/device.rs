@@ -11,14 +11,14 @@ use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
-    renderer::backend::{
+    renderer::backend::vk::{
         handles::{
             device::resources::{pipeline_layout, PipelineResource, ShaderResource},
             CommandBufferHandle, DepthBufferHandle, FenceHandle, FramebufferHandle, InstanceHandle,
             PhysicalDeviceHandle, RenderPassHandle, SemaphoreHandle, SurfaceHandle,
             SwapchainHandle,
         },
-        BackendConfig,
+        VkBackendConfig,
     },
     utils::{ffi, traits::Cleanup},
 };
@@ -64,7 +64,7 @@ impl DeviceHandle {
         instance_handle: &InstanceHandle,
         surface_handle: &SurfaceHandle,
         physical_device_handle: &PhysicalDeviceHandle,
-        config: &BackendConfig,
+        config: &VkBackendConfig,
         window: &WinitWindow,
     ) -> Self {
         let (device, queue_handle) =
@@ -154,7 +154,7 @@ impl DeviceHandle {
         let pipeline_layout = unsafe {
             device
                 .create_pipeline_layout(&pipeline_layout_info, None)
-                .expect("RendererBackend::init_pipelines - Failed to create pipeline layout!")
+                .expect("VkBackend::init_pipelines - Failed to create pipeline layout!")
         };
 
         let shader_entry_point = ffi::CString::new("main").unwrap();
@@ -249,10 +249,10 @@ impl DeviceHandle {
             // wait for the GPU to finish rendering last frame. Timeout of 1s - fences need to be explicitly rest after use.
             device
                 .wait_for_fences(&render_fences, true, 1000000000)
-                .expect("RendererBackend::DeviceHandle::draw - Failed to wait for fences!");
+                .expect("VkBackend::DeviceHandle::draw - Failed to wait for fences!");
             device
                 .reset_fences(&render_fences)
-                .expect("RendererBackend::DeviceHandle::draw - Failed to reset fences!");
+                .expect("VkBackend::DeviceHandle::draw - Failed to reset fences!");
         };
 
         let swapchain = self.get_swapchain();
@@ -266,9 +266,7 @@ impl DeviceHandle {
                     self.semaphore_handle.present_semaphore,
                     vk::Fence::null(),
                 )
-                .expect(
-                    "RendererBackend::DeviceHandle::draw - failed to acquire next swapchain image!",
-                )
+                .expect("VkBackend::DeviceHandle::draw - failed to acquire next swapchain image!")
         };
 
         // Cmd buffer should only be cleared once it is safe (i.e. GPU is done with it)
@@ -276,12 +274,12 @@ impl DeviceHandle {
             .command_buffer_handle
             .command_buffers
             .first()
-            .expect("RendererBackend::DeviceHandle::draw - No command buffers allocated!");
+            .expect("VkBackend::DeviceHandle::draw - No command buffers allocated!");
 
         unsafe {
             device
                 .reset_command_buffer(command_buffer, vk::CommandBufferResetFlags::empty())
-                .expect("RendererBackend::DeviceHandle::draw - Failed to reset command buffer!");
+                .expect("VkBackend::DeviceHandle::draw - Failed to reset command buffer!");
         };
 
         let begin_info = vk::CommandBufferBeginInfo::builder()
@@ -290,7 +288,7 @@ impl DeviceHandle {
         unsafe {
             device
                 .begin_command_buffer(command_buffer, &begin_info)
-                .expect("RendererBackend::DeviceHandle::draw - Failed to begin command buffer!")
+                .expect("VkBackend::DeviceHandle::draw - Failed to begin command buffer!")
         };
 
         let flash = f32::abs(f32::sin(frame_index as f32 / f32::to_radians(900.0)));
@@ -313,7 +311,7 @@ impl DeviceHandle {
                     .framebuffer_handle
                     .framebuffers
                     .get(swapchain_image_index as usize)
-                    .expect("RendererBackend::DeviceHandle::draw - Failed to retrieve framebuffer by swapchain index!"),
+                    .expect("VkBackend::DeviceHandle::draw - Failed to retrieve framebuffer by swapchain index!"),
             )
             .clear_values(&clear_values);
 
@@ -338,7 +336,7 @@ impl DeviceHandle {
             device.cmd_end_render_pass(command_buffer);
             device
                 .end_command_buffer(command_buffer)
-                .expect("RendererBackend::DeviceHandle::draw - Failed to end command buffer!");
+                .expect("VkBackend::DeviceHandle::draw - Failed to end command buffer!");
         }
 
         let wait_dst_stage_mask = [vk::PipelineStageFlags::COLOR_ATTACHMENT_OUTPUT];
@@ -359,7 +357,7 @@ impl DeviceHandle {
                     &submits,
                     self.fence_handle.render_fence,
                 )
-                .expect("RendererBackend::DeviceHandle::draw - Failed to submit to queue!")
+                .expect("VkBackend::DeviceHandle::draw - Failed to submit to queue!")
         }
 
         let swapchains = [self.swapchain_handle.swapchain_khr];
@@ -372,16 +370,16 @@ impl DeviceHandle {
         unsafe {
             swapchain
                 .queue_present(self.queue_handle.graphics_queue, &present_info)
-                .expect("RendererBackend::DeviceHandle::draw - Failed to present swapchain image!");
+                .expect("VkBackend::DeviceHandle::draw - Failed to present swapchain image!");
         }
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn await_idle(&mut self) {
         unsafe {
-            self.device
-                .device_wait_idle()
-                .expect("RendererBackend::DeviceHandle::await_idle - Failed to wait for device to become idle!");
+            self.device.device_wait_idle().expect(
+                "VkBackend::DeviceHandle::await_idle - Failed to wait for device to become idle!",
+            );
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -438,7 +436,7 @@ impl Cleanup for DeviceHandle {
 fn init_device_and_queue_handle(
     instance_handle: &InstanceHandle,
     physical_device_handle: &PhysicalDeviceHandle,
-    config: &BackendConfig,
+    config: &VkBackendConfig,
 ) -> (Device, QueueHandle) {
     let InstanceHandle { instance, .. } = instance_handle;
 
@@ -511,7 +509,7 @@ fn init_allocator(
     instance_handle: &InstanceHandle,
     physical_device_handle: &PhysicalDeviceHandle,
     device: &Device,
-    config: &BackendConfig,
+    config: &VkBackendConfig,
 ) -> Allocator {
     let allocator_create_info = vk_mem::AllocatorCreateInfo {
         physical_device: physical_device_handle.physical_device.to_owned(),

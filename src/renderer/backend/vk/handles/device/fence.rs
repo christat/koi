@@ -5,7 +5,7 @@ use ash::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::handles::device::DeviceCleanup;
+use crate::renderer::backend::vk::handles::device::DeviceCleanup;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct FenceHandle {

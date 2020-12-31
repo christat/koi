@@ -1,12 +1,12 @@
 use ash::{extensions::khr::Swapchain, version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::{
+use crate::renderer::backend::vk::{
     handles::{
         device::DeviceCleanup, InstanceHandle, PhysicalDeviceAttributes, PhysicalDeviceHandle,
         SurfaceHandle,
     },
-    BackendConfig,
+    VkBackendConfig,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ impl SwapchainHandle {
         surface_handle: &SurfaceHandle,
         physical_device_handle: &PhysicalDeviceHandle,
         device: &Device,
-        config: &BackendConfig,
+        config: &VkBackendConfig,
     ) -> Self {
         let PhysicalDeviceHandle {
             physical_device_attributes,

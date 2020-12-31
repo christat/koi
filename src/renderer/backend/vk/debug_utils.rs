@@ -2,7 +2,7 @@ use ash::{extensions::ext::DebugUtils, vk};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::utils::traits::Cleanup;
-use crate::{renderer::backend::handles::InstanceHandle, utils::ffi};
+use crate::{renderer::backend::vk::handles::InstanceHandle, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct DebugUtilsManager {

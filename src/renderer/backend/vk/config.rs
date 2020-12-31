@@ -8,10 +8,10 @@ use ash::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::{renderer::backend::platform, utils::ffi};
+use crate::{renderer::backend::vk::platform, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct BackendConfig {
+pub struct VkBackendConfig {
     pub instance_extensions: Vec<ffi::CString>,
     pub device_extensions: Vec<ffi::CString>,
     pub buffering: u32,
@@ -23,7 +23,7 @@ pub struct BackendConfig {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl BackendConfig {
+impl VkBackendConfig {
     pub fn init(entry: &Entry) -> Self {
         let mut instance_extensions = vec![ffi::cstr_to_cstring(Surface::name())];
         instance_extensions.extend_from_slice(&platform::get_platform_instance_extensions());

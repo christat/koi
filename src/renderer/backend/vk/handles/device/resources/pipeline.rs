@@ -192,7 +192,7 @@ impl PipelineResource {
         match pipeline {
             Ok(pipelines) => Ok(pipelines
                 .first()
-                .expect("RendererBackend::PipelineResource - Failed to extract created pipeline!")
+                .expect("VkBackend::PipelineResource - Failed to extract created pipeline!")
                 .to_owned()),
             Err(_) => Err(PipelineBuildError),
         }
