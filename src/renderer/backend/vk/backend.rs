@@ -5,7 +5,7 @@ use crate::renderer::backend::vk::{
     handles::{DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle},
     DebugUtilsManager, VkBackendConfig,
 };
-use crate::renderer::frontend::hal::RendererBackend;
+use crate::renderer::hal::RendererBackend;
 use crate::utils::traits::Cleanup;
 //----------------------------------------------------------------------------------------------------------------------
 

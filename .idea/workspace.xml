@@ -21,43 +21,15 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add dummy second pipeline and swap logic">
-      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/buffer.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/entities/mod.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/hal/backend.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/hal/buffer.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/hal/init.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/renderer/frontend/hal/mod.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="refactor for front/back renderer split">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/app.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/app.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/debug_utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/debug_utils.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/command_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/depth_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/fence.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/fence.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/framebuffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/render_pass.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/image.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/image.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/pipeline.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/shader.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/semaphore.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/device/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/swapchain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/instance.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/instance.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/physical_device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/physical_device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/handles/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/surface.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/platform/extensions.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/platform/extensions.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/platform/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/platform/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/platform/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/platform/surface.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/init.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/init.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/mod.rs" afterDir="false" />
@@ -102,9 +74,9 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\vk" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\app" />
-      <recent name="C:\Users\chris\CLionProjects\koi\src\renderer" />
       <recent name="C:\Users\chris\CLionProjects\koi" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\handles\device" />
     </key>
@@ -202,7 +174,7 @@
       <workItem from="1609245226275" duration="17000" />
       <workItem from="1609245388926" duration="14000" />
       <workItem from="1609245517929" duration="23280000" />
-      <workItem from="1609325985762" duration="34366000" />
+      <workItem from="1609325985762" duration="35051000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -306,7 +278,13 @@
       <option name="presentableId" value="LOCAL−00017" />
       <updated>1609397259942</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL−00018" summary="refactor for front/back renderer split">
+      <created>1609406815986</created>
+      <option name="number" value="LOCAL−00018" />
+      <option name="presentableId" value="LOCAL−00018" />
+      <updated>1609406815986</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -347,6 +325,7 @@
     <MESSAGE value="make bg clear flash less jarring" />
     <MESSAGE value="fix winit renderer integration to handle events" />
     <MESSAGE value="add dummy second pipeline and swap logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="add dummy second pipeline and swap logic" />
+    <MESSAGE value="refactor for front/back renderer split" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor for front/back renderer split" />
   </component>
 </project>

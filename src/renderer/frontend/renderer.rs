@@ -1,5 +1,7 @@
 use crate::core::Window;
-use crate::renderer::{backend::vk::VkBackend, frontend::hal::RendererBackend};
+use crate::renderer::backend::vk::VkBackend;
+use crate::renderer::hal::RendererBackend;
+
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Renderer<T: RendererBackend> {

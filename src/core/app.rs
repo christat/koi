@@ -21,7 +21,7 @@ pub struct App {
 impl App {
     pub fn init(name: &str) -> Self {
         info!("----- App::init -----");
-        let window = Window::init(name, 800, 600);
+        let window = Window::init(name, 1280, 720);
         let renderer = init_vk(name, &window);
 
         Self { window, renderer }
