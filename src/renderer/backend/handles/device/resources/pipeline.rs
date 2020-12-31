@@ -44,6 +44,12 @@ impl PipelineResource {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn clear_shader_stages(mut self) -> Self {
+        self.shader_stages.clear();
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn shader_stage(
         mut self,
         module: vk::ShaderModule,

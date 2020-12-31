@@ -2,7 +2,7 @@ use std::error::Error;
 //----------------------------------------------------------------------------------------------------------------------
 
 use winit::{
-    event::{Event, WindowEvent},
+    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::ControlFlow,
     platform::desktop::EventLoopExtDesktop,
 };
@@ -44,6 +44,22 @@ impl App {
                         renderer.await_device_idle();
                         *control_flow = ControlFlow::Exit;
                     }
+                    WindowEvent::KeyboardInput { input, .. } => match input {
+                        KeyboardInput {
+                            virtual_keycode,
+                            state,
+                            ..
+                        } => match (virtual_keycode, state) {
+                            (Some(VirtualKeyCode::Escape), ElementState::Pressed) => {
+                                renderer.await_device_idle();
+                                *control_flow = ControlFlow::Exit;
+                            }
+                            (Some(VirtualKeyCode::Space), ElementState::Pressed) => {
+                                renderer.swap_pipelines();
+                            }
+                            _ => {}
+                        },
+                    },
                     _ => *control_flow = ControlFlow::Poll,
                 },
                 Event::MainEventsCleared => window_handle.request_redraw(),

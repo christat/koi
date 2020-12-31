@@ -53,7 +53,9 @@ pub struct DeviceHandle {
     framebuffer_handle: FramebufferHandle,
 
     pipeline: Option<vk::Pipeline>,
+    pipeline_alt: Option<vk::Pipeline>,
     pipeline_layout: Option<vk::PipelineLayout>,
+    use_alt_pipeline: bool,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -123,7 +125,9 @@ impl DeviceHandle {
             framebuffer_handle,
 
             pipeline: None,
+            pipeline_alt: None,
             pipeline_layout: None,
+            use_alt_pipeline: false,
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -139,6 +143,11 @@ impl DeviceHandle {
             device,
             Path::new("resources/shaders/dist/hardcoded.frag.spv"),
         );
+
+        let alt_vert_shader =
+            ShaderResource::create(device, Path::new("resources/shaders/dist/alt.vert.spv"));
+        let alt_frag_shader =
+            ShaderResource::create(device, Path::new("resources/shaders/dist/alt.frag.spv"));
 
         let pipeline_layout_info = pipeline_layout();
 
@@ -195,12 +204,40 @@ impl DeviceHandle {
             Err(_) => panic!("Failed to generate triangle pipeline!"),
         };
 
+        let red_triangle_pipeline = pipeline_resource
+            .clear_shader_stages()
+            .shader_stage(
+                alt_vert_shader.shader,
+                vk::ShaderStageFlags::VERTEX,
+                &shader_entry_point,
+            )
+            .shader_stage(
+                alt_frag_shader.shader,
+                vk::ShaderStageFlags::FRAGMENT,
+                &shader_entry_point,
+            )
+            .build_pipeline(&self.device, self.render_pass_handle.render_pass);
+
+        let pipeline_alt = match red_triangle_pipeline {
+            Ok(pipeline) => pipeline,
+            Err(_) => panic!("Failed to generate red triangle pipeline!"),
+        };
+
         self.pipeline = Some(pipeline);
+        self.pipeline_alt = Some(pipeline_alt);
         self.pipeline_layout = Some(pipeline_layout);
-        // unsafe {
-        //     device.destroy_shader_module(vert_shader.shader, None);
-        //     device.destroy_shader_module(frag_shader.shader, None);
-        // }
+
+        unsafe {
+            device.destroy_shader_module(vert_shader.shader, None);
+            device.destroy_shader_module(frag_shader.shader, None);
+            device.destroy_shader_module(alt_vert_shader.shader, None);
+            device.destroy_shader_module(alt_frag_shader.shader, None);
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn swap_pipelines(&mut self) {
+        self.use_alt_pipeline = !self.use_alt_pipeline;
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -290,7 +327,11 @@ impl DeviceHandle {
             device.cmd_bind_pipeline(
                 command_buffer,
                 vk::PipelineBindPoint::GRAPHICS,
-                self.pipeline.unwrap(),
+                if self.use_alt_pipeline {
+                    self.pipeline_alt.unwrap()
+                } else {
+                    self.pipeline.unwrap()
+                },
             );
             device.cmd_draw(command_buffer, 3, 1, 0, 0);
 
@@ -375,15 +416,19 @@ impl DeviceHandle {
 impl Cleanup for DeviceHandle {
     fn cleanup(&mut self) {
         unsafe {
-            self.framebuffer_handle.cleanup(&self.device);
-            self.render_pass_handle.cleanup(&self.device);
-            self.depth_buffer_handle
-                .cleanup(&self.device, &self.allocator);
-            self.swapchain_handle.cleanup(&self.device);
-            self.semaphore_handle.cleanup(&self.device);
-            self.fence_handle.cleanup(&self.device);
+            let device = &self.device;
+            device.destroy_pipeline(self.pipeline.unwrap(), None);
+            device.destroy_pipeline(self.pipeline_alt.unwrap(), None);
+            device.destroy_pipeline_layout(self.pipeline_layout.unwrap(), None);
+
+            self.framebuffer_handle.cleanup(device);
+            self.render_pass_handle.cleanup(device);
+            self.depth_buffer_handle.cleanup(device, &self.allocator);
+            self.swapchain_handle.cleanup(device);
+            self.semaphore_handle.cleanup(device);
+            self.fence_handle.cleanup(device);
             self.allocator.destroy();
-            self.command_buffer_handle.cleanup(&self.device);
+            self.command_buffer_handle.cleanup(device);
             self.device.destroy_device(None);
         }
     }
