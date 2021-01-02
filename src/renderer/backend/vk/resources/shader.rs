@@ -11,7 +11,8 @@ extern crate byteorder;
 use byteorder::{ByteOrder, LittleEndian};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::handles::device::DeviceCleanup;
+use crate::renderer::backend::vk::handles::DeviceCleanup;
+use crate::utils::ffi;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct ShaderResource {
@@ -25,11 +26,17 @@ impl ShaderResource {
             shader: create_shader_module(device, file_path),
         }
     }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_default_shader_entry_point() -> ffi::CString {
+        ffi::CString::new("main").unwrap()
+    }
+    //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for ShaderResource {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             device.destroy_shader_module(self.shader, None);
         }

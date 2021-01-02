@@ -5,10 +5,7 @@ use ash::{
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::utils::traits::Cleanup;
-use crate::{
-    renderer::backend::vk::{DebugUtilsManager, VkBackendConfig},
-    utils::ffi,
-};
+use crate::{renderer::backend::vk::VkBackendConfig, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct InstanceHandle {

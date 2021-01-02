@@ -21,18 +21,45 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="refactor for front/back renderer split">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="move renderer glue to own module">
+      <change afterPath="$PROJECT_DIR$/resources/shaders/src/mesh.vert" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/image.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/alt.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/alt.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/light.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/app.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/app.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/init.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/init.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/hal/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/command_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/depth_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/fence.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/fence.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/framebuffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/render_pass.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/buffer.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/image.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/semaphore.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device/swapchain.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/instance.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/instance.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/mod.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/frontend/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/resources.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/init.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/ffi.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ffi.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,11 +73,20 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Rust File" />
+        <option value="GLSL Shader" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="fos4nf7i" />
@@ -82,11 +118,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package koi --bin koi" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -174,7 +205,11 @@
       <workItem from="1609245226275" duration="17000" />
       <workItem from="1609245388926" duration="14000" />
       <workItem from="1609245517929" duration="23280000" />
-      <workItem from="1609325985762" duration="35051000" />
+      <workItem from="1609325985762" duration="48399000" />
+      <workItem from="1609423874159" duration="300000" />
+      <workItem from="1609424351665" duration="1947000" />
+      <workItem from="1609491091890" duration="29218000" />
+      <workItem from="1609574887192" duration="5200000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -284,7 +319,13 @@
       <option name="presentableId" value="LOCAL−00018" />
       <updated>1609406815986</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL−00019" summary="move renderer glue to own module">
+      <created>1609407641331</created>
+      <option name="number" value="LOCAL−00019" />
+      <option name="presentableId" value="LOCAL−00019" />
+      <updated>1609407641331</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,6 +367,7 @@
     <MESSAGE value="fix winit renderer integration to handle events" />
     <MESSAGE value="add dummy second pipeline and swap logic" />
     <MESSAGE value="refactor for front/back renderer split" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor for front/back renderer split" />
+    <MESSAGE value="move renderer glue to own module" />
+    <option name="LAST_COMMIT_MESSAGE" value="move renderer glue to own module" />
   </component>
 </project>

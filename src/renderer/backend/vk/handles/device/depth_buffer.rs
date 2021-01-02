@@ -117,7 +117,7 @@ impl DepthBufferHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceAllocatorCleanup for DepthBufferHandle {
-    fn cleanup(&mut self, device: &Device, allocator: &vk_mem::Allocator) {
+    fn cleanup(&self, device: &Device, allocator: &vk_mem::Allocator) {
         unsafe {
             device.destroy_image_view(self.image_view, None);
             allocator

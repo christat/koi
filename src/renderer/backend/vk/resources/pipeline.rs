@@ -1,15 +1,67 @@
-use super::super::super::super::ash::version::DeviceV1_0;
-use crate::utils::ffi;
-use ash::{vk, Device};
 use std::fmt;
 //----------------------------------------------------------------------------------------------------------------------
 
-pub fn pipeline_layout() -> vk::PipelineLayoutCreateInfo {
-    vk::PipelineLayoutCreateInfo::builder()
-        .flags(vk::PipelineLayoutCreateFlags::empty())
-        .set_layouts(&[])
-        .push_constant_ranges(&[])
-        .build()
+use ash::version::DeviceV1_0;
+use ash::{vk, Device};
+//----------------------------------------------------------------------------------------------------------------------
+
+use crate::renderer::backend::vk::resources::{VertexInputDescription, MESH_PUSH_CONSTANTS_SIZE};
+use crate::{renderer::backend::vk::handles::DeviceCleanup, utils::ffi};
+//----------------------------------------------------------------------------------------------------------------------
+
+pub struct PipelineLayoutResource {
+    pub(in crate::renderer::backend) pipeline_layout: vk::PipelineLayout,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl PipelineLayoutResource {
+    pub fn create(device: &Device, push_constant_ranges: Option<&[vk::PushConstantRange]>) -> Self {
+        let create_info = vk::PipelineLayoutCreateInfo::builder()
+            .flags(vk::PipelineLayoutCreateFlags::empty())
+            .set_layouts(&[])
+            .push_constant_ranges(push_constant_ranges.unwrap_or(&[]));
+
+        let pipeline_layout = unsafe {
+            device.create_pipeline_layout(&create_info, None).expect(
+                "VkBackend::PipelineLayoutResource::create - Failed to create pipeline layout!",
+            )
+        };
+
+        Self { pipeline_layout }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl DeviceCleanup for PipelineLayoutResource {
+    fn cleanup(&self, device: &Device) {
+        unsafe {
+            device.destroy_pipeline_layout(self.pipeline_layout, None);
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub struct PipelineResource {
+    pub(in crate::renderer::backend) pipeline: vk::Pipeline,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl PipelineResource {
+    pub fn builder() -> PipelineResourceBuilder {
+        PipelineResourceBuilder::default()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl DeviceCleanup for PipelineResource {
+    fn cleanup(&self, device: &Device) {
+        unsafe {
+            device.destroy_pipeline(self.pipeline, None);
+        }
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +77,7 @@ impl fmt::Display for PipelineBuildError {
 //----------------------------------------------------------------------------------------------------------------------
 
 #[derive(Default)]
-pub struct PipelineResource {
+pub struct PipelineResourceBuilder {
     shader_stages: Vec<vk::PipelineShaderStageCreateInfo>,
     input_assembly_state: vk::PipelineInputAssemblyStateCreateInfo,
     vertex_input_state: vk::PipelineVertexInputStateCreateInfo,
@@ -38,12 +90,7 @@ pub struct PipelineResource {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl PipelineResource {
-    pub fn builder() -> Self {
-        PipelineResource::default()
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
+impl PipelineResourceBuilder {
     pub fn clear_shader_stages(mut self) -> Self {
         self.shader_stages.clear();
         self
@@ -68,10 +115,11 @@ impl PipelineResource {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn vertex_input_state(mut self) -> Self {
+    pub fn vertex_input_state(mut self, description: &VertexInputDescription) -> Self {
         self.vertex_input_state = vk::PipelineVertexInputStateCreateInfo::builder()
-            .vertex_attribute_descriptions(&[])
-            .vertex_binding_descriptions(&[])
+            .vertex_binding_descriptions(&description.bindings)
+            .vertex_attribute_descriptions(&description.attributes)
+            .flags(description.flags)
             .build();
 
         self
@@ -152,11 +200,11 @@ impl PipelineResource {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn build_pipeline(
+    pub fn build(
         &self,
         device: &Device,
         render_pass: vk::RenderPass,
-    ) -> Result<vk::Pipeline, PipelineBuildError> {
+    ) -> Result<PipelineResource, PipelineBuildError> {
         let viewports = [self.viewport];
         let scissors = [self.scissor];
         let viewport_state = vk::PipelineViewportStateCreateInfo::builder()
@@ -190,10 +238,13 @@ impl PipelineResource {
         };
 
         match pipeline {
-            Ok(pipelines) => Ok(pipelines
-                .first()
-                .expect("VkBackend::PipelineResource - Failed to extract created pipeline!")
-                .to_owned()),
+            Ok(pipelines) => {
+                let pipeline = pipelines
+                    .first()
+                    .expect("VkBackend::PipelineResourceBuilder::build - Failed to extract created pipeline!")
+                    .to_owned();
+                Ok(PipelineResource { pipeline })
+            }
             Err(_) => Err(PipelineBuildError),
         }
     }

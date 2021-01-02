@@ -275,6 +275,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "field-offset"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c40e7a744c1d22cd64783732a287dd5d08a9f0e1d89b685bf084aab753cb20d4"
+dependencies = [
+ "memoffset",
+ "rustc_version",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -420,6 +430,7 @@ dependencies = [
  "byteorder",
  "chrono",
  "env_logger",
+ "field-offset",
  "gilrs",
  "log",
  "ultraviolet",
@@ -531,6 +542,15 @@ checksum = "6585fd95e7bb50d6cc31e20d4cf9afb4e2ba16c5846fc76793f11218da9c475b"
 dependencies = [
  "libc",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "memoffset"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "043175f069eda7b85febe4a74abbaeff828d9f8b448515d3151a14a3542811aa"
+dependencies = [
+ "autocfg",
 ]
 
 [[package]]

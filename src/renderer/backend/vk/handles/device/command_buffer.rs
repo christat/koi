@@ -59,7 +59,7 @@ impl CommandBufferHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for CommandBufferHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             // TODO this may be dynamically realloc'd hence not deleted here?
             device.free_command_buffers(self.command_pool, &self.command_buffers);

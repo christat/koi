@@ -73,7 +73,7 @@ impl RenderPassHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for RenderPassHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             device.destroy_render_pass(self.render_pass, None);
         }

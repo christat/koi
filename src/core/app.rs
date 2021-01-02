@@ -8,13 +8,12 @@ use winit::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::{Renderer, VkBackend};
-use crate::{core::window::Window, renderer::init_vk};
+use crate::{core::Window, renderer::Renderer};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct App {
     window: Window,
-    renderer: Renderer<VkBackend>,
+    renderer: Renderer,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +21,7 @@ impl App {
     pub fn init(name: &str) -> Self {
         info!("----- App::init -----");
         let window = Window::init(name, 1280, 720);
-        let renderer = init_vk(name, &window);
+        let renderer = Renderer::init(name, &window);
 
         Self { window, renderer }
     }
@@ -64,7 +63,7 @@ impl App {
                     _ => *control_flow = ControlFlow::Poll,
                 },
                 Event::MainEventsCleared => window_handle.request_redraw(),
-                Event::RedrawRequested(_window_id) => renderer.run(),
+                Event::RedrawRequested(_window_id) => renderer.draw(),
                 Event::LoopDestroyed => renderer.await_device_idle(),
                 _ => *control_flow = ControlFlow::Poll,
             };

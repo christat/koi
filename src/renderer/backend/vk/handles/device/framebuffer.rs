@@ -52,7 +52,7 @@ impl FramebufferHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for FramebufferHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             self.framebuffers
                 .iter()

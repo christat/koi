@@ -30,7 +30,7 @@ impl FenceHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for FenceHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             device.destroy_fence(self.render_fence, None);
         }

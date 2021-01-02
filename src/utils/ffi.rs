@@ -55,3 +55,13 @@ pub fn vec_cstring_to_char_ptr(vec: &Vec<CString>) -> Vec<CharPtr> {
     vec.iter().map(|c_string| c_string.as_ptr()).collect()
 }
 //----------------------------------------------------------------------------------------------------------------------
+
+#[repr(C)]
+pub struct StaticCString(*const u8);
+unsafe impl Sync for StaticCString {}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub unsafe fn any_as_u8_slice<T: Sized>(p: &T) -> &[u8] {
+    ::std::slice::from_raw_parts((p as *const T) as *const u8, ::std::mem::size_of::<T>())
+}
+//----------------------------------------------------------------------------------------------------------------------

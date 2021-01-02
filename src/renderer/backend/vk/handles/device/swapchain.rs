@@ -129,7 +129,7 @@ impl SwapchainHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for SwapchainHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             self.swapchain_image_views
                 .iter()
@@ -166,7 +166,6 @@ fn select_surface_format(
 fn select_present_mode(
     physical_device_attributes: &PhysicalDeviceAttributes,
 ) -> vk::PresentModeKHR {
-    // Force to FIFO_RELAXED in dev to cap framerate; otherwise run triple buffering without hard VSync.
     #[cfg(not(debug_assertions))]
     {
         let PhysicalDeviceAttributes { present_modes, .. } = physical_device_attributes;

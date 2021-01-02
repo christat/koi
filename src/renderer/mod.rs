@@ -1,10 +1,10 @@
 mod backend;
-mod frontend;
+pub mod entities;
 mod hal;
+mod renderer;
 //----------------------------------------------------------------------------------------------------------------------
 
-pub use backend::vk::VkBackend;
 use backend::*;
-pub use frontend::renderer::Renderer;
-pub use hal::*;
+use hal::*;
+pub use renderer::Renderer;
 //----------------------------------------------------------------------------------------------------------------------

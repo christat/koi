@@ -34,7 +34,7 @@ impl SemaphoreHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl DeviceCleanup for SemaphoreHandle {
-    fn cleanup(&mut self, device: &Device) {
+    fn cleanup(&self, device: &Device) {
         unsafe {
             device.destroy_semaphore(self.present_semaphore, None);
             device.destroy_semaphore(self.render_semaphore, None);

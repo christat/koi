@@ -1,1 +1,1 @@
-pub(super) mod vk;
+pub(in crate::renderer) mod vk;
