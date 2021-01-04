@@ -1,7 +1,7 @@
 use ash::{extensions::ext::DebugUtils, vk};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::utils::traits::Cleanup;
+use crate::utils::traits::Destroy;
 use crate::{renderer::backend::vk::handles::InstanceHandle, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -49,8 +49,8 @@ impl DebugUtilsManager {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Cleanup for DebugUtilsManager {
-    fn cleanup(&mut self) {
+impl Destroy for DebugUtilsManager {
+    fn destroy(&mut self) {
         unsafe {
             self.debug_utils
                 .destroy_debug_utils_messenger(self.debug_utils_messenger_ext, None);

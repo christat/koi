@@ -1,7 +1,7 @@
 use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
-use ash::{version::DeviceV1_0, vk};
+use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::{projection::perspective_vk, rotor::Rotor3, Mat4, Vec3, Vec4};
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
@@ -10,18 +10,15 @@ use crate::{
     renderer::{
         backend::vk::{
             handles::{
-                DeviceCleanup, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
+                AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{
-                MeshPushConstants, MeshResource, PipelineLayoutResource, PipelineResource,
-                ShaderResource, VertexInputDescription,
-            },
-            VkBackendConfig,
+            resources::{MeshPushConstants, ResourceManager, VertexInputDescription, VkShader},
+            VkRendererConfig,
         },
         entities::Mesh,
         hal::RendererBackend,
     },
-    utils::{ffi, traits::Cleanup},
+    utils::{ffi, traits::Destroy},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -32,24 +29,30 @@ pub enum PipelineType {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct VkBackend {
-    config: VkBackendConfig,
-    instance_handle: InstanceHandle,
-    surface_handle: SurfaceHandle,
-    physical_device_handle: PhysicalDeviceHandle,
-    device_handle: DeviceHandle,
+pub trait DeviceDestroy {
+    fn destroy(&self, device: &Device);
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub struct VkRenderer {
+    pub config: VkRendererConfig,
+    pub instance_handle: InstanceHandle,
+    pub surface_handle: SurfaceHandle,
+    pub physical_device_handle: PhysicalDeviceHandle,
+    pub device_handle: DeviceHandle,
+    pub allocator_handle: AllocatorHandle,
 
     #[cfg(debug_assertions)]
-    debug_utils_manager: crate::renderer::backend::vk::DebugUtilsManager,
+    pub debug_utils_manager: crate::renderer::backend::vk::DebugUtilsManager,
 
+    pub resource_manager: ResourceManager,
     //------------------------------------------------------------------------------------------------------------------
     frame_index: u32,
-    pipelines_initialized: bool,
     pipeline_in_use: PipelineType,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl VkBackend {
+impl VkRenderer {
     pub fn init(app_name: &str, window: &WinitWindow) -> Self {
         info!("----- VkBackend::init -----");
 
@@ -60,13 +63,16 @@ impl VkBackend {
         let physical_device_handle =
             PhysicalDeviceHandle::init(&instance_handle, &surface_handle, &mut config);
 
-        let device_handle = DeviceHandle::init(
+        let device_handle = DeviceHandle::init(&instance_handle, &physical_device_handle, &config);
+
+        let allocator_handle = AllocatorHandle::init(
             &instance_handle,
-            &surface_handle,
             &physical_device_handle,
+            &device_handle.device,
             &config,
-            &window,
         );
+
+        let resource_manager = ResourceManager::init();
 
         Self {
             #[cfg(debug_assertions)]
@@ -80,51 +86,121 @@ impl VkBackend {
             surface_handle,
             physical_device_handle,
             device_handle,
-
+            allocator_handle,
+            resource_manager,
+            //----------------------------------------------------------------------------------------------------------
             frame_index: 0,
-            pipelines_initialized: false,
             pipeline_in_use: PipelineType::HARDCODED,
         }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    fn init_pipelines(&mut self) {
-        info!("----- VkBackend::init_pipelines -----");
+    pub fn device(&self) -> &Device {
+        &self.device_handle.device
+    }
+    //------------------------------------------------------------------------------------------------------------------
 
-        let device_handle = &self.device_handle;
+    pub fn resource_manager(&self) -> &ResourceManager {
+        &self.resource_manager
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn resource_manager_mut(&mut self) -> &mut ResourceManager {
+        &mut self.resource_manager
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn init_resources(&mut self) {
+        info!("----- VkBackend::init_resources -----");
+
+        let VkRenderer {
+            instance_handle,
+            physical_device_handle,
+            surface_handle,
+            config,
+            device_handle,
+            resource_manager,
+            ..
+        } = self;
+
         let device = device_handle.get_device();
 
-        let vert_shader = ShaderResource::create(
+        resource_manager.create_fence(device, "render", vk::FenceCreateFlags::SIGNALED);
+        resource_manager.create_semaphore(device, "render");
+        resource_manager.create_semaphore(device, "present");
+
+        let PhysicalDeviceHandle {
+            graphics_queue_index,
+            ..
+        } = physical_device_handle;
+
+        resource_manager.create_command_pool(device, graphics_queue_index.to_owned(), None);
+        resource_manager.create_command_buffers(device, config.buffering, None, None);
+
+        let swapchain = resource_manager.create_swapchain(
             device,
+            instance_handle,
+            physical_device_handle,
+            surface_handle,
+            config,
+        );
+
+        // let depth_buffer_handle = DepthBufferHandle::init(
+        //     instance_handle,
+        //     physical_device_handle,
+        //     &swapchain_handle,
+        //     &device,
+        //     allocator,
+        // );
+
+        let render_pass =
+            resource_manager.create_render_pass(device, None, swapchain.surface_format());
+
+        resource_manager.create_framebuffers(device, &swapchain, &render_pass);
+
+        let hardcoded_vert = resource_manager.create_shader(
+            device,
+            "hardcoded_vert",
             Path::new("resources/shaders/dist/hardcoded.vert.spv"),
         );
-        let frag_shader = ShaderResource::create(
+        let hardcoded_frag = resource_manager.create_shader(
             device,
+            "hardcoded_frag",
             Path::new("resources/shaders/dist/hardcoded.frag.spv"),
         );
 
-        let alt_vert_shader =
-            ShaderResource::create(device, Path::new("resources/shaders/dist/alt.vert.spv"));
-        let alt_frag_shader =
-            ShaderResource::create(device, Path::new("resources/shaders/dist/alt.frag.spv"));
+        let alt_vert = resource_manager.create_shader(
+            device,
+            "alt_vert",
+            Path::new("resources/shaders/dist/alt.vert.spv"),
+        );
+        let alt_frag = resource_manager.create_shader(
+            device,
+            "alt_frag",
+            Path::new("resources/shaders/dist/alt.frag.spv"),
+        );
 
-        let mesh_vert_shader =
-            ShaderResource::create(device, Path::new("resources/shaders/dist/mesh.vert.spv"));
+        let mesh_vert = resource_manager.create_shader(
+            device,
+            "mesh_vert",
+            Path::new("resources/shaders/dist/mesh.vert.spv"),
+        );
 
-        let pipeline_layout_resource = PipelineLayoutResource::create(device, None);
+        let pipeline_layout = resource_manager.create_pipeline_layout(device, "default", None);
 
-        let viewport_extent = device_handle.swapchain_handle.surface_extent;
-        let viewport_width = viewport_extent.width as f32;
-        let viewport_height = viewport_extent.height as f32;
+        let surface_extent = swapchain.surface_extent();
+        let vk::Extent2D { width, height } = surface_extent;
 
-        let mut pipeline_resource_builder = PipelineResource::builder()
+        let shader_entry_point = VkShader::get_default_shader_entry_point();
+
+        let mut pipeline_builder = ResourceManager::get_pipeline_builder()
             .input_assembly_state(vk::PrimitiveTopology::TRIANGLE_LIST)
             .viewport(
                 vk::Viewport::builder()
                     .x(0.0)
                     .y(0.0)
-                    .width(viewport_width)
-                    .height(viewport_height)
+                    .width(width as f32)
+                    .height(height as f32)
                     .min_depth(0.0)
                     .max_depth(1.0)
                     .build(),
@@ -132,130 +208,111 @@ impl VkBackend {
             .scissor(
                 vk::Rect2D::builder()
                     .offset(vk::Offset2D::default())
-                    .extent(viewport_extent)
+                    .extent(surface_extent)
                     .build(),
             )
             .rasterization_state(vk::PolygonMode::FILL)
             .multisampling_state()
             .color_blend_attachment_state()
-            .pipeline_layout(pipeline_layout_resource.pipeline_layout);
-
-        let render_pass = device_handle.render_pass_handle.render_pass;
-
-        let shader_entry_point = ShaderResource::get_default_shader_entry_point();
-
-        pipeline_resource_builder = pipeline_resource_builder
-            .clear_shader_stages()
+            .pipeline_layout(*pipeline_layout.get())
             .shader_stage(
-                vert_shader.shader,
+                *hardcoded_vert.get(),
                 vk::ShaderStageFlags::VERTEX,
                 &shader_entry_point,
             )
             .shader_stage(
-                frag_shader.shader,
+                *hardcoded_frag.get(),
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             );
 
-        let triangle_pipeline = pipeline_resource_builder.build(&device, render_pass);
+        resource_manager.create_pipeline(device, "hardcoded", &pipeline_builder, &render_pass);
 
-        let pipeline = match triangle_pipeline {
-            Ok(pipeline) => pipeline,
-            Err(_) => panic!("VkBackend::init_pipelines - Failed to generate triangle pipeline!"),
-        };
-
-        pipeline_resource_builder = pipeline_resource_builder
+        pipeline_builder = pipeline_builder
             .clear_shader_stages()
             .shader_stage(
-                alt_vert_shader.shader,
+                *alt_vert.get(),
                 vk::ShaderStageFlags::VERTEX,
                 &shader_entry_point,
             )
             .shader_stage(
-                alt_frag_shader.shader,
+                *alt_frag.get(),
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             );
 
-        let red_triangle_pipeline = pipeline_resource_builder.build(&device, render_pass);
-
-        let pipeline_alt = match red_triangle_pipeline {
-            Ok(pipeline) => pipeline,
-            Err(_) => {
-                panic!("VkBackend::init_pipelines - Failed to generate red triangle pipeline!")
-            }
-        };
+        resource_manager.create_pipeline(device, "alt", &pipeline_builder, &render_pass);
 
         let vertex_description = VertexInputDescription::get();
-
         let push_constant_ranges = [MeshPushConstants::get_range()];
-        let pipeline_layout_mesh_resource =
-            PipelineLayoutResource::create(device, Some(&push_constant_ranges));
+        let mesh_pipeline_layout =
+            resource_manager.create_pipeline_layout(device, "mesh", Some(&push_constant_ranges));
 
-        let mesh_pipeline = pipeline_resource_builder
+        pipeline_builder = pipeline_builder
             .vertex_input_state(&vertex_description)
             .clear_shader_stages()
             .shader_stage(
-                mesh_vert_shader.shader,
+                *mesh_vert.get(),
                 vk::ShaderStageFlags::VERTEX,
                 &shader_entry_point,
             )
             .shader_stage(
-                frag_shader.shader,
+                *hardcoded_frag.get(),
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             )
-            .pipeline_layout(pipeline_layout_mesh_resource.pipeline_layout)
-            .build(&device, render_pass);
+            .pipeline_layout(*mesh_pipeline_layout.get());
 
-        let pipeline_mesh = match mesh_pipeline {
-            Ok(pipeline) => pipeline,
-            Err(_) => {
-                panic!("VkBackend::init_pipelines - Failed to generate mesh pipeline!")
-            }
-        };
+        resource_manager.create_pipeline(device, "mesh", &pipeline_builder, &render_pass);
 
-        vert_shader.cleanup(device);
-        frag_shader.cleanup(device);
-        alt_vert_shader.cleanup(device);
-        alt_frag_shader.cleanup(device);
-        mesh_vert_shader.cleanup(device);
-
-        let mut_device_handle = &mut self.device_handle;
-        mut_device_handle.set_pipeline(PipelineType::HARDCODED, pipeline);
-        mut_device_handle.set_pipeline(PipelineType::ALT, pipeline_alt);
-        mut_device_handle.set_pipeline(PipelineType::MESH, pipeline_mesh);
-        mut_device_handle.set_pipeline_layout(PipelineType::HARDCODED, pipeline_layout_resource);
-        mut_device_handle.set_pipeline_layout(PipelineType::MESH, pipeline_layout_mesh_resource);
+        resource_manager.create_mesh(&self.allocator_handle, "triangle", Mesh::test_triangle());
     }
     //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Drop for VkBackend {
+impl Drop for VkRenderer {
     fn drop(&mut self) {
-        self.device_handle.cleanup();
-        self.surface_handle.cleanup();
+        let VkRenderer {
+            resource_manager,
+            device_handle,
+            allocator_handle,
+            ..
+        } = self;
+
+        unsafe {
+            resource_manager.destroy(&device_handle.device, &allocator_handle.allocator);
+        }
+
+        self.allocator_handle.destroy();
+
+        self.surface_handle.destroy();
+        self.device_handle.destroy();
 
         #[cfg(debug_assertions)]
-        self.debug_utils_manager.cleanup();
+        self.debug_utils_manager.destroy();
 
-        self.instance_handle.cleanup();
+        self.instance_handle.destroy();
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl RendererBackend for VkBackend {
+impl RendererBackend for VkRenderer {
     fn draw(&mut self) {
-        if !self.pipelines_initialized {
-            self.init_pipelines();
-            self.load_mesh(Mesh::test_triangle());
-            self.pipelines_initialized = true;
-        }
+        let VkRenderer {
+            device_handle,
+            resource_manager,
+            ..
+        } = self;
 
-        let device_handle = &mut self.device_handle;
-        let device = device_handle.get_device();
-        let render_fences = device_handle.get_render_fences();
+        let DeviceHandle {
+            device,
+            graphics_queue,
+            present_queue,
+        } = &device_handle;
+
+        let render_fence = *resource_manager.get_fence("render").get();
+        let render_fences = [render_fence];
 
         unsafe {
             // wait for the GPU to finish rendering last frame. Timeout of 1s - fences need to be explicitly reset after use.
@@ -267,26 +324,29 @@ impl RendererBackend for VkBackend {
                 .expect("VkBackend::draw - Failed to reset fences!");
         };
 
-        let swapchain = device_handle.get_swapchain();
+        let swapchain_resource = resource_manager.get_swapchain().unwrap();
+        let swapchain = swapchain_resource.get();
+        let swapchain_khr = *swapchain_resource.khr();
 
+        let present_semaphore = *resource_manager.get_semaphore("present").get();
         // Request image from swapchain. Timeout of 1s.
         let (swapchain_image_index, _is_suboptimal) = unsafe {
             swapchain
                 .acquire_next_image(
-                    device_handle.swapchain_handle.swapchain_khr,
+                    swapchain_khr,
                     1000000000,
-                    device_handle.semaphore_handle.present_semaphore,
+                    present_semaphore,
                     vk::Fence::null(),
                 )
                 .expect("VkBackend::draw - failed to acquire next swapchain image!")
         };
 
         // Cmd buffer should only be cleared once it is safe (i.e. GPU is done with it)
-        let command_buffer = *device_handle
-            .command_buffer_handle
-            .command_buffers
+        let command_buffers = resource_manager.get_command_buffers(None);
+        let command_buffer = *command_buffers
             .first()
-            .expect("VkBackend::draw - No command buffers allocated!");
+            .expect("VkBackend::draw - No command buffers allocated!")
+            .get();
 
         unsafe {
             device
@@ -310,21 +370,22 @@ impl RendererBackend for VkBackend {
             },
         }];
 
+        let render_pass = *resource_manager.get_render_pass(None).get();
+        let framebuffer = resource_manager
+            .get_framebuffers()
+            .get(swapchain_image_index as usize)
+            .expect("VkBackend::draw - Failed to retrieve framebuffer by swapchain index!")
+            .get();
+
         let render_pass_begin_info = vk::RenderPassBeginInfo::builder()
-            .render_pass(device_handle.render_pass_handle.render_pass)
+            .render_pass(render_pass)
             .render_area(
                 vk::Rect2D::builder()
                     .offset(vk::Offset2D::builder().x(0).y(0).build())
-                    .extent(device_handle.swapchain_handle.surface_extent)
+                    .extent(swapchain_resource.surface_extent())
                     .build(),
             )
-            .framebuffer(
-                *device_handle
-                    .framebuffer_handle
-                    .framebuffers
-                    .get(swapchain_image_index as usize)
-                    .expect("VkBackend::draw - Failed to retrieve framebuffer by swapchain index!"),
-            )
+            .framebuffer(*framebuffer)
             .clear_values(&clear_values);
 
         unsafe {
@@ -333,61 +394,67 @@ impl RendererBackend for VkBackend {
                 &render_pass_begin_info,
                 vk::SubpassContents::INLINE,
             );
+        }
+        let pipeline_key = match self.pipeline_in_use {
+            PipelineType::HARDCODED => "hardcoded",
+            PipelineType::ALT => "alt",
+            PipelineType::MESH => "mesh",
+        };
 
-            let pipeline_resource = match self.pipeline_in_use {
-                PipelineType::HARDCODED => &device_handle.pipeline,
-                PipelineType::ALT => &device_handle.pipeline_alt,
-                PipelineType::MESH => &device_handle.pipeline_mesh,
-            };
+        let pipeline = resource_manager.get_pipeline(pipeline_key);
 
-            let pipeline_layout_resource = match self.pipeline_in_use {
-                PipelineType::MESH => &device_handle.pipeline_layout_mesh,
-                _ => &device_handle.pipeline_layout,
-            };
+        let pipeline_layout_key = match self.pipeline_in_use {
+            PipelineType::MESH => "mesh",
+            _ => "default",
+        };
 
+        let pipeline_layout = resource_manager.get_pipeline_layout(pipeline_layout_key);
+
+        unsafe {
             device.cmd_bind_pipeline(
                 command_buffer,
                 vk::PipelineBindPoint::GRAPHICS,
-                pipeline_resource
-                    .as_ref()
-                    .expect("VkBackend::draw - Failed to retrieve PipelineResource!")
-                    .pipeline,
+                *pipeline.get(),
             );
+        }
 
-            if let PipelineType::MESH = &self.pipeline_in_use {
-                if let Some(mesh_resource) = &device_handle.mesh_resource {
-                    device.cmd_bind_vertex_buffers(
-                        command_buffer,
-                        0,
-                        &[mesh_resource.vertex_buffer.buffer],
-                        &[0],
-                    );
-                }
+        if let PipelineType::MESH = &self.pipeline_in_use {
+            let mesh = resource_manager.get_mesh("triangle");
 
-                let view = Mat4::from_translation(Vec3::new(0.0, 0.0, -2.0));
-                let projection = perspective_vk(f32::to_radians(70.0), 1700.0 / 900.0, 0.1, 200.0);
-                let model_rotor = Rotor3::from_euler_angles(
-                    0.0,
-                    0.0,
-                    -f32::to_radians(2.0 * self.frame_index as f32),
-                );
-                let model = model_rotor.into_matrix().into_homogeneous();
-                let transform_matrix = projection * view * model;
-
-                let stage_flags = MeshPushConstants::get_range().stage_flags;
-                let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
-                device.cmd_push_constants(
+            unsafe {
+                device.cmd_bind_vertex_buffers(
                     command_buffer,
-                    pipeline_layout_resource
-                        .as_ref()
-                        .expect("VkBackend::draw - Failed to retrieve PipelineLayoutResource!")
-                        .pipeline_layout,
-                    stage_flags,
                     0,
-                    unsafe { ffi::any_as_u8_slice(&mesh_push_constants) },
+                    &[*mesh.vertex_buffer.get()],
+                    &[0],
                 );
             }
 
+            let view = Mat4::from_translation(Vec3::new(0.0, 0.0, -2.0));
+            let projection = perspective_vk(f32::to_radians(70.0), 1700.0 / 900.0, 0.1, 200.0);
+            let model_rotor = Rotor3::from_euler_angles(
+                0.0,
+                0.0,
+                -f32::to_radians(2.0 * self.frame_index as f32),
+            );
+            let model = model_rotor.into_matrix().into_homogeneous();
+            let transform_matrix = projection * view * model;
+
+            let stage_flags = MeshPushConstants::get_range().stage_flags;
+            let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
+
+            unsafe {
+                device.cmd_push_constants(
+                    command_buffer,
+                    *pipeline_layout.get(),
+                    stage_flags,
+                    0,
+                    ffi::any_as_u8_slice(&mesh_push_constants),
+                );
+            }
+        }
+
+        unsafe {
             device.cmd_draw(command_buffer, 3, 1, 0, 0);
 
             device.cmd_end_render_pass(command_buffer);
@@ -397,8 +464,10 @@ impl RendererBackend for VkBackend {
         }
 
         let wait_dst_stage_mask = [vk::PipelineStageFlags::COLOR_ATTACHMENT_OUTPUT];
-        let present_semaphores = device_handle.get_present_semaphores();
-        let render_semaphores = device_handle.get_render_semaphores();
+        let present_semaphores = [present_semaphore];
+
+        let render_semaphore = *resource_manager.get_semaphore("present").get();
+        let render_semaphores = [render_semaphore];
 
         let submits = [vk::SubmitInfo::builder()
             .wait_dst_stage_mask(&wait_dst_stage_mask)
@@ -409,15 +478,11 @@ impl RendererBackend for VkBackend {
 
         unsafe {
             device
-                .queue_submit(
-                    device_handle.queue_handle.graphics_queue,
-                    &submits,
-                    device_handle.fence_handle.render_fence,
-                )
+                .queue_submit(*graphics_queue, &submits, render_fence)
                 .expect("VkBackend::DeviceHandle::draw - Failed to submit to queue!")
         }
 
-        let swapchains = [device_handle.swapchain_handle.swapchain_khr];
+        let swapchains = [swapchain_khr];
         let image_indices = [swapchain_image_index];
         let present_info = vk::PresentInfoKHR::builder()
             .swapchains(&swapchains)
@@ -426,7 +491,7 @@ impl RendererBackend for VkBackend {
 
         unsafe {
             swapchain
-                .queue_present(device_handle.queue_handle.graphics_queue, &present_info)
+                .queue_present(*present_queue, &present_info)
                 .expect("VkBackend::draw - Failed to present swapchain image!");
         }
 
@@ -435,11 +500,10 @@ impl RendererBackend for VkBackend {
     //------------------------------------------------------------------------------------------------------------------
 
     fn await_device_idle(&mut self) {
-        let device = self.device_handle.get_device();
         unsafe {
-            device
+            self.device()
                 .device_wait_idle()
-                .expect("VkBackend::await_device_idle - Failed to wait for device to become idle!");
+                .expect("VkBackend::await_device_idle - Failed to wait for dev to become idle!");
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -455,11 +519,10 @@ impl RendererBackend for VkBackend {
     //------------------------------------------------------------------------------------------------------------------
 
     fn load_mesh(&mut self, mesh: Mesh) {
-        let allocator_handle = &self.device_handle.allocator_handle;
-        let mesh_resource = MeshResource::init(mesh, allocator_handle);
-        mesh_resource.upload(allocator_handle);
-
-        self.device_handle.set_mesh(mesh_resource);
+        let mesh_resource =
+            self.resource_manager
+                .create_mesh(&self.allocator_handle, "default", mesh);
+        mesh_resource.upload(&self.allocator_handle);
     }
     //------------------------------------------------------------------------------------------------------------------
 }

@@ -1,26 +1,24 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::handles::{
-    device::DeviceCleanup, DepthBufferHandle, SwapchainHandle,
-};
+use crate::renderer::backend::vk::DeviceDestroy;
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct RenderPassHandle {
+pub struct VkRenderPass {
     pub render_pass: vk::RenderPass,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl RenderPassHandle {
-    pub fn init(
-        swapchain_handle: &SwapchainHandle,
-        depth_buffer_handle: &DepthBufferHandle,
+impl VkRenderPass {
+    pub(in crate::renderer::backend::vk::resources) fn new(
         device: &Device,
+        color_attachment_format: vk::Format,
+        // depth_attachment_format: vk::Format,
     ) -> Self {
         let attachments: [vk::AttachmentDescription; 1] = [
             // color attachment
             vk::AttachmentDescription::builder()
-                .format(swapchain_handle.surface_format.format)
+                .format(color_attachment_format)
                 .samples(vk::SampleCountFlags::TYPE_1)
                 .load_op(vk::AttachmentLoadOp::CLEAR)
                 .store_op(vk::AttachmentStoreOp::STORE)
@@ -31,7 +29,7 @@ impl RenderPassHandle {
                 .build(),
             // depth attachment
             // vk::AttachmentDescription::builder()
-            //     .format(depth_buffer_handle.format)
+            //     .format(depth_attachment_format)
             //     .samples(vk::SampleCountFlags::TYPE_1)
             //     .load_op(vk::AttachmentLoadOp::DONT_CARE)
             //     .store_op(vk::AttachmentStoreOp::STORE)
@@ -69,11 +67,17 @@ impl RenderPassHandle {
 
         Self { render_pass }
     }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get(&self) -> &vk::RenderPass {
+        &self.render_pass
+    }
+    //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceCleanup for RenderPassHandle {
-    fn cleanup(&self, device: &Device) {
+impl DeviceDestroy for VkRenderPass {
+    fn destroy(&self, device: &Device) {
         unsafe {
             device.destroy_render_pass(self.render_pass, None);
         }

@@ -1,34 +1,43 @@
-use ash::vk::{Buffer, BufferCreateInfo, BufferUsageFlags, DeviceSize};
-use vk_mem::{Allocation, Allocator};
+use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::handles::AllocatorFree;
+use crate::renderer::backend::vk::DeviceDestroy;
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct VkBuffer {
-    pub buffer: Buffer,
-    pub allocation: Allocation,
+pub struct VkFence {
+    pub fence: vk::Fence,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl VkBuffer {
-    pub fn create_info(size: DeviceSize, usage: BufferUsageFlags) -> BufferCreateInfo {
-        BufferCreateInfo::builder().size(size).usage(usage).build()
+impl VkFence {
+    pub(in crate::renderer::backend::vk::resources) fn new(
+        device: &Device,
+        flags: vk::FenceCreateFlags,
+    ) -> Self {
+        let create_info = vk::FenceCreateInfo::builder().flags(flags);
+
+        let fence = unsafe {
+            device
+                .create_fence(&create_info, None)
+                .expect("VkFence::new - Failed to create fence!")
+        };
+
+        Self { fence }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get(&self) -> &Buffer {
-        &self.buffer
+    pub fn get(&self) -> &vk::Fence {
+        &self.fence
     }
     //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl AllocatorFree for VkBuffer {
-    fn free(&self, allocator: &Allocator) {
-        allocator
-            .destroy_buffer(self.buffer, &self.allocation)
-            .expect("BufferResource::cleanup - Failed to cleanup BufferResource!");
+impl DeviceDestroy for VkFence {
+    fn destroy(&self, device: &Device) {
+        unsafe {
+            device.destroy_fence(self.fence, None);
+        }
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

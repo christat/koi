@@ -3,7 +3,7 @@ use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::vk::{handles::InstanceHandle, platform};
-use crate::utils::traits::Cleanup;
+use crate::utils::traits::Destroy;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct SurfaceHandle {
@@ -26,8 +26,8 @@ impl SurfaceHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Cleanup for SurfaceHandle {
-    fn cleanup(&mut self) {
+impl Destroy for SurfaceHandle {
+    fn destroy(&mut self) {
         unsafe {
             self.surface.destroy_surface(self.surface_khr, None);
         }

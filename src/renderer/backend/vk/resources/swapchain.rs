@@ -2,39 +2,36 @@ use ash::{extensions::khr::Swapchain, version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::vk::{
-    handles::{
-        device::DeviceCleanup, InstanceHandle, PhysicalDeviceAttributes, PhysicalDeviceHandle,
-        SurfaceHandle,
-    },
-    VkBackendConfig,
+    handles::{InstanceHandle, PhysicalDeviceAttributes, PhysicalDeviceHandle, SurfaceHandle},
+    DeviceDestroy, VkRendererConfig,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct SwapchainHandle {
-    pub swapchain: Swapchain,
-    pub swapchain_khr: vk::SwapchainKHR,
-    pub surface_extent: vk::Extent2D,
-    pub surface_format: vk::SurfaceFormatKHR,
-    pub present_mode: vk::PresentModeKHR,
-    pub swapchain_images: Vec<vk::Image>,
-    pub swapchain_image_views: Vec<vk::ImageView>,
+pub struct VkSwapchain {
+    swapchain: Swapchain,
+    khr: vk::SwapchainKHR,
+    surface_extent: vk::Extent2D,
+    surface_format: vk::SurfaceFormatKHR,
+    present_mode: vk::PresentModeKHR,
+    images: Vec<vk::Image>,
+    image_views: Vec<vk::ImageView>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl SwapchainHandle {
-    pub fn init(
-        instance_handle: &InstanceHandle,
-        surface_handle: &SurfaceHandle,
-        physical_device_handle: &PhysicalDeviceHandle,
+impl VkSwapchain {
+    pub(in crate::renderer::backend::vk::resources) fn new(
         device: &Device,
-        config: &VkBackendConfig,
+        instance_handle: &InstanceHandle,
+        physical_device_handle: &PhysicalDeviceHandle,
+        surface_handle: &SurfaceHandle,
+        config: &VkRendererConfig,
     ) -> Self {
         let PhysicalDeviceHandle {
             physical_device_attributes,
             graphics_queue_index,
             present_queue_index,
             ..
-        } = physical_device_handle;
+        } = &physical_device_handle;
 
         let PhysicalDeviceAttributes {
             surface_capabilities,
@@ -73,19 +70,19 @@ impl SwapchainHandle {
         }
 
         let swapchain = Swapchain::new(&instance_handle.instance, device);
-        let swapchain_khr = unsafe {
+        let khr = unsafe {
             swapchain
                 .create_swapchain(&create_info, None)
-                .expect("SwapchainHandle::new - Failed to create swapchain!")
+                .expect("VkSwapchain::new - Failed to create swapchain!")
         };
 
-        let swapchain_images = unsafe {
+        let images = unsafe {
             swapchain
-                .get_swapchain_images(swapchain_khr)
-                .expect("SwapchainHandle::new - Failed to get swapchain images!")
+                .get_swapchain_images(khr)
+                .expect("VkSwapchain::new - Failed to get swapchain images!")
         };
 
-        let swapchain_image_views = swapchain_images
+        let image_views = images
             .iter()
             .map(|image| {
                 let create_info = vk::ImageViewCreateInfo::builder()
@@ -110,31 +107,57 @@ impl SwapchainHandle {
                 unsafe {
                     device
                         .create_image_view(&create_info, None)
-                        .expect("Swapchain::init - Failed to create swapchain image view!")
+                        .expect("VkSwapchain::new - Failed to create swapchain image view!")
                 }
             })
             .collect::<Vec<vk::ImageView>>();
 
         Self {
             swapchain,
-            swapchain_khr,
+            khr,
             surface_extent,
             surface_format,
             present_mode,
-            swapchain_images,
-            swapchain_image_views,
+            images,
+            image_views,
         }
     }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get(&self) -> &Swapchain {
+        &self.swapchain
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn khr(&self) -> &vk::SwapchainKHR {
+        &self.khr
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn surface_format(&self) -> vk::Format {
+        self.surface_format.format.clone()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn surface_extent(&self) -> vk::Extent2D {
+        self.surface_extent.clone()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn image_views(&self) -> &[vk::ImageView] {
+        &self.image_views
+    }
+    //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceCleanup for SwapchainHandle {
-    fn cleanup(&self, device: &Device) {
+impl DeviceDestroy for VkSwapchain {
+    fn destroy(&self, device: &Device) {
         unsafe {
-            self.swapchain_image_views
+            self.image_views
                 .iter()
                 .for_each(|image_view| device.destroy_image_view(*image_view, None));
-            self.swapchain.destroy_swapchain(self.swapchain_khr, None);
+            self.swapchain.destroy_swapchain(self.khr, None);
         }
     }
 }
@@ -148,7 +171,7 @@ fn select_surface_format(
     } = physical_device_attributes;
 
     if surface_formats.len() == 0 {
-        panic!("SwapchainHandle::select_surface_format - No surface formats available in device!")
+        panic!("VkSwapchain::select_surface_format - No surface formats available in dev!")
     };
 
     for surface_format in surface_formats.iter() {
@@ -164,11 +187,11 @@ fn select_surface_format(
 //----------------------------------------------------------------------------------------------------------------------
 
 fn select_present_mode(
-    physical_device_attributes: &PhysicalDeviceAttributes,
+    _physical_device_attributes: &PhysicalDeviceAttributes,
 ) -> vk::PresentModeKHR {
     #[cfg(not(debug_assertions))]
     {
-        let PhysicalDeviceAttributes { present_modes, .. } = physical_device_attributes;
+        let PhysicalDeviceAttributes { present_modes, .. } = _physical_device_attributes;
 
         for present_mode in present_modes.iter() {
             if *present_mode == vk::PresentModeKHR::MAILBOX {

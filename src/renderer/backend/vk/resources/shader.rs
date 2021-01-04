@@ -11,20 +11,24 @@ extern crate byteorder;
 use byteorder::{ByteOrder, LittleEndian};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::handles::DeviceCleanup;
-use crate::utils::ffi;
+use crate::{renderer::backend::vk::DeviceDestroy, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct ShaderResource {
-    pub shader: ShaderModule,
+pub struct VkShader {
+    module: ShaderModule,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl ShaderResource {
-    pub fn create(device: &Device, file_path: &Path) -> Self {
+impl VkShader {
+    pub(in crate::renderer::backend::vk::resources) fn new(device: &Device, path: &Path) -> Self {
         Self {
-            shader: create_shader_module(device, file_path),
+            module: create_shader_module(device, path),
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get(&self) -> &ShaderModule {
+        &self.module
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -35,10 +39,10 @@ impl ShaderResource {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl DeviceCleanup for ShaderResource {
-    fn cleanup(&self, device: &Device) {
+impl DeviceDestroy for VkShader {
+    fn destroy(&self, device: &Device) {
         unsafe {
-            device.destroy_shader_module(self.shader, None);
+            device.destroy_shader_module(self.module, None);
         }
     }
 }
@@ -66,8 +70,8 @@ fn read_shader(file_path: &Path) -> Vec<u32> {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-fn create_shader_module(device: &Device, file_path: &Path) -> ShaderModule {
-    let shader_raw = read_shader(file_path);
+fn create_shader_module(device: &Device, path: &Path) -> ShaderModule {
+    let shader_raw = read_shader(path);
 
     let create_info = ShaderModuleCreateInfo::builder().code(&shader_raw).build();
 
@@ -79,7 +83,7 @@ fn create_shader_module(device: &Device, file_path: &Path) -> ShaderModule {
 
     info!(
         "VkBackend::ShaderResource - Successfully loaded shader {}",
-        file_path.to_str().unwrap()
+        path.to_str().unwrap()
     );
 
     shader_module

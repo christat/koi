@@ -1,3 +1,6 @@
+use std::ptr::copy_nonoverlapping;
+//----------------------------------------------------------------------------------------------------------------------
+
 use ash::{vk::BufferCreateInfo, Device};
 use vk_mem::{
     AllocationCreateFlags, AllocationCreateInfo, Allocator, AllocatorCreateFlags,
@@ -5,13 +8,14 @@ use vk_mem::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::BufferResource;
-use crate::renderer::backend::vk::{
-    handles::{InstanceHandle, PhysicalDeviceHandle},
-    VkBackendConfig,
+use crate::{
+    renderer::backend::vk::{
+        handles::{InstanceHandle, PhysicalDeviceHandle},
+        resources::VkBuffer,
+        VkRendererConfig,
+    },
+    utils::traits::Destroy,
 };
-use crate::utils::traits::Cleanup;
-use std::ptr::copy_nonoverlapping;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct AllocatorHandle {
@@ -19,8 +23,8 @@ pub struct AllocatorHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-pub trait AllocatorCleanup {
-    fn cleanup(&self, allocator: &Allocator);
+pub trait AllocatorFree {
+    fn free(&self, allocator: &Allocator);
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +33,7 @@ impl AllocatorHandle {
         instance_handle: &InstanceHandle,
         physical_device_handle: &PhysicalDeviceHandle,
         device: &Device,
-        config: &VkBackendConfig,
+        config: &VkRendererConfig,
     ) -> Self {
         let allocator_create_info = AllocatorCreateInfo {
             physical_device: physical_device_handle.physical_device.to_owned(),
@@ -68,17 +72,17 @@ impl AllocatorHandle {
         &self,
         info: BufferCreateInfo,
         allocation_info: AllocationCreateInfo,
-    ) -> BufferResource {
+    ) -> VkBuffer {
         let (buffer, allocation, ..) = self
             .allocator
             .create_buffer(&info, &allocation_info)
             .expect("VkBackend::AllocatorHandle::create_buffer - Failed to create buffer!");
 
-        BufferResource { buffer, allocation }
+        VkBuffer { buffer, allocation }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn write_buffer<T>(&self, buffer: &BufferResource, data: *const T, size: usize) {
+    pub fn write_buffer<T>(&self, buffer: &VkBuffer, data: *const T, size: usize) {
         let mapped_memory = self
             .allocator
             .map_memory(&buffer.allocation)
@@ -96,8 +100,8 @@ impl AllocatorHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Cleanup for AllocatorHandle {
-    fn cleanup(&mut self) {
+impl Destroy for AllocatorHandle {
+    fn destroy(&mut self) {
         self.allocator.destroy();
     }
 }

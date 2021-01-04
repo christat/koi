@@ -4,8 +4,8 @@ use ash::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::utils::traits::Cleanup;
-use crate::{renderer::backend::vk::VkBackendConfig, utils::ffi};
+use crate::utils::traits::Destroy;
+use crate::{renderer::backend::vk::VkRendererConfig, utils::ffi};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct InstanceHandle {
@@ -15,17 +15,17 @@ pub struct InstanceHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl InstanceHandle {
-    pub fn init(app_name: &str) -> (Self, VkBackendConfig) {
+    pub fn init(app_name: &str) -> (Self, VkRendererConfig) {
         let entry = Entry::new().expect("InstanceHandle::init - Failed to instantiate library!");
-        let config = VkBackendConfig::init(&entry);
+        let config = VkRendererConfig::init(&entry);
         let instance = create_configured_instance(&entry, app_name, &config);
         (Self { entry, instance }, config)
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl Cleanup for InstanceHandle {
-    fn cleanup(&mut self) {
+impl Destroy for InstanceHandle {
+    fn destroy(&mut self) {
         unsafe {
             self.instance.destroy_instance(None);
         }
@@ -33,7 +33,11 @@ impl Cleanup for InstanceHandle {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-fn create_configured_instance(entry: &Entry, app_name: &str, config: &VkBackendConfig) -> Instance {
+fn create_configured_instance(
+    entry: &Entry,
+    app_name: &str,
+    config: &VkRendererConfig,
+) -> Instance {
     let application_name = ffi::CString::new(app_name).unwrap();
     let engine_name = ffi::CString::new("Koi").unwrap();
 

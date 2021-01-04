@@ -4,7 +4,7 @@ use ash::{version::InstanceV1_0, vk, Instance};
 use crate::{
     renderer::backend::vk::{
         handles::{InstanceHandle, SurfaceHandle},
-        VkBackendConfig,
+        VkRendererConfig,
     },
     utils::{ffi, math},
 };
@@ -22,7 +22,7 @@ impl PhysicalDeviceHandle {
     pub fn init(
         instance_handle: &InstanceHandle,
         surface_handle: &SurfaceHandle,
-        config: &mut VkBackendConfig,
+        config: &mut VkRendererConfig,
     ) -> Self {
         let InstanceHandle { instance, .. } = instance_handle;
 
@@ -84,7 +84,7 @@ impl PhysicalDeviceHandle {
                             queue_index as u32,
                             *surface_khr,
                         )
-                        .expect("PhysicalDeviceHandle::init - Failed to get physical device surface support!")
+                        .expect("PhysicalDeviceHandle::init - Failed to get physical dev surface support!")
                 };
 
                 if !surface_supported {
@@ -120,7 +120,7 @@ impl PhysicalDeviceHandle {
                             queue_index as u32,
                             *surface_khr,
                         )
-                        .expect("PhysicalDeviceHandle::init - Failed to get physical device surface support!")
+                        .expect("PhysicalDeviceHandle::init - Failed to get physical dev surface support!")
                 };
 
                 if surface_supported {
@@ -149,7 +149,7 @@ impl PhysicalDeviceHandle {
             }
         }
 
-        panic!("PhysicalDeviceHandle::init - Failed to select a suitable physical device!");
+        panic!("PhysicalDeviceHandle::init - Failed to select a suitable physical dev!");
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -187,17 +187,21 @@ impl PhysicalDeviceAttributes {
             let extensions_properties =
                 instance
                     .enumerate_device_extension_properties(physical_device)
-                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} extension properties!", name));
+                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query dev {} extension properties!", name));
 
             let surface_capabilities =
                 surface.get_physical_device_surface_capabilities(physical_device, *surface_khr)
-                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} surface capabilities!", name));
+                    .expect(&format!("VkBackend::enumerate_physical_devices - Failed to query dev {} surface capabilities!", name));
 
             let surface_formats =
-                surface.get_physical_device_surface_formats(physical_device, *surface_khr).expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} surface formats!", name));
+                surface.get_physical_device_surface_formats(physical_device, *surface_khr).expect(&format!("VkBackend::enumerate_physical_devices - Failed to query dev {} surface formats!", name));
 
-            let present_modes =
-                surface.get_physical_device_surface_present_modes(physical_device, *surface_khr).expect(&format!("VkBackend::enumerate_physical_devices - Failed to query device {} present modes!", name));
+            let present_modes = surface
+                .get_physical_device_surface_present_modes(physical_device, *surface_khr)
+                .expect(&format!(
+                    "VkBackend::enumerate_physical_devices - Failed to query dev {} present modes!",
+                    name
+                ));
 
             Self {
                 name: String::from(name),
@@ -214,7 +218,7 @@ impl PhysicalDeviceAttributes {
     }
     //----------------------------------------------------------------------------------------------
 
-    pub fn check_physical_device_extension_support(&self, config: &VkBackendConfig) -> bool {
+    pub fn check_physical_device_extension_support(&self, config: &VkRendererConfig) -> bool {
         let supported_device_extensions = self
             .extensions_properties
             .iter()

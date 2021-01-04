@@ -1,20 +1,22 @@
 use crate::core::Window;
-use crate::renderer::backend::vk::VkBackend;
+use crate::renderer::backend::vk::VkRenderer;
 use crate::renderer::entities::Mesh;
 use crate::renderer::hal::RendererBackend;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Renderer {
-    backend: VkBackend,
+    backend: VkRenderer,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
 impl Renderer {
     pub fn init(app_name: &str, window: &Window) -> Self {
         info!("----- Renderer::init -----");
-        Self {
-            backend: VkBackend::init(app_name, &window.window_handle),
-        }
+
+        let mut backend = VkRenderer::init(app_name, &window.window_handle);
+        backend.init_resources();
+
+        Self { backend }
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +39,7 @@ impl Renderer {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn load_meshes(&mut self, mesh: Mesh) {
+    pub fn load_mesh(&mut self, mesh: Mesh) {
         self.backend.load_mesh(mesh);
     }
     //------------------------------------------------------------------------------------------------------------------

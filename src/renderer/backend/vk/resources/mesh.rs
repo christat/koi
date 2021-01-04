@@ -1,3 +1,4 @@
+// use std::ptr::copy_nonoverlapping
 use std::mem::size_of;
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -9,12 +10,11 @@ use vk_mem::{Allocator, MemoryUsage};
 
 use crate::renderer::{
     backend::vk::{
-        handles::{AllocatorCleanup, AllocatorHandle},
-        resources::BufferResource,
+        handles::{AllocatorFree, AllocatorHandle},
+        resources::VkBuffer,
     },
     entities::{Mesh, Vertex, VERTEX_SIZE},
 };
-use std::ptr::copy_nonoverlapping;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VertexInputDescription {
@@ -95,16 +95,19 @@ impl MeshPushConstants {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-pub struct MeshResource {
+pub struct VkMesh {
     mesh: Mesh,
-    pub(crate) vertex_buffer: BufferResource,
+    pub(crate) vertex_buffer: VkBuffer,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl MeshResource {
-    pub fn init(mesh: Mesh, allocator_handle: &AllocatorHandle) -> Self {
+impl VkMesh {
+    pub(in crate::renderer::backend::vk::resources) fn new(
+        mesh: Mesh,
+        allocator_handle: &AllocatorHandle,
+    ) -> Self {
         let vertex_buffer = allocator_handle.create_buffer(
-            BufferResource::create_info(
+            VkBuffer::create_info(
                 (mesh.vertices.len() * VERTEX_SIZE) as vk::DeviceSize,
                 vk::BufferUsageFlags::VERTEX_BUFFER,
             ),
@@ -126,9 +129,9 @@ impl MeshResource {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl AllocatorCleanup for MeshResource {
-    fn cleanup(&self, allocator: &Allocator) {
-        self.vertex_buffer.cleanup(allocator);
+impl AllocatorFree for VkMesh {
+    fn free(&self, allocator: &Allocator) {
+        self.vertex_buffer.free(allocator);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------
