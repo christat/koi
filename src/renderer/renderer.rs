@@ -1,7 +1,7 @@
-use crate::core::Window;
-use crate::renderer::backend::vk::VkRenderer;
-use crate::renderer::entities::Mesh;
-use crate::renderer::hal::RendererBackend;
+use crate::{
+    core::Window,
+    renderer::{backend::vk::VkRenderer, hal::RendererBackend},
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Renderer {

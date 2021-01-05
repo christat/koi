@@ -12,8 +12,12 @@ pub struct VkSwapchain {
     khr: vk::SwapchainKHR,
     surface_extent: vk::Extent2D,
     surface_format: vk::SurfaceFormatKHR,
+
+    #[allow(dead_code)]
     present_mode: vk::PresentModeKHR,
+    #[allow(dead_code)]
     images: Vec<vk::Image>,
+
     image_views: Vec<vk::ImageView>,
 }
 //----------------------------------------------------------------------------------------------------------------------

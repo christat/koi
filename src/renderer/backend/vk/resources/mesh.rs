@@ -14,7 +14,6 @@ use crate::renderer::{
     },
     entities::{Mesh, Vertex, VERTEX_SIZE},
 };
-use winit::window::CursorIcon::VerticalText;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VertexInputDescription {
