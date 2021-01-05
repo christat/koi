@@ -258,9 +258,12 @@ impl VkRenderer {
 
         resource_manager.create_pipeline(device, "mesh", &pipeline_builder, &render_pass);
 
-        let mesh_resource =
-            resource_manager.create_mesh("triangle", Mesh::test_triangle(), allocator_handle);
-        mesh_resource.upload(allocator_handle);
+        let meshes = Mesh::from_obj(Path::new("assets/models/monkey/monkey_smooth.obj"));
+        for (index, mesh) in meshes.into_iter().enumerate() {
+            let mesh_resource =
+                resource_manager.create_mesh(&format!("monkey{}", index), mesh, allocator_handle);
+            mesh_resource.upload(allocator_handle);
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -415,7 +418,7 @@ impl RendererBackend for VkRenderer {
 
         let mut vertex_count: u32 = 3;
         if let PipelineType::MESH = &self.pipeline_in_use {
-            let triangle_mesh = resource_manager.get_mesh("triangle");
+            let triangle_mesh = resource_manager.get_mesh("monkey0");
             vertex_count = triangle_mesh.get_mesh().vertices.len() as u32;
             unsafe {
                 device.cmd_bind_vertex_buffers(

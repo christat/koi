@@ -21,12 +21,14 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="fixed mesh triangle example">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="cleanup unused import and dead code warnings">
+      <change afterPath="$PROJECT_DIR$/assets/models/monkey/monkey_smooth.mtl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/models/monkey/monkey_smooth.obj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +78,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/assets/models/monkey/monkey_smooth.mtl.rs" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/build.rs" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/utils/logger.rs" value="true" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
@@ -187,7 +190,7 @@
       <workItem from="1609424351665" duration="1947000" />
       <workItem from="1609491091890" duration="29218000" />
       <workItem from="1609574887192" duration="52959000" />
-      <workItem from="1609828096202" duration="8813000" />
+      <workItem from="1609828096202" duration="17816000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -321,7 +324,13 @@
       <option name="presentableId" value="LOCAL−00022" />
       <updated>1609866759904</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL−00023" summary="cleanup unused import and dead code warnings">
+      <created>1609866908902</created>
+      <option name="number" value="LOCAL−00023" />
+      <option name="presentableId" value="LOCAL−00023" />
+      <updated>1609866908902</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,7 +376,8 @@
     <MESSAGE value="added vertex buffer to pipeline and push constants to layout" />
     <MESSAGE value="refactored VkBackend to manage resources dynamically (ResourceManager struct)" />
     <MESSAGE value="fixed mesh triangle example" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed mesh triangle example" />
+    <MESSAGE value="cleanup unused import and dead code warnings" />
+    <option name="LAST_COMMIT_MESSAGE" value="cleanup unused import and dead code warnings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

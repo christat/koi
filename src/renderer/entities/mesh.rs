@@ -1,8 +1,12 @@
+use std::path::Path;
+//----------------------------------------------------------------------------------------------------------------------
+
+use tobj;
 use ultraviolet::Vec3;
 //----------------------------------------------------------------------------------------------------------------------
 
 #[repr(C)]
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vertex {
     pub position: Vec3,
     pub normal: Vec3,
@@ -13,8 +17,19 @@ pub struct Vertex {
 pub const VERTEX_SIZE: usize = std::mem::size_of::<Vertex>();
 //----------------------------------------------------------------------------------------------------------------------
 
+impl Vertex {
+    pub fn new(position: Vec3, normal: Vec3, color: Vec3) -> Self {
+        Self {
+            position,
+            normal,
+            color,
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 pub struct Mesh {
-    pub(crate) vertices: Vec<Vertex>,
+    pub vertices: Vec<Vertex>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -26,37 +41,54 @@ impl Mesh {
             z: 0.0,
         };
 
-        let vertices = vec![
-            Vertex {
-                position: Vec3 {
-                    x: 1.0,
-                    y: 1.0,
-                    z: 0.0,
-                },
-                normal: Default::default(),
-                color: COLOR,
-            },
-            Vertex {
-                position: Vec3 {
-                    x: -1.0,
-                    y: 1.0,
-                    z: 0.0,
-                },
-                normal: Default::default(),
-                color: COLOR,
-            },
-            Vertex {
-                position: Vec3 {
-                    x: 0.0,
-                    y: -1.0,
-                    z: 0.0,
-                },
-                normal: Default::default(),
-                color: COLOR,
-            },
-        ];
-
-        Self { vertices }
+        Self {
+            vertices: vec![
+                Vertex::new(Vec3::new(1.0, 1.0, 1.0), Vec3::default(), COLOR),
+                Vertex::new(Vec3::new(-1.0, 1.0, 1.0), Vec3::default(), COLOR),
+                Vertex::new(Vec3::new(0.0, -1.0, 0.0), Vec3::default(), COLOR),
+            ],
+        }
     }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn from_obj(file_path: &Path) -> Vec<Mesh> {
+        let (models, _materials) = tobj::load_obj(file_path, true).expect(&format!(
+            "Mesh::from_obj - Failed to load model in path {}!",
+            file_path.to_str().unwrap_or("<Failed to covert path>")
+        ));
+
+        models
+            .iter()
+            .map(|model| {
+                let tobj::Model { mesh, .. } = model;
+                let tobj::Mesh {
+                    indices,
+                    positions: v,
+                    normals: vn,
+                    ..
+                } = mesh;
+
+                // ensure the model consists of tris
+                assert_eq!(0, v.len() % 3);
+
+                let vertices = indices
+                    .iter()
+                    .map(|i| {
+                        let f = *i as usize;
+                        let count = mesh.num_face_indices[f] as usize; // should always be 3 when triangulated
+
+                        let position = Vec3::new(v[count * f], v[count * f + 1], v[count * f + 2]);
+                        let normal = Vec3::new(vn[count * f], vn[count * f + 1], vn[count * f + 2]);
+                        Vertex::new(position, normal, normal)
+                    })
+                    .collect::<Vec<Vertex>>();
+
+                assert_ne!(0, vertices.len());
+
+                Self { vertices }
+            })
+            .collect()
+    }
+    //------------------------------------------------------------------------------------------------------------------
 }
 //----------------------------------------------------------------------------------------------------------------------
