@@ -23,24 +23,14 @@
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="refactored VkBackend to manage resources dynamically (ResourceManager struct)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/mesh.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/mesh.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_pool.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_pool.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/fence.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/fence.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/framebuffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/handles/allocator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline_layout.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline_layout.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/render_pass.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/semaphore.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,11 +94,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package koi --bin koi" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -139,6 +124,11 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -201,6 +191,7 @@
       <workItem from="1609424351665" duration="1947000" />
       <workItem from="1609491091890" duration="29218000" />
       <workItem from="1609574887192" duration="52959000" />
+      <workItem from="1609828096202" duration="8660000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -374,5 +365,16 @@
     <MESSAGE value="added vertex buffer to pipeline and push constants to layout" />
     <MESSAGE value="refactored VkBackend to manage resources dynamically (ResourceManager struct)" />
     <option name="LAST_COMMIT_MESSAGE" value="refactored VkBackend to manage resources dynamically (ResourceManager struct)" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs</url>
+          <line>125</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

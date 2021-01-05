@@ -300,11 +300,11 @@ impl ResourceManager {
 
     pub fn create_mesh(
         &mut self,
-        allocator_handle: &AllocatorHandle,
         id: &str,
         mesh: Mesh,
+        allocator_handle: &AllocatorHandle,
     ) -> Rc<VkMesh> {
-        let vk_mesh = Rc::new(VkMesh::new(mesh, &allocator_handle));
+        let vk_mesh = Rc::new(VkMesh::new(mesh, allocator_handle));
         self.meshes.insert(id.to_owned(), vk_mesh.clone());
 
         vk_mesh

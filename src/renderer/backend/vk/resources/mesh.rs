@@ -1,4 +1,3 @@
-// use std::ptr::copy_nonoverlapping
 use std::mem::size_of;
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +14,7 @@ use crate::renderer::{
     },
     entities::{Mesh, Vertex, VERTEX_SIZE},
 };
+use winit::window::CursorIcon::VerticalText;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VertexInputDescription {
@@ -28,7 +28,7 @@ impl VertexInputDescription {
     pub fn get() -> Self {
         let bindings = vec![vk::VertexInputBindingDescription::builder()
             .binding(0)
-            .stride(size_of::<Vertex>() as u32)
+            .stride(VERTEX_SIZE as u32)
             .input_rate(vk::VertexInputRate::VERTEX)
             .build()];
 
@@ -97,7 +97,7 @@ impl MeshPushConstants {
 
 pub struct VkMesh {
     mesh: Mesh,
-    pub(crate) vertex_buffer: VkBuffer,
+    vertex_buffer: VkBuffer,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -124,6 +124,16 @@ impl VkMesh {
     pub fn upload(&self, allocator_handle: &AllocatorHandle) {
         let vertices = &self.mesh.vertices;
         allocator_handle.write_buffer(&self.vertex_buffer, vertices.as_ptr(), vertices.len());
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_mesh(&self) -> &Mesh {
+        &self.mesh
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_buffer(&self) -> &VkBuffer {
+        &self.vertex_buffer
     }
     //------------------------------------------------------------------------------------------------------------------
 }

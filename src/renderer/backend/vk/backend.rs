@@ -100,16 +100,6 @@ impl VkRenderer {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn resource_manager(&self) -> &ResourceManager {
-        &self.resource_manager
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    pub fn resource_manager_mut(&mut self) -> &mut ResourceManager {
-        &mut self.resource_manager
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
     pub fn init_resources(&mut self) {
         info!("----- VkBackend::init_resources -----");
 
@@ -120,6 +110,7 @@ impl VkRenderer {
             config,
             device_handle,
             resource_manager,
+            allocator_handle,
             ..
         } = self;
 
@@ -158,33 +149,43 @@ impl VkRenderer {
 
         resource_manager.create_framebuffers(device, &swapchain, &render_pass);
 
-        let hardcoded_vert = resource_manager.create_shader(
-            device,
-            "hardcoded_vert",
-            Path::new("resources/shaders/dist/hardcoded.vert.spv"),
-        );
-        let hardcoded_frag = resource_manager.create_shader(
-            device,
-            "hardcoded_frag",
-            Path::new("resources/shaders/dist/hardcoded.frag.spv"),
-        );
+        let hardcoded_vert = *resource_manager
+            .create_shader(
+                device,
+                "hardcoded_vert",
+                Path::new("resources/shaders/dist/hardcoded.vert.spv"),
+            )
+            .get();
+        let hardcoded_frag = *resource_manager
+            .create_shader(
+                device,
+                "hardcoded_frag",
+                Path::new("resources/shaders/dist/hardcoded.frag.spv"),
+            )
+            .get();
 
-        let alt_vert = resource_manager.create_shader(
-            device,
-            "alt_vert",
-            Path::new("resources/shaders/dist/alt.vert.spv"),
-        );
-        let alt_frag = resource_manager.create_shader(
-            device,
-            "alt_frag",
-            Path::new("resources/shaders/dist/alt.frag.spv"),
-        );
+        let alt_vert = *resource_manager
+            .create_shader(
+                device,
+                "alt_vert",
+                Path::new("resources/shaders/dist/alt.vert.spv"),
+            )
+            .get();
+        let alt_frag = *resource_manager
+            .create_shader(
+                device,
+                "alt_frag",
+                Path::new("resources/shaders/dist/alt.frag.spv"),
+            )
+            .get();
 
-        let mesh_vert = resource_manager.create_shader(
-            device,
-            "mesh_vert",
-            Path::new("resources/shaders/dist/mesh.vert.spv"),
-        );
+        let mesh_vert = *resource_manager
+            .create_shader(
+                device,
+                "mesh_vert",
+                Path::new("resources/shaders/dist/mesh.vert.spv"),
+            )
+            .get();
 
         let pipeline_layout = resource_manager.create_pipeline_layout(device, "default", None);
 
@@ -216,12 +217,12 @@ impl VkRenderer {
             .color_blend_attachment_state()
             .pipeline_layout(*pipeline_layout.get())
             .shader_stage(
-                *hardcoded_vert.get(),
+                hardcoded_vert,
                 vk::ShaderStageFlags::VERTEX,
                 &shader_entry_point,
             )
             .shader_stage(
-                *hardcoded_frag.get(),
+                hardcoded_frag,
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             );
@@ -230,13 +231,9 @@ impl VkRenderer {
 
         pipeline_builder = pipeline_builder
             .clear_shader_stages()
+            .shader_stage(alt_vert, vk::ShaderStageFlags::VERTEX, &shader_entry_point)
             .shader_stage(
-                *alt_vert.get(),
-                vk::ShaderStageFlags::VERTEX,
-                &shader_entry_point,
-            )
-            .shader_stage(
-                *alt_frag.get(),
+                alt_frag,
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             );
@@ -251,13 +248,9 @@ impl VkRenderer {
         pipeline_builder = pipeline_builder
             .vertex_input_state(&vertex_description)
             .clear_shader_stages()
+            .shader_stage(mesh_vert, vk::ShaderStageFlags::VERTEX, &shader_entry_point)
             .shader_stage(
-                *mesh_vert.get(),
-                vk::ShaderStageFlags::VERTEX,
-                &shader_entry_point,
-            )
-            .shader_stage(
-                *hardcoded_frag.get(),
+                hardcoded_frag,
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             )
@@ -265,7 +258,9 @@ impl VkRenderer {
 
         resource_manager.create_pipeline(device, "mesh", &pipeline_builder, &render_pass);
 
-        resource_manager.create_mesh(&self.allocator_handle, "triangle", Mesh::test_triangle());
+        let mesh_resource =
+            resource_manager.create_mesh("triangle", Mesh::test_triangle(), allocator_handle);
+        mesh_resource.upload(allocator_handle);
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -418,14 +413,15 @@ impl RendererBackend for VkRenderer {
             );
         }
 
+        let mut vertex_count: u32 = 3;
         if let PipelineType::MESH = &self.pipeline_in_use {
-            let mesh = resource_manager.get_mesh("triangle");
-
+            let triangle_mesh = resource_manager.get_mesh("triangle");
+            vertex_count = triangle_mesh.get_mesh().vertices.len() as u32;
             unsafe {
                 device.cmd_bind_vertex_buffers(
                     command_buffer,
                     0,
-                    &[*mesh.vertex_buffer.get()],
+                    &[*triangle_mesh.get_buffer().get()],
                     &[0],
                 );
             }
@@ -455,8 +451,7 @@ impl RendererBackend for VkRenderer {
         }
 
         unsafe {
-            device.cmd_draw(command_buffer, 3, 1, 0, 0);
-
+            device.cmd_draw(command_buffer, vertex_count, 1, 0, 0);
             device.cmd_end_render_pass(command_buffer);
             device
                 .end_command_buffer(command_buffer)
@@ -515,14 +510,6 @@ impl RendererBackend for VkRenderer {
             PipelineType::MESH => PipelineType::HARDCODED,
         };
         self.pipeline_in_use = new_pipeline_in_use;
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    fn load_mesh(&mut self, mesh: Mesh) {
-        let mesh_resource =
-            self.resource_manager
-                .create_mesh(&self.allocator_handle, "default", mesh);
-        mesh_resource.upload(&self.allocator_handle);
     }
     //------------------------------------------------------------------------------------------------------------------
 }

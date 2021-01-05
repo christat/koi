@@ -86,15 +86,15 @@ impl AllocatorHandle {
         let mapped_memory = self
             .allocator
             .map_memory(&buffer.allocation)
-            .expect("VkBackend::Allocator::write_buffer - Failed to map buffer allocation!");
+            .expect("VkBackend::AllocatorHandle::write_buffer - Failed to map buffer allocation!");
 
         unsafe {
             copy_nonoverlapping(data, mapped_memory as *mut T, size);
         }
 
-        self.allocator
-            .unmap_memory(&buffer.allocation)
-            .expect("VkBackend::Allocator::write_buffer - Failed to unmap buffer allocation!");
+        self.allocator.unmap_memory(&buffer.allocation).expect(
+            "VkBackend::AllocatorHandle::write_buffer - Failed to unmap buffer allocation!",
+        );
     }
     //------------------------------------------------------------------------------------------------------------------
 }
