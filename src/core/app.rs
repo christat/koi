@@ -54,10 +54,7 @@ impl App {
                                 renderer.await_device_idle();
                                 *control_flow = ControlFlow::Exit;
                             }
-                            (Some(VirtualKeyCode::Space), ElementState::Pressed) => {
-                                renderer.swap_pipelines();
-                            }
-                            _ => {}
+                            _ => *control_flow = ControlFlow::Poll,
                         },
                     },
                     _ => *control_flow = ControlFlow::Poll,

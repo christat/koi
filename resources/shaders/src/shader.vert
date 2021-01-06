@@ -10,11 +10,11 @@ layout (location = 0) out vec3 outColor;
 layout( push_constant ) uniform constants
 {
     vec4 data;
-    mat4 render_matrix;
+    mat4 transform_matrix;
 } PushConstants;
 
 void main()
 {
-    gl_Position = PushConstants.render_matrix * vec4(vPosition, 1.0f);
+    gl_Position = PushConstants.transform_matrix * vec4(vPosition, 1.0f);
     outColor = vColor;
 }

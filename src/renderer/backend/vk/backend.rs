@@ -23,13 +23,6 @@ use crate::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-pub enum PipelineType {
-    HARDCODED,
-    ALT,
-    MESH,
-}
-//----------------------------------------------------------------------------------------------------------------------
-
 pub trait DeviceDestroy {
     fn destroy(&self, device: &Device);
 }
@@ -54,7 +47,6 @@ pub struct VkRenderer {
     pub resource_manager: ResourceManager,
     //------------------------------------------------------------------------------------------------------------------
     frame_index: u32,
-    pipeline_in_use: PipelineType,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +88,6 @@ impl VkRenderer {
             resource_manager,
             //----------------------------------------------------------------------------------------------------------
             frame_index: 0,
-            pipeline_in_use: PipelineType::HARDCODED,
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -160,52 +151,32 @@ impl VkRenderer {
             depth_attachment_format,
         );
 
-        let hardcoded_vert = resource_manager
+        let fragment_shader = resource_manager
             .create_shader(
                 device,
-                "hardcoded_vert",
-                Path::new("resources/shaders/dist/hardcoded.vert.spv"),
-            )
-            .get();
-        let hardcoded_frag = resource_manager
-            .create_shader(
-                device,
-                "hardcoded_frag",
-                Path::new("resources/shaders/dist/hardcoded.frag.spv"),
+                "fragment",
+                Path::new("resources/shaders/dist/shader.frag.spv"),
             )
             .get();
 
-        let alt_vert = resource_manager
+        let vertex_shader = resource_manager
             .create_shader(
                 device,
-                "alt_vert",
-                Path::new("resources/shaders/dist/alt.vert.spv"),
+                "vertex",
+                Path::new("resources/shaders/dist/shader.vert.spv"),
             )
             .get();
-        let alt_frag = resource_manager
-            .create_shader(
-                device,
-                "alt_frag",
-                Path::new("resources/shaders/dist/alt.frag.spv"),
-            )
-            .get();
-
-        let mesh_vert = resource_manager
-            .create_shader(
-                device,
-                "mesh_vert",
-                Path::new("resources/shaders/dist/mesh.vert.spv"),
-            )
-            .get();
-
-        let pipeline_layout = resource_manager.create_pipeline_layout(device, "default", None);
 
         let surface_extent = swapchain.surface_extent();
         let vk::Extent2D { width, height } = surface_extent;
-
         let shader_entry_point = VkShader::get_default_shader_entry_point();
 
-        let mut pipeline_builder = ResourceManager::get_pipeline_builder()
+        let vertex_description = VertexInputDescription::get();
+        let push_constant_ranges = [MeshPushConstants::get_range()];
+        let pipeline_layout =
+            resource_manager.create_pipeline_layout(device, "default", Some(&push_constant_ranges));
+
+        let pipeline_builder = ResourceManager::get_pipeline_builder()
             .input_assembly_state(vk::PrimitiveTopology::TRIANGLE_LIST)
             .viewport(
                 vk::Viewport::builder()
@@ -227,47 +198,19 @@ impl VkRenderer {
             .multisampling_state()
             .color_blend_attachment_state()
             .pipeline_layout(pipeline_layout.get())
+            .vertex_input_state(&vertex_description)
             .shader_stage(
-                hardcoded_vert,
+                vertex_shader,
                 vk::ShaderStageFlags::VERTEX,
                 &shader_entry_point,
             )
             .shader_stage(
-                hardcoded_frag,
+                fragment_shader,
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             );
 
-        resource_manager.create_pipeline(device, "hardcoded", &pipeline_builder, &render_pass);
-
-        pipeline_builder = pipeline_builder
-            .clear_shader_stages()
-            .shader_stage(alt_vert, vk::ShaderStageFlags::VERTEX, &shader_entry_point)
-            .shader_stage(
-                alt_frag,
-                vk::ShaderStageFlags::FRAGMENT,
-                &shader_entry_point,
-            );
-
-        resource_manager.create_pipeline(device, "alt", &pipeline_builder, &render_pass);
-
-        let vertex_description = VertexInputDescription::get();
-        let push_constant_ranges = [MeshPushConstants::get_range()];
-        let mesh_pipeline_layout =
-            resource_manager.create_pipeline_layout(device, "mesh", Some(&push_constant_ranges));
-
-        pipeline_builder = pipeline_builder
-            .vertex_input_state(&vertex_description)
-            .clear_shader_stages()
-            .shader_stage(mesh_vert, vk::ShaderStageFlags::VERTEX, &shader_entry_point)
-            .shader_stage(
-                hardcoded_frag,
-                vk::ShaderStageFlags::FRAGMENT,
-                &shader_entry_point,
-            )
-            .pipeline_layout(mesh_pipeline_layout.get());
-
-        resource_manager.create_pipeline(device, "mesh", &pipeline_builder, &render_pass);
+        resource_manager.create_pipeline(device, "default", &pipeline_builder, &render_pass);
 
         let meshes = Mesh::from_obj(Path::new("assets/models/monkey/monkey_smooth.obj"));
         for (index, mesh) in meshes.into_iter().enumerate() {
@@ -372,11 +315,11 @@ impl RendererBackend for VkRenderer {
                 .expect("VkBackend::draw - Failed to begin command buffer!")
         };
 
-        let flash = f32::abs(f32::sin(self.frame_index as f32 / f32::to_radians(900.0)));
+        const BG: f32 = 0.035;
         let clear_values = [
             vk::ClearValue {
                 color: vk::ClearColorValue {
-                    float32: [flash, flash, flash, 1.0],
+                    float32: [BG, BG, BG, 1.0],
                 },
             },
             vk::ClearValue {
@@ -412,20 +355,9 @@ impl RendererBackend for VkRenderer {
                 vk::SubpassContents::INLINE,
             );
         }
-        let pipeline_key = match self.pipeline_in_use {
-            PipelineType::HARDCODED => "hardcoded",
-            PipelineType::ALT => "alt",
-            PipelineType::MESH => "mesh",
-        };
 
-        let pipeline = resource_manager.get_pipeline(pipeline_key);
-
-        let pipeline_layout_key = match self.pipeline_in_use {
-            PipelineType::MESH => "mesh",
-            _ => "default",
-        };
-
-        let pipeline_layout = resource_manager.get_pipeline_layout(pipeline_layout_key);
+        let pipeline = resource_manager.get_pipeline("default");
+        let pipeline_layout = resource_manager.get_pipeline_layout("default");
 
         unsafe {
             device.cmd_bind_pipeline(
@@ -435,44 +367,36 @@ impl RendererBackend for VkRenderer {
             );
         }
 
-        let mut vertex_count: u32 = 3;
-        if let PipelineType::MESH = &self.pipeline_in_use {
-            let triangle_mesh = resource_manager.get_mesh("monkey0");
-            vertex_count = triangle_mesh.get_mesh().vertices.len() as u32;
-            unsafe {
-                device.cmd_bind_vertex_buffers(
-                    command_buffer,
-                    0,
-                    &[triangle_mesh.get_buffer().get()],
-                    &[0],
-                );
-            }
-
-            let view = Mat4::from_translation(Vec3::new(0.0, 0.0, -2.0));
-            let projection = perspective_vk(f32::to_radians(70.0), 1700.0 / 900.0, 0.1, 200.0);
-            let model_rotor = Rotor3::from_euler_angles(
-                0.0,
-                0.0,
-                -f32::to_radians(2.0 * self.frame_index as f32),
-            );
-            let model = model_rotor.into_matrix().into_homogeneous();
-            let transform_matrix = projection * view * model;
-
-            let stage_flags = MeshPushConstants::get_range().stage_flags;
-            let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
-
-            unsafe {
-                device.cmd_push_constants(
-                    command_buffer,
-                    pipeline_layout.get(),
-                    stage_flags,
-                    0,
-                    ffi::any_as_u8_slice(&mesh_push_constants),
-                );
-            }
-        }
+        let triangle_mesh = resource_manager.get_mesh("monkey0");
+        let vertex_count = triangle_mesh.get_mesh().vertices.len() as u32;
 
         unsafe {
+            device.cmd_bind_vertex_buffers(
+                command_buffer,
+                0,
+                &[triangle_mesh.get_buffer().get()],
+                &[0],
+            );
+        }
+
+        let view = Mat4::from_translation(Vec3::new(0.0, 0.0, -2.0));
+        let projection = perspective_vk(f32::to_radians(70.0), 1700.0 / 900.0, 0.1, 200.0);
+        let model_rotor =
+            Rotor3::from_euler_angles(0.0, 0.0, -f32::to_radians(2.0 * self.frame_index as f32));
+        let model = model_rotor.into_matrix().into_homogeneous();
+        let transform_matrix = projection * view * model;
+
+        let stage_flags = MeshPushConstants::get_range().stage_flags;
+        let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
+
+        unsafe {
+            device.cmd_push_constants(
+                command_buffer,
+                pipeline_layout.get(),
+                stage_flags,
+                0,
+                ffi::any_as_u8_slice(&mesh_push_constants),
+            );
             device.cmd_draw(command_buffer, vertex_count, 1, 0, 0);
             device.cmd_end_render_pass(command_buffer);
             device
@@ -522,16 +446,6 @@ impl RendererBackend for VkRenderer {
                 .device_wait_idle()
                 .expect("VkBackend::await_device_idle - Failed to wait for dev to become idle!");
         }
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-    fn swap_pipelines(&mut self) {
-        let new_pipeline_in_use = match self.pipeline_in_use {
-            PipelineType::HARDCODED => PipelineType::ALT,
-            PipelineType::ALT => PipelineType::MESH,
-            PipelineType::MESH => PipelineType::HARDCODED,
-        };
-        self.pipeline_in_use = new_pipeline_in_use;
     }
     //------------------------------------------------------------------------------------------------------------------
 }

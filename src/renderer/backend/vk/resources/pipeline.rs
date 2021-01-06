@@ -74,6 +74,7 @@ pub struct VkPipelineBuilder {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl VkPipelineBuilder {
+    #[allow(dead_code)]
     pub fn clear_shader_stages(mut self) -> Self {
         self.shader_stages.clear();
         self
