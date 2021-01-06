@@ -21,12 +21,18 @@ pub struct VkPipeline {
 
 impl VkPipeline {
     pub(in crate::renderer::backend::vk::resources) fn builder() -> VkPipelineBuilder {
-        VkPipelineBuilder::default()
+        let builder = VkPipelineBuilder::default().depth_stencil_state(
+            true,
+            true,
+            vk::CompareOp::LESS_OR_EQUAL,
+        );
+
+        builder
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get(&self) -> &vk::Pipeline {
-        &self.pipeline
+    pub fn get(&self) -> vk::Pipeline {
+        self.pipeline.clone()
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -62,6 +68,7 @@ pub struct VkPipelineBuilder {
     scissor: vk::Rect2D,
     color_blend_attachment: vk::PipelineColorBlendAttachmentState,
     multisample_state: vk::PipelineMultisampleStateCreateInfo,
+    depth_stencil_state: vk::PipelineDepthStencilStateCreateInfo,
     pipeline_layout: vk::PipelineLayout,
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -170,6 +177,30 @@ impl VkPipelineBuilder {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn depth_stencil_state(
+        mut self,
+        enable_test: bool,
+        enable_write: bool,
+        compare_op: vk::CompareOp,
+    ) -> Self {
+        self.depth_stencil_state = vk::PipelineDepthStencilStateCreateInfo::builder()
+            .depth_test_enable(enable_test)
+            .depth_write_enable(enable_write)
+            .depth_compare_op(if enable_test {
+                compare_op
+            } else {
+                vk::CompareOp::ALWAYS
+            })
+            .depth_bounds_test_enable(false)
+            .min_depth_bounds(0.0)
+            .max_depth_bounds(1.0)
+            .stencil_test_enable(false)
+            .build();
+
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn pipeline_layout(mut self, pipeline_layout: vk::PipelineLayout) -> Self {
         self.pipeline_layout = pipeline_layout;
         self
@@ -203,8 +234,9 @@ impl VkPipelineBuilder {
             .rasterization_state(&self.rasterization_state)
             .multisample_state(&self.multisample_state)
             .color_blend_state(&color_blend_state)
+            .depth_stencil_state(&self.depth_stencil_state)
             .layout(self.pipeline_layout)
-            .render_pass(*render_pass.get())
+            .render_pass(render_pass.get())
             .subpass(0)
             .base_pipeline_handle(vk::Pipeline::null())
             .build()];

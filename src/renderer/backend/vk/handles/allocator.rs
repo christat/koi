@@ -1,7 +1,10 @@
 use std::ptr::copy_nonoverlapping;
 //----------------------------------------------------------------------------------------------------------------------
 
-use ash::{vk::BufferCreateInfo, Device};
+use ash::{
+    vk::{BufferCreateInfo, ImageCreateInfo, MemoryPropertyFlags},
+    Device,
+};
 use vk_mem::{
     AllocationCreateFlags, AllocationCreateInfo, Allocator, AllocatorCreateFlags,
     AllocatorCreateInfo, MemoryUsage,
@@ -11,7 +14,7 @@ use vk_mem::{
 use crate::{
     renderer::backend::vk::{
         handles::{InstanceHandle, PhysicalDeviceHandle},
-        resources::VkBuffer,
+        resources::{VkBuffer, VkImage},
         VkRendererConfig,
     },
     utils::traits::Destroy,
@@ -35,7 +38,7 @@ impl AllocatorHandle {
         device: &Device,
         config: &VkRendererConfig,
     ) -> Self {
-        let allocator_create_info = AllocatorCreateInfo {
+        let create_info = AllocatorCreateInfo {
             physical_device: physical_device_handle.physical_device.to_owned(),
             device: device.to_owned(),
             instance: instance_handle.instance.to_owned(),
@@ -45,22 +48,23 @@ impl AllocatorHandle {
             heap_size_limits: None,
         };
 
-        let allocator = Allocator::new(&allocator_create_info)
-            .expect("DeviceHandle::init_allocator - failed to create mem_rs allocator!");
+        let allocator = Allocator::new(&create_info)
+            .expect("DeviceHandle::init_allocator - failed to create vk-mem allocator!");
 
         Self { allocator }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn create_allocation_info(
+    pub fn allocation_create_info(
         usage: MemoryUsage,
         flags: Option<AllocationCreateFlags>,
+        required_flags: Option<MemoryPropertyFlags>,
     ) -> AllocationCreateInfo {
         AllocationCreateInfo {
             usage,
             flags: flags.unwrap_or(AllocationCreateFlags::NONE),
-            required_flags: Default::default(),
-            preferred_flags: Default::default(),
+            required_flags: required_flags.unwrap_or(MemoryPropertyFlags::empty()),
+            preferred_flags: MemoryPropertyFlags::empty(),
             memory_type_bits: 0,
             pool: None,
             user_data: None,
@@ -70,31 +74,47 @@ impl AllocatorHandle {
 
     pub fn create_buffer(
         &self,
-        info: BufferCreateInfo,
-        allocation_info: AllocationCreateInfo,
+        info: &BufferCreateInfo,
+        allocation_info: &AllocationCreateInfo,
     ) -> VkBuffer {
         let (buffer, allocation, ..) = self
             .allocator
-            .create_buffer(&info, &allocation_info)
+            .create_buffer(info, allocation_info)
             .expect("VkBackend::AllocatorHandle::create_buffer - Failed to create buffer!");
 
-        VkBuffer { buffer, allocation }
+        VkBuffer::new(buffer, allocation)
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn write_buffer<T>(&self, buffer: &VkBuffer, data: *const T, size: usize) {
+        let allocation = buffer.allocation();
+
         let mapped_memory = self
             .allocator
-            .map_memory(&buffer.allocation)
+            .map_memory(allocation)
             .expect("VkBackend::AllocatorHandle::write_buffer - Failed to map buffer allocation!");
 
         unsafe {
             copy_nonoverlapping(data, mapped_memory as *mut T, size);
         }
 
-        self.allocator.unmap_memory(&buffer.allocation).expect(
+        self.allocator.unmap_memory(allocation).expect(
             "VkBackend::AllocatorHandle::write_buffer - Failed to unmap buffer allocation!",
         );
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn create_image(
+        &self,
+        info: &ImageCreateInfo,
+        allocation_info: &AllocationCreateInfo,
+    ) -> VkImage {
+        let (image, allocation, ..) = self
+            .allocator
+            .create_image(info, allocation_info)
+            .expect("VkBackend::AllocatorHandle::create_image - Failed to create image!");
+
+        VkImage::new(image, allocation)
     }
     //------------------------------------------------------------------------------------------------------------------
 }

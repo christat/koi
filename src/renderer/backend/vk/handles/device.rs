@@ -13,16 +13,6 @@ use crate::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-pub(in crate::renderer::backend) trait DeviceDrop {
-    fn device_drop(&self, device: &Device);
-}
-//----------------------------------------------------------------------------------------------------------------------
-
-pub(in crate::renderer::backend) trait DeviceAllocatorDrop {
-    fn device_allocator_drop(&self, device: &Device, allocator: &vk_mem::Allocator);
-}
-//----------------------------------------------------------------------------------------------------------------------
-
 struct QueueHandle {
     graphics_queue: vk::Queue,
     present_queue: vk::Queue,

@@ -34,6 +34,7 @@ pub struct Mesh {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl Mesh {
+    #[allow(dead_code)]
     pub fn test_triangle() -> Self {
         const COLOR: Vec3 = Vec3 {
             x: 0.0,
@@ -74,11 +75,11 @@ impl Mesh {
                 let vertices = indices
                     .iter()
                     .map(|i| {
-                        let f = *i as usize;
-                        let count = mesh.num_face_indices[f] as usize; // should always be 3 when triangulated
+                        let i = *i as usize;
+                        let f = i * mesh.num_face_indices[i] as usize;
 
-                        let position = Vec3::new(v[count * f], v[count * f + 1], v[count * f + 2]);
-                        let normal = Vec3::new(vn[count * f], vn[count * f + 1], vn[count * f + 2]);
+                        let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
+                        let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);
                         Vertex::new(position, normal, normal)
                     })
                     .collect::<Vec<Vertex>>();

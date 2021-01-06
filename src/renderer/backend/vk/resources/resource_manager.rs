@@ -10,10 +10,11 @@ use crate::renderer::{
             AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
         },
         resources::{
-            VkCommandBuffer, VkCommandPool, VkFence, VkFramebuffer, VkMesh, VkPipeline,
-            VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkSemaphore, VkShader, VkSwapchain,
+            VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence, VkFramebuffer, VkMesh,
+            VkPipeline, VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkSemaphore, VkShader,
+            VkSwapchain,
         },
-        DeviceDestroy, VkRendererConfig,
+        DeviceAllocatorDestroy, DeviceDestroy, VkRendererConfig,
     },
     entities::Mesh,
 };
@@ -28,6 +29,7 @@ pub struct ResourceManager {
     render_passes: HashMap<String, Rc<VkRenderPass>>,
 
     swapchain: Option<Rc<VkSwapchain>>,
+    depth_buffer: Option<Rc<VkDepthBuffer>>,
     framebuffers: Vec<Rc<VkFramebuffer>>,
 
     command_pools: HashMap<String, Rc<VkCommandPool>>,
@@ -49,6 +51,7 @@ impl ResourceManager {
         Self {
             render_passes: HashMap::new(),
             swapchain: None,
+            depth_buffer: None,
             framebuffers: vec![],
             command_pools: HashMap::new(),
             command_buffers: HashMap::new(),
@@ -67,9 +70,14 @@ impl ResourceManager {
         device: &Device,
         id: Option<&str>,
         color_attachment_format: vk::Format,
+        depth_attachment_format: vk::Format,
     ) -> Rc<VkRenderPass> {
         let render_pass_id = id.unwrap_or("default");
-        let render_pass = Rc::new(VkRenderPass::new(device, color_attachment_format));
+        let render_pass = Rc::new(VkRenderPass::new(
+            device,
+            color_attachment_format,
+            depth_attachment_format,
+        ));
         self.render_passes
             .insert(render_pass_id.to_owned(), render_pass.clone());
 
@@ -111,12 +119,37 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    fn create_depth_buffer(
+        &mut self,
+        device: &Device,
+        allocator_handle: &AllocatorHandle,
+        swapchain: &VkSwapchain,
+        depth_attachment_format: vk::Format,
+    ) -> Rc<VkDepthBuffer> {
+        let depth_buffer = Rc::new(VkDepthBuffer::new(
+            device,
+            allocator_handle,
+            swapchain.surface_extent(),
+            depth_attachment_format,
+        ));
+
+        self.depth_buffer = Some(depth_buffer.clone());
+
+        depth_buffer
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn create_framebuffers(
         &mut self,
         device: &Device,
+        allocator_handle: &AllocatorHandle,
         swapchain: &VkSwapchain,
         render_pass: &VkRenderPass,
+        depth_attachment_format: vk::Format,
     ) -> Vec<Rc<VkFramebuffer>> {
+        let depth_buffer =
+            self.create_depth_buffer(device, allocator_handle, swapchain, depth_attachment_format);
+
         let framebuffers = swapchain
             .image_views()
             .iter()
@@ -124,6 +157,7 @@ impl ResourceManager {
                 Rc::new(VkFramebuffer::new(
                     device,
                     image_view,
+                    &depth_buffer.image_view,
                     render_pass.get().to_owned(),
                     swapchain.surface_extent(),
                 ))
@@ -175,8 +209,7 @@ impl ResourceManager {
         let command_pool = self.get_command_pool(Some(id)).expect(&format!("ResourceManager::create_command_buffer - Failed to find command buffer with pool_id {}!", id));
 
         let create_info = vk::CommandBufferAllocateInfo::builder()
-            .command_pool(*command_pool.get())
-            // .command_buffer_count(renderer.config.buffering);
+            .command_pool(command_pool.get())
             .command_buffer_count(count)
             .level(level.unwrap_or(vk::CommandBufferLevel::PRIMARY));
 
@@ -332,6 +365,10 @@ impl ResourceManager {
 
         for pipeline_layout in self.pipeline_layouts.values() {
             pipeline_layout.destroy(device);
+        }
+
+        if let Some(depth_buffer) = &self.depth_buffer {
+            depth_buffer.destroy(device, allocator);
         }
 
         for framebuffer in self.framebuffers.iter() {

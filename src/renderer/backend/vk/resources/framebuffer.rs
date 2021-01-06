@@ -13,14 +13,11 @@ impl VkFramebuffer {
     pub(in crate::renderer::backend::vk::resources) fn new(
         device: &Device,
         color_image_view: &vk::ImageView,
-        // depth_image_view: &vk::ImageView,
+        depth_image_view: &vk::ImageView,
         render_pass: vk::RenderPass,
         extent: vk::Extent2D,
     ) -> Self {
-        let attachments: [vk::ImageView; 1] = [
-            color_image_view.to_owned(),
-            // depth_buffer_handle.image_view.to_owned(),
-        ];
+        let attachments = [color_image_view.to_owned(), depth_image_view.to_owned()];
 
         let create_info = vk::FramebufferCreateInfo::builder()
             .render_pass(render_pass)
@@ -39,8 +36,8 @@ impl VkFramebuffer {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get(&self) -> &vk::Framebuffer {
-        &self.framebuffer
+    pub fn get(&self) -> vk::Framebuffer {
+        self.framebuffer.clone()
     }
     //------------------------------------------------------------------------------------------------------------------
 }

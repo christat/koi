@@ -6,8 +6,8 @@ use crate::renderer::backend::vk::handles::AllocatorFree;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VkBuffer {
-    pub buffer: Buffer,
-    pub allocation: Allocation,
+    buffer: Buffer,
+    allocation: Allocation,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -17,8 +17,18 @@ impl VkBuffer {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get(&self) -> &Buffer {
-        &self.buffer
+    pub fn new(buffer: Buffer, allocation: Allocation) -> Self {
+        Self { buffer, allocation }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get(&self) -> Buffer {
+        self.buffer.clone()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn allocation(&self) -> &Allocation {
+        &self.allocation
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -28,7 +38,7 @@ impl AllocatorFree for VkBuffer {
     fn free(&self, allocator: &Allocator) {
         allocator
             .destroy_buffer(self.buffer, &self.allocation)
-            .expect("BufferResource::cleanup - Failed to cleanup BufferResource!");
+            .expect("VkBuffer::cleanup - Failed to cleanup VkBuffer!");
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

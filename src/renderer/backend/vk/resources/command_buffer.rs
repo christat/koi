@@ -21,8 +21,8 @@ impl VkCommandBuffer {
         }
     }
 
-    pub fn get(&self) -> &vk::CommandBuffer {
-        &self.command_buffer
+    pub fn get(&self) -> vk::CommandBuffer {
+        self.command_buffer.clone()
     }
     //------------------------------------------------------------------------------------------------------------------
 }
@@ -31,7 +31,7 @@ impl ResourceManagerDestroy for VkCommandBuffer {
     fn destroy(&self, device: &Device, resource_manager: &ResourceManager) {
         let command_pool = resource_manager.get_command_pool(Some(&self.pool_id)).expect("VkCommandBuffer::destroy - Failed to obtain originating VkCommandPool from ResourceManager!");
         unsafe {
-            device.free_command_buffers(*command_pool.get(), &[self.command_buffer]);
+            device.free_command_buffers(command_pool.get(), &[self.command_buffer]);
         }
     }
 }

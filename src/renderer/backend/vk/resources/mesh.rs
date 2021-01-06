@@ -106,11 +106,11 @@ impl VkMesh {
         allocator_handle: &AllocatorHandle,
     ) -> Self {
         let vertex_buffer = allocator_handle.create_buffer(
-            VkBuffer::create_info(
+            &VkBuffer::create_info(
                 (mesh.vertices.len() * VERTEX_SIZE) as vk::DeviceSize,
                 vk::BufferUsageFlags::VERTEX_BUFFER,
             ),
-            AllocatorHandle::create_allocation_info(MemoryUsage::CpuToGpu, None),
+            &AllocatorHandle::allocation_create_info(MemoryUsage::CpuToGpu, None, None),
         );
 
         Self {

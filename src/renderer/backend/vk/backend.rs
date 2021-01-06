@@ -6,6 +6,7 @@ use ultraviolet::{projection::perspective_vk, rotor::Rotor3, Mat4, Vec3, Vec4};
 use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::VkDepthBuffer;
 use crate::{
     renderer::{
         backend::vk::{
@@ -31,6 +32,11 @@ pub enum PipelineType {
 
 pub trait DeviceDestroy {
     fn destroy(&self, device: &Device);
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub(in crate::renderer::backend) trait DeviceAllocatorDestroy {
+    fn destroy(&self, device: &Device, allocator: &vk_mem::Allocator);
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -136,27 +142,32 @@ impl VkRenderer {
             config,
         );
 
-        // let depth_buffer_handle = DepthBufferHandle::init(
-        //     instance_handle,
-        //     physical_device_handle,
-        //     &swapchain_handle,
-        //     &device,
-        //     allocator,
-        // );
+        let depth_attachment_format =
+            VkDepthBuffer::find_supported_depth_format(instance_handle, physical_device_handle);
 
-        let render_pass =
-            resource_manager.create_render_pass(device, None, swapchain.surface_format());
+        let render_pass = resource_manager.create_render_pass(
+            device,
+            None,
+            swapchain.surface_format(),
+            depth_attachment_format,
+        );
 
-        resource_manager.create_framebuffers(device, &swapchain, &render_pass);
+        resource_manager.create_framebuffers(
+            device,
+            allocator_handle,
+            &swapchain,
+            &render_pass,
+            depth_attachment_format,
+        );
 
-        let hardcoded_vert = *resource_manager
+        let hardcoded_vert = resource_manager
             .create_shader(
                 device,
                 "hardcoded_vert",
                 Path::new("resources/shaders/dist/hardcoded.vert.spv"),
             )
             .get();
-        let hardcoded_frag = *resource_manager
+        let hardcoded_frag = resource_manager
             .create_shader(
                 device,
                 "hardcoded_frag",
@@ -164,14 +175,14 @@ impl VkRenderer {
             )
             .get();
 
-        let alt_vert = *resource_manager
+        let alt_vert = resource_manager
             .create_shader(
                 device,
                 "alt_vert",
                 Path::new("resources/shaders/dist/alt.vert.spv"),
             )
             .get();
-        let alt_frag = *resource_manager
+        let alt_frag = resource_manager
             .create_shader(
                 device,
                 "alt_frag",
@@ -179,7 +190,7 @@ impl VkRenderer {
             )
             .get();
 
-        let mesh_vert = *resource_manager
+        let mesh_vert = resource_manager
             .create_shader(
                 device,
                 "mesh_vert",
@@ -215,7 +226,7 @@ impl VkRenderer {
             .rasterization_state(vk::PolygonMode::FILL)
             .multisampling_state()
             .color_blend_attachment_state()
-            .pipeline_layout(*pipeline_layout.get())
+            .pipeline_layout(pipeline_layout.get())
             .shader_stage(
                 hardcoded_vert,
                 vk::ShaderStageFlags::VERTEX,
@@ -254,7 +265,7 @@ impl VkRenderer {
                 vk::ShaderStageFlags::FRAGMENT,
                 &shader_entry_point,
             )
-            .pipeline_layout(*mesh_pipeline_layout.get());
+            .pipeline_layout(mesh_pipeline_layout.get());
 
         resource_manager.create_pipeline(device, "mesh", &pipeline_builder, &render_pass);
 
@@ -309,7 +320,7 @@ impl RendererBackend for VkRenderer {
             present_queue,
         } = &device_handle;
 
-        let render_fence = *resource_manager.get_fence("render").get();
+        let render_fence = resource_manager.get_fence("render").get();
         let render_fences = [render_fence];
 
         unsafe {
@@ -324,9 +335,9 @@ impl RendererBackend for VkRenderer {
 
         let swapchain_resource = resource_manager.get_swapchain().unwrap();
         let swapchain = swapchain_resource.get();
-        let swapchain_khr = *swapchain_resource.khr();
+        let swapchain_khr = swapchain_resource.khr();
 
-        let present_semaphore = *resource_manager.get_semaphore("present").get();
+        let present_semaphore = resource_manager.get_semaphore("present").get();
         // Request image from swapchain. Timeout of 1s.
         let (swapchain_image_index, _is_suboptimal) = unsafe {
             swapchain
@@ -341,7 +352,7 @@ impl RendererBackend for VkRenderer {
 
         // Cmd buffer should only be cleared once it is safe (i.e. GPU is done with it)
         let command_buffers = resource_manager.get_command_buffers(None);
-        let command_buffer = *command_buffers
+        let command_buffer = command_buffers
             .first()
             .expect("VkBackend::draw - No command buffers allocated!")
             .get();
@@ -362,13 +373,21 @@ impl RendererBackend for VkRenderer {
         };
 
         let flash = f32::abs(f32::sin(self.frame_index as f32 / f32::to_radians(900.0)));
-        let clear_values = [vk::ClearValue {
-            color: vk::ClearColorValue {
-                float32: [flash, flash, flash, 1.0],
+        let clear_values = [
+            vk::ClearValue {
+                color: vk::ClearColorValue {
+                    float32: [flash, flash, flash, 1.0],
+                },
             },
-        }];
+            vk::ClearValue {
+                depth_stencil: vk::ClearDepthStencilValue {
+                    depth: 1.0,
+                    stencil: 0,
+                },
+            },
+        ];
 
-        let render_pass = *resource_manager.get_render_pass(None).get();
+        let render_pass = resource_manager.get_render_pass(None).get();
         let framebuffer = resource_manager
             .get_framebuffers()
             .get(swapchain_image_index as usize)
@@ -383,7 +402,7 @@ impl RendererBackend for VkRenderer {
                     .extent(swapchain_resource.surface_extent())
                     .build(),
             )
-            .framebuffer(*framebuffer)
+            .framebuffer(framebuffer)
             .clear_values(&clear_values);
 
         unsafe {
@@ -412,7 +431,7 @@ impl RendererBackend for VkRenderer {
             device.cmd_bind_pipeline(
                 command_buffer,
                 vk::PipelineBindPoint::GRAPHICS,
-                *pipeline.get(),
+                pipeline.get(),
             );
         }
 
@@ -424,7 +443,7 @@ impl RendererBackend for VkRenderer {
                 device.cmd_bind_vertex_buffers(
                     command_buffer,
                     0,
-                    &[*triangle_mesh.get_buffer().get()],
+                    &[triangle_mesh.get_buffer().get()],
                     &[0],
                 );
             }
@@ -445,7 +464,7 @@ impl RendererBackend for VkRenderer {
             unsafe {
                 device.cmd_push_constants(
                     command_buffer,
-                    *pipeline_layout.get(),
+                    pipeline_layout.get(),
                     stage_flags,
                     0,
                     ffi::any_as_u8_slice(&mesh_push_constants),
@@ -464,7 +483,7 @@ impl RendererBackend for VkRenderer {
         let wait_dst_stage_mask = [vk::PipelineStageFlags::COLOR_ATTACHMENT_OUTPUT];
         let present_semaphores = [present_semaphore];
 
-        let render_semaphore = *resource_manager.get_semaphore("present").get();
+        let render_semaphore = resource_manager.get_semaphore("present").get();
         let render_semaphores = [render_semaphore];
 
         let submits = [vk::SubmitInfo::builder()
