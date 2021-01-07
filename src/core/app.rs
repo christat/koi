@@ -2,18 +2,27 @@ use std::error::Error;
 //----------------------------------------------------------------------------------------------------------------------
 
 use winit::{
-    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
+    event::{DeviceEvent, Event, VirtualKeyCode as Key, WindowEvent},
     event_loop::ControlFlow,
     platform::desktop::EventLoopExtDesktop,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::{core::Window, renderer::Renderer};
+use crate::{
+    core::{Input, Window},
+    renderer::Renderer,
+};
+//----------------------------------------------------------------------------------------------------------------------
+
+pub enum CoreEvent {
+    CloseRequested,
+}
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct App {
-    window: Window,
+    window: Window<CoreEvent>,
     renderer: Renderer,
+    input: Input,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -22,47 +31,89 @@ impl App {
         info!("----- App::init -----");
         let window = Window::init(name, 1280, 720);
         let renderer = Renderer::init(name, &window);
+        let input = Input::init(None);
 
-        Self { window, renderer }
+        Self {
+            window,
+            renderer,
+            input,
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn run(&mut self) -> Result<(), Box<dyn Error>> {
         info!("----- App::run -----");
 
-        let Window {
-            window_handle,
-            event_loop_handle,
-        } = &mut self.window;
+        let Self {
+            renderer,
+            window,
+            input: input_handle,
+        } = self;
 
-        let renderer = &mut self.renderer;
+        let Window {
+            event_loop_handle,
+            focused,
+            ..
+        } = window;
+
+        let event_loop_proxy = event_loop_handle.create_proxy();
 
         event_loop_handle.run_return(|event, _, control_flow| {
             match event {
+                Event::UserEvent(event) => match event {
+                    CoreEvent::CloseRequested => {
+                        renderer.await_device_idle();
+                        *control_flow = ControlFlow::Exit;
+                    }
+                },
                 Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::Focused(state) => {
+                        *focused = state;
+                    }
                     WindowEvent::CloseRequested => {
                         renderer.await_device_idle();
                         *control_flow = ControlFlow::Exit;
                     }
-                    WindowEvent::KeyboardInput { input, .. } => match input {
-                        KeyboardInput {
-                            virtual_keycode,
-                            state,
-                            ..
-                        } => match (virtual_keycode, state) {
-                            (Some(VirtualKeyCode::Escape), ElementState::Pressed) => {
-                                renderer.await_device_idle();
-                                *control_flow = ControlFlow::Exit;
-                            }
-                            _ => *control_flow = ControlFlow::Poll,
-                        },
-                    },
-                    _ => *control_flow = ControlFlow::Poll,
+                    _ => {}
                 },
-                Event::MainEventsCleared => window_handle.request_redraw(),
-                Event::RedrawRequested(_window_id) => renderer.draw(),
+                Event::DeviceEvent { event, .. } => {
+                    if *focused {
+                        match event {
+                            DeviceEvent::Key(input) => {
+                                if let Some(keycode) = input.virtual_keycode {
+                                    input_handle.update_keyboard_input(keycode, input.state);
+                                }
+                            }
+                            DeviceEvent::Button { button, state, .. } => {
+                                info!("button event sent for: {}", button);
+                                input_handle.update_mouse_input(button, state);
+                            }
+                            DeviceEvent::MouseMotion { delta: deltas, .. } => {
+                                input_handle.update_mouse_deltas(deltas);
+                            }
+                            DeviceEvent::MouseWheel { delta, .. } => {
+                                input_handle.update_mouse_scroll(delta);
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+                Event::MainEventsCleared => {
+                    if *focused {
+                        if input_handle.is_key_down(Key::Escape) {
+                            event_loop_proxy
+                                .send_event(CoreEvent::CloseRequested)
+                                .unwrap_or_else(|_| {
+                                    warn!("Failed to send CloseRequested event to event loop!")
+                                });
+                            return;
+                        }
+
+                        renderer.draw();
+                    }
+                }
                 Event::LoopDestroyed => renderer.await_device_idle(),
-                _ => *control_flow = ControlFlow::Poll,
+                _ => {}
             };
         });
 
