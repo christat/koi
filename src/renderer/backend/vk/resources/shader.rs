@@ -7,7 +7,6 @@ use ash::{
     Device,
 };
 
-extern crate byteorder;
 use byteorder::{ByteOrder, LittleEndian};
 //----------------------------------------------------------------------------------------------------------------------
 

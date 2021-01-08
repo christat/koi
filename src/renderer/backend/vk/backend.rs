@@ -1,6 +1,3 @@
-extern crate ash;
-//----------------------------------------------------------------------------------------------------------------------
-
 use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -8,7 +5,6 @@ use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::{projection::perspective_vk, rotor::Rotor3, Mat4, Vec3, Vec4};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::VkDepthBuffer;
 use crate::{
     core::window::WindowHandle,
     renderer::{
@@ -16,7 +12,9 @@ use crate::{
             handles::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{MeshPushConstants, ResourceManager, VertexInputDescription, VkShader},
+            resources::{
+                MeshPushConstants, ResourceManager, VertexInputDescription, VkDepthBuffer, VkShader,
+            },
             VkRendererConfig,
         },
         entities::Mesh,

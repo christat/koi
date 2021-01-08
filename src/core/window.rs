@@ -1,6 +1,3 @@
-extern crate winit;
-//----------------------------------------------------------------------------------------------------------------------
-
 use winit::{
     dpi::LogicalSize,
     event::{DeviceEvent, Event, VirtualKeyCode, WindowEvent},

@@ -193,6 +193,7 @@ pub struct Input {
 
 impl Input {
     pub fn init(hold_time_millis: Option<u128>) -> Self {
+        info!("----- Input::init -----");
         Self {
             keyboard: HashMap::new(),
             mouse: HashMap::new(),

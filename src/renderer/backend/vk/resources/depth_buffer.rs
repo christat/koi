@@ -1,13 +1,12 @@
-use ash::{vk, Device};
+use ash::{version::DeviceV1_0, vk, Device};
+use vk_mem::Allocator;
 //----------------------------------------------------------------------------------------------------------------------
 
-use super::super::ash::version::DeviceV1_0;
-use crate::renderer::backend::vk::handles::{
-    AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle,
+use crate::renderer::backend::vk::{
+    handles::{AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle},
+    resources::image::VkImage,
+    DeviceAllocatorDestroy,
 };
-use crate::renderer::backend::vk::resources::image::VkImage;
-use crate::renderer::backend::vk::DeviceAllocatorDestroy;
-use vk_mem::Allocator;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VkDepthBuffer {
