@@ -1,13 +1,16 @@
+extern crate ash;
+//----------------------------------------------------------------------------------------------------------------------
+
 use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
 use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::{projection::perspective_vk, rotor::Rotor3, Mat4, Vec3, Vec4};
-use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::vk::resources::VkDepthBuffer;
 use crate::{
+    core::window::WindowHandle,
     renderer::{
         backend::vk::{
             handles::{
@@ -51,7 +54,7 @@ pub struct VkRenderer {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl VkRenderer {
-    pub fn init(app_name: &str, window: &WinitWindow) -> Self {
+    pub fn init(app_name: &str, window: &WindowHandle) -> Self {
         info!("----- VkBackend::init -----");
 
         let (instance_handle, mut config) = InstanceHandle::init(app_name);

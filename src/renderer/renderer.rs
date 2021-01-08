@@ -1,5 +1,5 @@
 use crate::{
-    core::Window,
+    core::window::WindowHandle,
     renderer::{backend::vk::VkRenderer, hal::RendererBackend},
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -10,10 +10,10 @@ pub struct Renderer {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl Renderer {
-    pub fn init<T>(app_name: &str, window: &Window<T>) -> Self {
+    pub fn init(app_name: &str, window: &WindowHandle) -> Self {
         info!("----- Renderer::init -----");
 
-        let mut backend = VkRenderer::init(app_name, &window.window_handle);
+        let mut backend = VkRenderer::init(app_name, window);
         backend.init_resources();
 
         Self { backend }

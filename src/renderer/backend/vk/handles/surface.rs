@@ -1,9 +1,11 @@
 use ash::{extensions::khr::Surface, vk};
-use winit::window::Window as WinitWindow;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::{handles::InstanceHandle, platform};
-use crate::utils::traits::Destroy;
+use crate::{
+    core::window::WindowHandle,
+    renderer::backend::vk::{handles::InstanceHandle, platform},
+    utils::traits::Destroy,
+};
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct SurfaceHandle {
@@ -13,7 +15,7 @@ pub struct SurfaceHandle {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl SurfaceHandle {
-    pub fn init(instance_handle: &InstanceHandle, window: &WinitWindow) -> Self {
+    pub fn init(instance_handle: &InstanceHandle, window: &WindowHandle) -> Self {
         let InstanceHandle {
             entry, instance, ..
         } = instance_handle;

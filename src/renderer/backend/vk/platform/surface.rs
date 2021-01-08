@@ -2,11 +2,13 @@ use std::ptr;
 //----------------------------------------------------------------------------------------------------------------------
 
 use ash::{vk, Entry, Instance};
-use winit::window::Window as WinitWindow;
+//----------------------------------------------------------------------------------------------------------------------
+
+use crate::core::window::WindowHandle;
 //----------------------------------------------------------------------------------------------------------------------
 
 #[cfg(target_os = "windows")]
-pub fn create_surface(entry: &Entry, instance: &Instance, window: &WinitWindow) -> vk::SurfaceKHR {
+pub fn create_surface(entry: &Entry, instance: &Instance, window: &WindowHandle) -> vk::SurfaceKHR {
     use ash::extensions::khr::Win32Surface;
     use winapi::um::libloaderapi::GetModuleHandleW;
     use winit::platform::windows::WindowExtWindows;
@@ -28,7 +30,7 @@ pub fn create_surface(entry: &Entry, instance: &Instance, window: &WinitWindow) 
 
 // TODO try targeting wayland as well?
 #[cfg(target_os = "linux")]
-pub fn create_surface(entry: &Entry, instance: &Instance, window: &WinitWindow) -> vk::SurfaceKHR {
+pub fn create_surface(entry: &Entry, instance: &Instance, window: &WindowHandle) -> vk::SurfaceKHR {
     use ash::extensions::khr::XcbSurface;
     use winit::platform::unix::WindowExtUnix;
 
