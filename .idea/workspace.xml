@@ -21,16 +21,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="remove core::app as it doesn't serve any purpose and hinders running winit event loop normally">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="cleanup (as of Rust 2018) redundant extern crate declarations">
       <change afterPath="$PROJECT_DIR$/src/renderer/entities/camera.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/window.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/depth_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +189,7 @@
       <workItem from="1609424351665" duration="1947000" />
       <workItem from="1609491091890" duration="29218000" />
       <workItem from="1609574887192" duration="52959000" />
-      <workItem from="1609828096202" duration="80726000" />
+      <workItem from="1609828096202" duration="81944000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -368,7 +365,13 @@
       <option name="presentableId" value="LOCAL−00029" />
       <updated>1610137785202</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL−00030" summary="cleanup (as of Rust 2018) redundant extern crate declarations">
+      <created>1610138508091</created>
+      <option name="number" value="LOCAL−00030" />
+      <option name="presentableId" value="LOCAL−00030" />
+      <updated>1610138508091</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +424,8 @@
     <MESSAGE value="added initial input management" />
     <MESSAGE value="added initial gamepad input" />
     <MESSAGE value="remove core::app as it doesn't serve any purpose and hinders running winit event loop normally" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove core::app as it doesn't serve any purpose and hinders running winit event loop normally" />
+    <MESSAGE value="cleanup (as of Rust 2018) redundant extern crate declarations" />
+    <option name="LAST_COMMIT_MESSAGE" value="cleanup (as of Rust 2018) redundant extern crate declarations" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

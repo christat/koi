@@ -2,7 +2,7 @@ use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
 use ash::{version::DeviceV1_0, vk, Device};
-use ultraviolet::{projection::perspective_vk, rotor::Rotor3, Mat4, Vec3, Vec4};
+use ultraviolet::{rotor::Rotor3, Vec4};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
@@ -17,7 +17,7 @@ use crate::{
             },
             VkRendererConfig,
         },
-        entities::Mesh,
+        entities::{Camera, Mesh},
         hal::RendererBackend,
     },
     utils::{ffi, traits::Destroy},
@@ -251,7 +251,7 @@ impl Drop for VkRenderer {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl RendererBackend for VkRenderer {
-    fn draw(&mut self) {
+    fn draw(&mut self, camera: &Camera) {
         let VkRenderer {
             device_handle,
             resource_manager,
@@ -380,8 +380,8 @@ impl RendererBackend for VkRenderer {
             );
         }
 
-        let view = Mat4::from_translation(Vec3::new(0.0, 0.0, -2.0));
-        let projection = perspective_vk(f32::to_radians(70.0), 1700.0 / 900.0, 0.1, 200.0);
+        let view = camera.view();
+        let projection = camera.projection();
         let model_rotor =
             Rotor3::from_euler_angles(0.0, 0.0, -f32::to_radians(2.0 * self.frame_index as f32));
         let model = model_rotor.into_matrix().into_homogeneous();
