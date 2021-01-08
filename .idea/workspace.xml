@@ -21,14 +21,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="cleanup hardcoded pipelines">
-      <change afterPath="$PROJECT_DIR$/src/core/input.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="added initial input management">
       <change afterPath="$PROJECT_DIR$/src/renderer/entities/camera.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/app.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/app.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/window.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/input.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -191,7 +190,7 @@
       <workItem from="1609424351665" duration="1947000" />
       <workItem from="1609491091890" duration="29218000" />
       <workItem from="1609574887192" duration="52959000" />
-      <workItem from="1609828096202" duration="59243000" />
+      <workItem from="1609828096202" duration="74770000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -349,7 +348,13 @@
       <option name="presentableId" value="LOCAL−00026" />
       <updated>1609956707669</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL−00027" summary="added initial input management">
+      <created>1610048271272</created>
+      <option name="number" value="LOCAL−00027" />
+      <option name="presentableId" value="LOCAL−00027" />
+      <updated>1610048271272</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -399,7 +404,8 @@
     <MESSAGE value="added obj loading and monkey 3D model files" />
     <MESSAGE value="added depth buffer" />
     <MESSAGE value="cleanup hardcoded pipelines" />
-    <option name="LAST_COMMIT_MESSAGE" value="cleanup hardcoded pipelines" />
+    <MESSAGE value="added initial input management" />
+    <option name="LAST_COMMIT_MESSAGE" value="added initial input management" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

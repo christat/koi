@@ -26,11 +26,11 @@ impl Renderer {
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn draw(&mut self) {
-        //let frame_start = std::time::Instant::now();
+        let frame_start = std::time::Instant::now();
 
         self.backend.draw();
 
-        //eprintln!("frame time: {:?}", frame_start.elapsed());
+        eprintln!("Frame time: {:?}", frame_start.elapsed());
     }
     //------------------------------------------------------------------------------------------------------------------
 }

@@ -9,7 +9,7 @@ use winit::{
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
-    core::{Input, Window},
+    core::{input::GamepadButton, Input, Window},
     renderer::Renderer,
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,6 @@ impl App {
                                 }
                             }
                             DeviceEvent::Button { button, state, .. } => {
-                                info!("button event sent for: {}", button);
                                 input_handle.update_mouse_input(button, state);
                             }
                             DeviceEvent::MouseMotion { delta: deltas, .. } => {
@@ -100,7 +99,11 @@ impl App {
                 }
                 Event::MainEventsCleared => {
                     if *focused {
-                        if input_handle.is_key_down(Key::Escape) {
+                        input_handle.update_gamepad_input();
+
+                        if input_handle.is_key_down(Key::Escape)
+                            || (input_handle.is_button_down(GamepadButton::Start))
+                        {
                             event_loop_proxy
                                 .send_event(CoreEvent::CloseRequested)
                                 .unwrap_or_else(|_| {
