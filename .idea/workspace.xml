@@ -21,13 +21,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="cleanup (as of Rust 2018) redundant extern crate declarations">
-      <change afterPath="$PROJECT_DIR$/src/renderer/entities/camera.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="wrap view, projection matrices and their params into Camera entity">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/input.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/camera.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/math.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/math.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,6 +92,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package koi --bin koi" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -122,11 +127,6 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -189,7 +189,8 @@
       <workItem from="1609424351665" duration="1947000" />
       <workItem from="1609491091890" duration="29218000" />
       <workItem from="1609574887192" duration="52959000" />
-      <workItem from="1609828096202" duration="81944000" />
+      <workItem from="1609828096202" duration="82836000" />
+      <workItem from="1610179146741" duration="6637000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -371,7 +372,13 @@
       <option name="presentableId" value="LOCAL−00030" />
       <updated>1610138508091</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL−00031" summary="wrap view, projection matrices and their params into Camera entity">
+      <created>1610139695157</created>
+      <option name="number" value="LOCAL−00031" />
+      <option name="presentableId" value="LOCAL−00031" />
+      <updated>1610139695157</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -425,7 +432,8 @@
     <MESSAGE value="added initial gamepad input" />
     <MESSAGE value="remove core::app as it doesn't serve any purpose and hinders running winit event loop normally" />
     <MESSAGE value="cleanup (as of Rust 2018) redundant extern crate declarations" />
-    <option name="LAST_COMMIT_MESSAGE" value="cleanup (as of Rust 2018) redundant extern crate declarations" />
+    <MESSAGE value="wrap view, projection matrices and their params into Camera entity" />
+    <option name="LAST_COMMIT_MESSAGE" value="wrap view, projection matrices and their params into Camera entity" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

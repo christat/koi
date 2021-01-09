@@ -13,12 +13,15 @@ pub mod renderer;
 pub mod utils;
 //----------------------------------------------------------------------------------------------------------------------
 
+use ultraviolet::Rotor3;
+//----------------------------------------------------------------------------------------------------------------------
+
 use crate::{
     core::{
-        input::{GamepadButton, Input},
-        window::{init_window, DevEvt, Evt, Flow, Key, WinEvt},
+        input::{Button, Input, Key},
+        window::{init_window, DevEvt, Evt, Flow, WinEvt},
     },
-    renderer::Renderer,
+    renderer::{entities::Camera, Renderer},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -38,8 +41,8 @@ fn main() {
 
     let (window_handle, event_loop_handle, event_proxy_handle, mut window_state) =
         init_window(APP_NAME, WIDTH, HEIGHT);
-    let mut renderer = Renderer::init(APP_NAME, &window_handle);
     let mut input_handle = Input::init(None);
+    let mut renderer = Renderer::init(APP_NAME, &window_handle);
 
     info!("----- EventLoopHandle::run -----");
     event_loop_handle.run(move |event, _, control_flow| {
@@ -87,7 +90,7 @@ fn main() {
                     input_handle.update_gamepad_input();
 
                     if input_handle.is_key_down(Key::Escape)
-                        || (input_handle.is_button_down(GamepadButton::Start))
+                        || (input_handle.is_button_down(Button::Start))
                     {
                         event_proxy_handle
                             .send_event(CoreEvent::CloseRequested)
@@ -97,6 +100,8 @@ fn main() {
                         return;
                     }
 
+                    update_camera(renderer.camera_mut(), &input_handle);
+
                     renderer.draw();
                 }
             }
@@ -104,5 +109,11 @@ fn main() {
             _ => {}
         };
     });
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+fn update_camera(camera: &mut Camera, input_handle: &Input) {
+    //camera.translate();
+    //camera.rotate();
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -41,12 +41,17 @@ impl Renderer {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn camera_mut(&mut self) -> &mut Camera {
+        &mut self.camera
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn draw(&mut self) {
-        let frame_start = std::time::Instant::now();
+        //let frame_start = std::time::Instant::now();
 
         self.backend.draw(&self.camera);
 
-        eprintln!("Frame time: {:?}", frame_start.elapsed());
+        //eprintln!("Frame time: {:?}", frame_start.elapsed());
     }
     //------------------------------------------------------------------------------------------------------------------
 }

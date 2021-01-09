@@ -42,12 +42,12 @@ impl Camera {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn update_position(&mut self, translation: Vec3) {
+    pub fn translate(&mut self, translation: Vec3) {
         self.position += translation;
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn update_rotation(&mut self, rotor: Rotor3) {
+    pub fn rotate(&mut self, rotor: Rotor3) {
         self.direction = rotor * self.direction;
     }
     //------------------------------------------------------------------------------------------------------------------
