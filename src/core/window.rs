@@ -1,21 +1,24 @@
+use std::fmt::Debug;
+//----------------------------------------------------------------------------------------------------------------------
+
 use winit::{
     dpi::LogicalSize,
-    event::{DeviceEvent, Event, VirtualKeyCode, WindowEvent},
-    event_loop::ControlFlow,
+    event::{Event, WindowEvent},
     event_loop::EventLoop,
     event_loop::EventLoopProxy,
-    window::{Window as WinitWindow, WindowBuilder},
+    window::WindowBuilder,
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-pub type WindowHandle = WinitWindow;
+pub use winit::{
+    event::{DeviceEvent as DevEvt, VirtualKeyCode as Key},
+    event_loop::ControlFlow as Flow,
+    window::Window as WindowHandle,
+};
+
 pub type EventLoopHandle<T> = EventLoop<T>;
-pub type EventProxyHandle<T> = EventLoopProxy<T>;
-pub type Key = VirtualKeyCode;
 pub type Evt<'a, T> = Event<'a, T>;
-pub type DevEvt = DeviceEvent;
 pub type WinEvt<'a> = WindowEvent<'a>;
-pub type Flow = ControlFlow;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct WindowState {
@@ -36,19 +39,35 @@ impl WindowState {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-pub fn init_window<T>(
+pub struct EventProxy<T: 'static + Debug + Clone> {
+    proxy: EventLoopProxy<T>,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl<T: 'static + Debug + Clone> EventProxy<T> {
+    pub fn init(event_loop_handle: &EventLoop<T>) -> Self {
+        Self {
+            proxy: event_loop_handle.create_proxy(),
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn emit(&self, event: T) {
+        self.proxy
+            .send_event(event.clone())
+            .unwrap_or_else(|_| warn!("Failed to send event {:?} to event loop!", event));
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub fn init_window<T: 'static + Debug + Clone>(
     title: &str,
     width: usize,
     height: usize,
-) -> (
-    WindowHandle,
-    EventLoopHandle<T>,
-    EventProxyHandle<T>,
-    WindowState,
-) {
+) -> (WindowHandle, EventLoopHandle<T>, EventProxy<T>, WindowState) {
     info!("----- Window::init -----");
     let event_loop_handle = EventLoop::with_user_event();
-    let event_proxy_handle = event_loop_handle.create_proxy();
+    let event_proxy = EventProxy::init(&event_loop_handle);
 
     let window_handle = WindowBuilder::new()
         .with_inner_size(LogicalSize::new(width as f64, height as f64))
@@ -59,7 +78,7 @@ pub fn init_window<T>(
     (
         window_handle,
         event_loop_handle,
-        event_proxy_handle,
+        event_proxy,
         WindowState { focused: true },
     )
 }
