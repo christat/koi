@@ -202,3 +202,49 @@ pub enum GamepadInput {
     Trigger(Trigger),
 }
 //----------------------------------------------------------------------------------------------------------------------
+
+#[derive(Clone, Copy, Debug)]
+pub struct ActionBindings {
+    kbm: Option<KeyboardMouseInput>,
+    kbm_alt: Option<KeyboardMouseInput>,
+    gamepad: Option<GamepadInput>,
+    gamepad_alt: Option<GamepadInput>,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl ActionBindings {
+    pub fn builder() -> Self {
+        Self {
+            kbm: None,
+            kbm_alt: None,
+            gamepad: None,
+            gamepad_alt: None,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn kbm(mut self, kbm: KeyboardMouseInput) -> Self {
+        self.kbm = Some(kbm);
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn kbm_alt(mut self, kbm: KeyboardMouseInput) -> Self {
+        self.kbm_alt = Some(kbm);
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn gamepad(mut self, gamepad: GamepadInput) -> Self {
+        self.gamepad = Some(gamepad);
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn gamepad_alt(mut self, gamepad: GamepadInput) -> Self {
+        self.gamepad_alt = Some(gamepad);
+        self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------

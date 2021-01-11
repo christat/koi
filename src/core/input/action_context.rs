@@ -4,49 +4,14 @@ use std::collections::{HashMap, HashSet};
 use paste::paste;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::core::input::types::{
-    Axis, Button, GamepadInput, Key, KeyboardMouseInput, Mouse, MouseMotion, Trigger,
+use crate::core::input::{
+    types::{
+        ActionBindings, Axis, Button, GamepadInput, Key, KeyboardMouseInput, Mouse, MouseMotion,
+        Trigger,
+    },
+    InputManager,
 };
 //----------------------------------------------------------------------------------------------------------------------
-
-#[derive(Clone, Copy, Debug)]
-pub struct ActionBindings {
-    kbm: Option<KeyboardMouseInput>,
-    kbm_alt: Option<KeyboardMouseInput>,
-    gamepad: Option<GamepadInput>,
-    gamepad_alt: Option<GamepadInput>,
-}
-
-impl ActionBindings {
-    pub fn default() -> Self {
-        Self {
-            kbm: None,
-            kbm_alt: None,
-            gamepad: None,
-            gamepad_alt: None,
-        }
-    }
-
-    pub fn kbm(mut self, kbm: KeyboardMouseInput) -> Self {
-        self.kbm = Some(kbm);
-        self
-    }
-
-    pub fn kbm_alt(mut self, kbm: KeyboardMouseInput) -> Self {
-        self.kbm_alt = Some(kbm);
-        self
-    }
-
-    pub fn gamepad(mut self, gamepad: GamepadInput) -> Self {
-        self.gamepad = Some(gamepad);
-        self
-    }
-
-    pub fn gamepad_alt(mut self, gamepad: GamepadInput) -> Self {
-        self.gamepad_alt = Some(gamepad);
-        self
-    }
-}
 
 macro_rules! define_contextual_action_bindings {
     ($($ctx:ident { $({ $action:ident, $gpe:ident$(::$gpi:ident)?, $gpe2:ident$(::$gpi2:ident)?, $kbme:ident$(::$kbmi:ident)?, $kbme2:ident$(::$kbmi2:ident)? })+ })+) => {
@@ -62,14 +27,14 @@ macro_rules! define_contextual_action_bindings {
 
         paste! {
 
-            pub struct ActionContext {
+            pub struct InputActions {
                 active_ctxs: HashSet<ActionContexts>,
                 $(
                     [<$ctx:snake>]: HashMap<[<$ctx Actions>], ActionBindings>,
                 )+
             }
 
-            impl ActionContext {
+            impl InputActions {
                 pub fn init() -> Self {
                     #[allow(unused_imports)]
                     use Axis::*;
@@ -90,7 +55,7 @@ macro_rules! define_contextual_action_bindings {
                             $(
                                 (
                                     [<$ctx Actions>]::$action,
-                                    ActionBindings::default()
+                                    ActionBindings::builder()
                                     $(.gamepad(GamepadInput::$gpe($gpi)))?
                                     $(.gamepad_alt(GamepadInput::$gpe2($gpi2)))?
                                     $(.kbm(KeyboardMouseInput::$kbme($kbmi)))?
@@ -119,6 +84,29 @@ macro_rules! define_contextual_action_bindings {
                 pub fn remove_active_context(&mut self, ctx: &ActionContexts) {
                     self.active_ctxs.remove(ctx);
                 }
+
+                $(
+                    pub fn [<is_ $ctx:snake _action_down>] (&self, action: &[<$ctx Actions>], mgr: &InputManager) -> bool {
+                        match self.[<$ctx:snake>].get(action) {
+                            Some(binding) => mgr.is_binding_down(binding),
+                            None => false
+                        }
+                    }
+
+                    pub fn [<is_ $ctx:snake _action_hold>] (&self, action: &[<$ctx Actions>], mgr: &InputManager) -> bool {
+                        match self.[<$ctx:snake>].get(action) {
+                            Some(binding) => mgr.is_binding_hold(binding),
+                            None => false
+                        }
+                    }
+
+                    pub fn [<get_ $ctx:snake _action_value>] (&self, action: &[<$ctx Actions>], mgr: &InputManager) -> f32 {
+                        match self.[<$ctx:snake>].get(action) {
+                            Some(binding) => mgr.get_binding_value(binding),
+                            None => 0.0
+                        }
+                    }
+                )+
             }
         }
     };

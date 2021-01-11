@@ -21,17 +21,11 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add update_camera stub (preparing to split physical/logical input handles)">
-      <change afterPath="$PROJECT_DIR$/src/core/input/action_context.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/input/input_manager.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/input/mod.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/input/types.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add logical input bindings (WIP macro)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/window.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/action_context.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/input/input_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/input_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/input/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/types.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -195,7 +189,7 @@
       <workItem from="1609574887192" duration="52959000" />
       <workItem from="1609828096202" duration="82836000" />
       <workItem from="1610179146741" duration="21404000" />
-      <workItem from="1610376977765" duration="11140000" />
+      <workItem from="1610376977765" duration="12342000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -389,7 +383,13 @@
       <option name="presentableId" value="LOCAL−00032" />
       <updated>1610203432307</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL−00033" summary="add logical input bindings (WIP macro)">
+      <created>1610396651279</created>
+      <option name="number" value="LOCAL−00033" />
+      <option name="presentableId" value="LOCAL−00033" />
+      <updated>1610396651279</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -445,7 +445,8 @@
     <MESSAGE value="cleanup (as of Rust 2018) redundant extern crate declarations" />
     <MESSAGE value="wrap view, projection matrices and their params into Camera entity" />
     <MESSAGE value="add update_camera stub (preparing to split physical/logical input handles)" />
-    <option name="LAST_COMMIT_MESSAGE" value="add update_camera stub (preparing to split physical/logical input handles)" />
+    <MESSAGE value="add logical input bindings (WIP macro)" />
+    <option name="LAST_COMMIT_MESSAGE" value="add logical input bindings (WIP macro)" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
