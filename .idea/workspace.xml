@@ -21,7 +21,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="finalized first (naive) implementation of input action system; setup camera movement with it">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add active context checks to enable/disable action groups">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/action_context.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
@@ -189,7 +189,7 @@
       <workItem from="1609828096202" duration="82836000" />
       <workItem from="1610179146741" duration="21404000" />
       <workItem from="1610376977765" duration="12678000" />
-      <workItem from="1610465879730" duration="10734000" />
+      <workItem from="1610465879730" duration="11111000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -401,7 +401,13 @@
       <option name="presentableId" value="LOCAL−00035" />
       <updated>1610476248534</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL−00036" summary="add active context checks to enable/disable action groups">
+      <created>1610477441004</created>
+      <option name="number" value="LOCAL−00036" />
+      <option name="presentableId" value="LOCAL−00036" />
+      <updated>1610477441004</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -433,7 +439,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed drop logic (implicit trait does not seem to execute as desired)" />
     <MESSAGE value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
     <MESSAGE value="removed spirv-builder for now" />
     <MESSAGE value="bound pipeline resource and set hardcoded triangle draw cmd" />
@@ -458,7 +463,8 @@
     <MESSAGE value="add logical input bindings (WIP macro)" />
     <MESSAGE value="binding to value conversion stub" />
     <MESSAGE value="finalized first (naive) implementation of input action system; setup camera movement with it" />
-    <option name="LAST_COMMIT_MESSAGE" value="finalized first (naive) implementation of input action system; setup camera movement with it" />
+    <MESSAGE value="add active context checks to enable/disable action groups" />
+    <option name="LAST_COMMIT_MESSAGE" value="add active context checks to enable/disable action groups" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

@@ -112,13 +112,20 @@ fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputM
     let bwd = input_actions.get_in_game_action_value(mgr, InGameActions::Backward);
     let left = input_actions.get_in_game_action_value(mgr, InGameActions::Left);
     let right = input_actions.get_in_game_action_value(mgr, InGameActions::Right);
+    let lb_down = input_actions.is_in_game_action_down(mgr, InGameActions::Sprint);
 
-    const MOVEMENT_MULTIPLIER: f32 = 0.5;
+    const WALK_MULTIPLIER: f32 = 0.2;
+    const SPRINT_MULTIPLIER: f32 = 0.8;
+    let multiplier = if lb_down {
+        SPRINT_MULTIPLIER
+    } else {
+        WALK_MULTIPLIER
+    };
 
     camera.translate(Vec3::new(
-        (left - right) * MOVEMENT_MULTIPLIER,
+        (left - right) * multiplier,
         0.0,
-        (fwd - bwd) * MOVEMENT_MULTIPLIER,
+        (fwd - bwd) * multiplier,
     ));
     //camera.rotate();
 }
