@@ -13,15 +13,18 @@ pub mod renderer;
 pub mod utils;
 //----------------------------------------------------------------------------------------------------------------------
 
+use ultraviolet::Vec3;
+//----------------------------------------------------------------------------------------------------------------------
+
 use crate::{
     core::{
         input::{
             types::{Button, GamepadEvent, Key},
-            InputManager,
+            InGameActions, InputActions, InputManager,
         },
         window::{init_window, Evt, Flow, WinEvt},
     },
-    renderer::Renderer,
+    renderer::{entities::Camera, Renderer},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +46,8 @@ fn main() {
 
     let (window_handle, event_loop_handle, event_proxy, mut window_state) =
         init_window(APP_NAME, WIDTH, HEIGHT);
-    let mut input_handle = InputManager::init(None);
+    let mut input_manager = InputManager::init(None);
+    let input_actions = InputActions::init();
     let mut renderer = Renderer::init(APP_NAME, &window_handle);
 
     info!("----- EventLoopHandle::run -----");
@@ -72,24 +76,24 @@ fn main() {
             },
             Evt::DeviceEvent { event, .. } => {
                 if is_focused {
-                    input_handle.update_keyboard_mouse_input(event);
+                    input_manager.update_keyboard_mouse_input(event);
                 }
             }
             Evt::MainEventsCleared => {
                 if is_focused {
-                    if let Some(evt) = input_handle.update_gamepad_input() {
+                    if let Some(evt) = input_manager.update_gamepad_input() {
                         if evt == GamepadEvent::Disconnected {
                             event_proxy.emit(CoreEvent::GamepadDisconnected);
                         }
                     }
 
-                    if input_handle.is_key_down(Key::Escape)
-                        || (input_handle.is_button_down(Button::Start))
+                    if input_manager.is_key_down(Key::Escape)
+                        || (input_manager.is_button_down(Button::Start))
                     {
                         event_proxy.emit(CoreEvent::CloseRequested);
                     }
 
-                    // update_camera(renderer.camera_mut(), &input_handle);
+                    update_camera(renderer.camera_mut(), &input_actions, &input_manager);
 
                     renderer.draw();
                 }
@@ -101,8 +105,19 @@ fn main() {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-// fn update_camera(camera: &mut Camera, input_handle: &InputManager) {
-//      camera.translate();
-//      camera.rotate();
-// }
+fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputManager) {
+    let fwd = input_actions.get_in_game_action_value(mgr, InGameActions::Forward);
+    let bwd = input_actions.get_in_game_action_value(mgr, InGameActions::Backward);
+    let left = input_actions.get_in_game_action_value(mgr, InGameActions::Left);
+    let right = input_actions.get_in_game_action_value(mgr, InGameActions::Right);
+
+    const MOVEMENT_MULTIPLIER: f32 = 0.5;
+
+    camera.translate(Vec3::new(
+        (left - right) * MOVEMENT_MULTIPLIER,
+        0.0,
+        (fwd - bwd) * MOVEMENT_MULTIPLIER,
+    ));
+    //camera.rotate();
+}
 //----------------------------------------------------------------------------------------------------------------------

@@ -21,11 +21,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add logical input bindings (WIP macro)">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="binding to value conversion stub">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/action_context.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/input/input_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/input_manager.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/input/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +91,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package koi --bin koi" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -120,11 +126,6 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -189,7 +190,8 @@
       <workItem from="1609574887192" duration="52959000" />
       <workItem from="1609828096202" duration="82836000" />
       <workItem from="1610179146741" duration="21404000" />
-      <workItem from="1610376977765" duration="12342000" />
+      <workItem from="1610376977765" duration="12678000" />
+      <workItem from="1610465879730" duration="9613000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -389,7 +391,13 @@
       <option name="presentableId" value="LOCAL−00033" />
       <updated>1610396651279</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL−00034" summary="binding to value conversion stub">
+      <created>1610397723559</created>
+      <option name="number" value="LOCAL−00034" />
+      <option name="presentableId" value="LOCAL−00034" />
+      <updated>1610397723559</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +429,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Initial commit" />
     <MESSAGE value="mvp render loop" />
     <MESSAGE value="fixed drop logic (implicit trait does not seem to execute as desired)" />
     <MESSAGE value="add render pass setting clearColor; slight refactor to extract structs from mod.rs files" />
@@ -446,7 +453,8 @@
     <MESSAGE value="wrap view, projection matrices and their params into Camera entity" />
     <MESSAGE value="add update_camera stub (preparing to split physical/logical input handles)" />
     <MESSAGE value="add logical input bindings (WIP macro)" />
-    <option name="LAST_COMMIT_MESSAGE" value="add logical input bindings (WIP macro)" />
+    <MESSAGE value="binding to value conversion stub" />
+    <option name="LAST_COMMIT_MESSAGE" value="binding to value conversion stub" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

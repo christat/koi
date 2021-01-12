@@ -8,12 +8,12 @@ use std::{
 
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::core::input::types::ActionBindings;
+use crate::core::input::types::{EvCode, MouseMotion, Stick, Trigger};
 use crate::{
     core::{
         input::types::{
-            AxisInfo, Button, Event, GamepadEvent, GamepadEventMeta, Gilrs, HwAxis, InputState,
-            Key, Mouse, ScrollDelta, IS_Y_AXIS_REVERSED,
+            AxisInfo, Button, Event, GamepadEvent, GamepadEventMeta, Gilrs, HwAxis, InputMode,
+            InputState, Key, Mouse, ScrollDelta, IS_Y_AXIS_REVERSED,
         },
         window::DevEvt,
     },
@@ -31,6 +31,8 @@ pub struct InputManager {
     gamepad: HashMap<Button, (InputState, Instant)>,
     gamepad_axis: HashMap<HwAxis, f32>,
     //------------------------------------------------------------------------------------------------------------------
+    current_input_mode: InputMode,
+    last_input_update: Instant,
     hold_time_millis: u128,
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,12 +53,85 @@ impl InputManager {
             gamepad: HashMap::new(),
             gamepad_axis: HashMap::new(),
             //----------------------------------------------------------------------------------------------------------
+            current_input_mode: InputMode::Gamepad,
+            last_input_update: Instant::now(),
             hold_time_millis: hold_time_millis.unwrap_or(500),
         }
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn update_gamepad_input(&mut self) -> Option<GamepadEvent> {
+        // flush gamepad event queue. TODO Investigate if there's a better way to implement this...
+        while let Some(gamepad_event) = self.gamepad_manager.next_event() {
+            let GamepadEventMeta {
+                event: r#type,
+                id,
+                time,
+            } = gamepad_event;
+
+            if self.current_input_mode != InputMode::Gamepad {
+                if let Ok(duration) = time.elapsed() {
+                    let now = Instant::now();
+                    if duration < now.duration_since(self.last_input_update) {
+                        self.current_input_mode = InputMode::Gamepad;
+                        self.last_input_update = now;
+                    }
+                }
+            }
+
+            use GamepadEvent::*;
+            match r#type {
+                Connected => {
+                    info!("Input - Gamepad connected (id: {})", id);
+                }
+                Disconnected => {
+                    info!("Input - Gamepad disconnected (id: {})", id);
+                    return Some(Disconnected);
+                }
+                AxisValueChanged(value, code) => {
+                    if let Some(gamepad) = self.gamepad_manager.gamepad(id) {
+                        if let Ok(axis) = HwAxis::try_from(code) {
+                            if let Some(axis_info) = gamepad.axis_info(code) {
+                                let v = clamp_hw_axis_value(axis, axis_info, value);
+                                self.gamepad_axis.insert(axis, v);
+                            }
+                        }
+                    }
+                }
+                ButtonPressed(code) => self.update_button_state(code, InputState::Down),
+                ButtonReleased(code) => self.update_button_state(code, InputState::Up),
+            };
+        }
+
+        None
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    fn update_button_state(&mut self, code: EvCode, new_state: InputState) {
+        if let Ok(button) = Button::try_from(code) {
+            match self.gamepad.entry(button) {
+                Entry::Vacant(entry) => {
+                    entry.insert((new_state, Instant::now()));
+                }
+                Entry::Occupied(mut entry) => match entry.get() {
+                    (input_state, _) => {
+                        if *input_state != new_state {
+                            entry.insert((new_state, Instant::now()));
+                        }
+                    }
+                },
+            };
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn update_keyboard_mouse_input(&mut self, event: DevEvt) {
+        // NB! takes advantage of the fact KBM gets spammed from Winit and skip duration checks.
+        if self.current_input_mode != InputMode::KBM {
+            self.last_input_update = Instant::now();
+            self.current_input_mode = InputMode::KBM;
+        }
+
         match event {
             DevEvt::Key(input) => {
                 if let Some(keycode) = input.virtual_keycode {
@@ -112,67 +187,8 @@ impl InputManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn update_gamepad_input(&mut self) -> Option<GamepadEvent> {
-        // flush gamepad event queue. TODO Investigate if there's a better way to implement this...
-        while let Some(gamepad_event) = self.gamepad_manager.next_event() {
-            let GamepadEventMeta {
-                event: r#type, id, ..
-            } = gamepad_event;
-
-            match r#type {
-                GamepadEvent::Connected => {
-                    info!("Input - Gamepad connected (id: {})", id);
-                }
-                GamepadEvent::Disconnected => {
-                    info!("Input - Gamepad disconnected (id: {})", id);
-                    return Some(GamepadEvent::Disconnected);
-                }
-                GamepadEvent::AxisValueChanged(value, code) => {
-                    if let Some(gamepad) = self.gamepad_manager.gamepad(id) {
-                        if let Ok(axis) = HwAxis::try_from(code) {
-                            if let Some(axis_info) = gamepad.axis_info(code) {
-                                let v = clamp_hw_axis_value(axis, axis_info, value);
-                                self.gamepad_axis.insert(axis, v);
-                            }
-                        }
-                    }
-                }
-                GamepadEvent::ButtonPressed(code) => {
-                    if let Ok(button) = Button::try_from(code) {
-                        match self.gamepad.entry(button) {
-                            Entry::Vacant(entry) => {
-                                entry.insert((InputState::Down, Instant::now()));
-                            }
-                            Entry::Occupied(mut entry) => match entry.get() {
-                                (InputState::Up, _) => {
-                                    entry.insert((InputState::Down, Instant::now()));
-                                }
-                                (_, _) => {}
-                            },
-                        };
-                    }
-                }
-                GamepadEvent::ButtonReleased(code) => {
-                    if let Ok(button) = Button::try_from(code) {
-                        match self.gamepad.entry(button) {
-                            Entry::Vacant(entry) => {
-                                entry.insert((InputState::Up, Instant::now()));
-                            }
-                            Entry::Occupied(mut entry) => {
-                                match entry.get() {
-                                    (InputState::Down, _) => {}
-                                    (_, _) => {
-                                        entry.insert((InputState::Up, Instant::now()));
-                                    }
-                                };
-                            }
-                        };
-                    }
-                }
-            };
-        }
-
-        None
+    pub fn get_current_input_mode(&self) -> InputMode {
+        self.current_input_mode
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -198,24 +214,82 @@ impl InputManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn get_key_value(&self, key: Key) -> f32 {
+        match self.is_key_down(key) {
+            true => 1.0,
+            false => 0.0,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn is_mouse_down(&self, button: Mouse) -> bool {
-        match self.mouse.get(&button) {
-            Some((state, _)) => match state {
-                InputState::Up => false,
-                _ => true,
+        use Mouse::*;
+        match button {
+            ScrollDown | ScrollUp => self.is_scroll_active(button),
+            _ => match self.mouse.get(&button) {
+                Some((state, _)) => match state {
+                    InputState::Up => false,
+                    _ => true,
+                },
+                None => false,
             },
-            None => false,
         }
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn is_mouse_hold(&self, button: Mouse) -> bool {
-        match self.mouse.get(&button) {
-            Some((state, _)) => match state {
-                InputState::Hold => true,
-                _ => false,
+        use Mouse::*;
+        match button {
+            ScrollDown | ScrollUp => self.is_scroll_active(button),
+            _ => match self.mouse.get(&button) {
+                Some((state, _)) => match state {
+                    InputState::Hold => true,
+                    _ => false,
+                },
+                None => false,
             },
-            None => false,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_mouse_value(&self, button: Mouse) -> f32 {
+        match self.is_mouse_down(button) {
+            true => 1.0,
+            false => 0.0,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn is_scroll_active(&self, button: Mouse) -> bool {
+        use Mouse::*;
+        match button {
+            ScrollUp => self.scroll_delta > 0.0,
+            ScrollDown => self.scroll_delta < 0.0,
+            _ => false,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn is_mouse_in_motion(&self, mouse_motion: MouseMotion) -> bool {
+        use MouseMotion::*;
+        let (x_delta, y_delta) = self.mouse_deltas;
+        match mouse_motion {
+            XLeft => x_delta < 0.0,
+            XRight => x_delta > 0.0,
+            YUp => y_delta < 0.0,
+            YDown => y_delta > 0.0,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_mouse_motion(&self, mouse_motion: MouseMotion) -> f32 {
+        use MouseMotion::*;
+        let (x_delta, y_delta) = self.mouse_deltas;
+        match mouse_motion {
+            XLeft => (-x_delta as f32).max(0.0),
+            XRight => (x_delta as f32).max(0.0),
+            YUp => (-y_delta as f32).max(0.0),
+            YDown => (y_delta as f32).max(0.0),
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -260,6 +334,14 @@ impl InputManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn get_button_value(&self, button: Button) -> f32 {
+        match self.is_button_down(button) {
+            true => 1.0,
+            false => 0.0,
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn get_axis_offset(&self, axis: HwAxis) -> f32 {
         match self.gamepad_axis.get(&axis) {
             Some(offset) => offset.clone(),
@@ -268,18 +350,96 @@ impl InputManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn is_binding_down(&self, binding: &ActionBindings) -> bool {
-        unimplemented!()
+    pub fn is_stick_in_motion(&self, stick: Stick) -> bool {
+        use HwAxis::*;
+        use Stick::*;
+        match stick {
+            LSUp | LSDown => {
+                let offset = self.get_axis_offset(LeftStickY);
+                if stick == LSUp {
+                    offset > 0.0
+                } else {
+                    offset < 0.0
+                }
+            }
+            LSLeft | LSRight => {
+                let offset = self.get_axis_offset(LeftStickX);
+                if stick == LSRight {
+                    offset > 0.0
+                } else {
+                    offset < 0.0
+                }
+            }
+            RSUp | RSDown => {
+                let offset = self.get_axis_offset(RightStickY);
+                if stick == RSUp {
+                    offset > 0.0
+                } else {
+                    offset < 0.0
+                }
+            }
+            RSLeft | RSRight => {
+                let offset = self.get_axis_offset(RightStickX);
+                if stick == RSRight {
+                    offset > 0.0
+                } else {
+                    offset < 0.0
+                }
+            }
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn is_binding_hold(&self, binding: &ActionBindings) -> bool {
-        unimplemented!()
+    pub fn get_stick_value(&self, stick: Stick) -> f32 {
+        use HwAxis::*;
+        use Stick::*;
+        match stick {
+            LSUp | LSDown => {
+                let offset = self.get_axis_offset(LeftStickY);
+                if stick == LSUp {
+                    offset.max(0.0)
+                } else {
+                    (-offset).max(0.0)
+                }
+            }
+            LSLeft | LSRight => {
+                let offset = self.get_axis_offset(LeftStickX);
+                if stick == LSRight {
+                    offset.max(0.0)
+                } else {
+                    (-offset).max(0.0)
+                }
+            }
+            RSUp | RSDown => {
+                let offset = self.get_axis_offset(RightStickY);
+                if stick == RSUp {
+                    offset.max(0.0)
+                } else {
+                    (-offset).max(0.0)
+                }
+            }
+            RSLeft | RSRight => {
+                let offset = self.get_axis_offset(RightStickX);
+                if stick == RSRight {
+                    offset.max(0.0)
+                } else {
+                    (-offset).max(0.0)
+                }
+            }
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get_binding_value(&self, binding: &ActionBindings) -> f32 {
-        unimplemented!()
+    pub fn is_trigger_active(&self, trigger: Trigger) -> bool {
+        self.get_trigger_value(trigger) > 0.0
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_trigger_value(&self, trigger: Trigger) -> f32 {
+        match trigger {
+            Trigger::LT => self.get_axis_offset(HwAxis::LeftTrigger),
+            Trigger::RT => self.get_axis_offset(HwAxis::RightTrigger),
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 }

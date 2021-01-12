@@ -10,7 +10,7 @@ pub use winit::event::{
 };
 //----------------------------------------------------------------------------------------------------------------------
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum InputState {
     Up,
     Down,
@@ -33,6 +33,8 @@ pub enum Mouse {
     LMB,
     MMB,
     RMB,
+    ScrollUp,
+    ScrollDown,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -52,10 +54,11 @@ impl TryFrom<u32> for Mouse {
     type Error = MouseFromU32Error;
 
     fn try_from(code: u32) -> Result<Self, Self::Error> {
+        use Mouse::*;
         match code {
-            1 => Ok(Mouse::LMB),
-            2 => Ok(Mouse::MMB),
-            3 => Ok(Mouse::RMB),
+            1 => Ok(LMB),
+            2 => Ok(MMB),
+            3 => Ok(RMB),
             _ => Err(Self::Error {}),
         }
     }
@@ -72,7 +75,7 @@ pub enum MouseMotion {
 //----------------------------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Axis {
+pub enum Stick {
     LSUp,
     LSDown,
     LSLeft,
@@ -118,13 +121,14 @@ impl TryFrom<EvCode> for HwAxis {
     type Error = HwAxisFromEvCodeError;
 
     fn try_from(code: EvCode) -> Result<Self, Self::Error> {
+        use HwAxis::*;
         match code.into_u32() {
-            0 => Ok(HwAxis::LeftStickX),
-            1 => Ok(HwAxis::LeftStickY),
-            3 => Ok(HwAxis::RightStickX),
-            4 => Ok(HwAxis::RightStickY),
-            10 => Ok(HwAxis::RightTrigger),
-            11 => Ok(HwAxis::LeftTrigger),
+            0 => Ok(LeftStickX),
+            1 => Ok(LeftStickY),
+            3 => Ok(RightStickX),
+            4 => Ok(RightStickY),
+            10 => Ok(RightTrigger),
+            11 => Ok(LeftTrigger),
             _ => Err(Self::Error {}),
         }
     }
@@ -166,21 +170,22 @@ impl TryFrom<EvCode> for Button {
     type Error = ButtonFromEvCodeError;
 
     fn try_from(code: EvCode) -> Result<Self, Self::Error> {
+        use Button::*;
         match code.into_u32() {
-            27 => Ok(Button::DPadUp),
-            28 => Ok(Button::DPadDown),
-            29 => Ok(Button::DPadLeft),
-            30 => Ok(Button::DPadRight),
-            15 => Ok(Button::North),
-            12 => Ok(Button::South),
-            16 => Ok(Button::East),
-            13 => Ok(Button::West),
-            18 => Ok(Button::LeftBumper),
-            19 => Ok(Button::RightBumper),
-            22 => Ok(Button::Select),
-            23 => Ok(Button::Start),
-            25 => Ok(Button::LeftStick),
-            26 => Ok(Button::RightStick),
+            27 => Ok(DPadUp),
+            28 => Ok(DPadDown),
+            29 => Ok(DPadLeft),
+            30 => Ok(DPadRight),
+            15 => Ok(North),
+            12 => Ok(South),
+            16 => Ok(East),
+            13 => Ok(West),
+            18 => Ok(LeftBumper),
+            19 => Ok(RightBumper),
+            22 => Ok(Select),
+            23 => Ok(Start),
+            25 => Ok(LeftStick),
+            26 => Ok(RightStick),
             _ => Err(Self::Error {}),
         }
     }
@@ -198,17 +203,24 @@ pub enum KeyboardMouseInput {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum GamepadInput {
     Button(Button),
-    Axis(Axis),
+    Stick(Stick),
     Trigger(Trigger),
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InputMode {
+    KBM,
+    Gamepad,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug)]
 pub struct ActionBindings {
-    kbm: Option<KeyboardMouseInput>,
-    kbm_alt: Option<KeyboardMouseInput>,
-    gamepad: Option<GamepadInput>,
-    gamepad_alt: Option<GamepadInput>,
+    pub kbm: Option<KeyboardMouseInput>,
+    pub kbm_alt: Option<KeyboardMouseInput>,
+    pub gamepad: Option<GamepadInput>,
+    pub gamepad_alt: Option<GamepadInput>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -244,6 +256,16 @@ impl ActionBindings {
     pub fn gamepad_alt(mut self, gamepad: GamepadInput) -> Self {
         self.gamepad_alt = Some(gamepad);
         self
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_gamepad_bindings(&self) -> [Option<GamepadInput>; 2] {
+        [self.gamepad, self.gamepad_alt]
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_kbm_bindings(&self) -> [Option<KeyboardMouseInput>; 2] {
+        [self.kbm, self.kbm_alt]
     }
     //------------------------------------------------------------------------------------------------------------------
 }
