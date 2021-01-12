@@ -20,7 +20,7 @@ use crate::{
     core::{
         input::{
             types::{Button, GamepadEvent, Key},
-            InGameActions, InputActions, InputManager,
+            ActionContexts, InGameActions, InputActions, InputManager,
         },
         window::{init_window, Evt, Flow, WinEvt},
     },
@@ -47,8 +47,10 @@ fn main() {
     let (window_handle, event_loop_handle, event_proxy, mut window_state) =
         init_window(APP_NAME, WIDTH, HEIGHT);
     let mut input_manager = InputManager::init(None);
-    let input_actions = InputActions::init();
+    let mut input_actions = InputActions::init();
     let mut renderer = Renderer::init(APP_NAME, &window_handle);
+
+    input_actions.set_active_context(ActionContexts::InGame);
 
     info!("----- EventLoopHandle::run -----");
     event_loop_handle.run(move |event, _, control_flow| {

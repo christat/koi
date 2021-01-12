@@ -81,12 +81,19 @@ macro_rules! define_contextual_action_bindings {
                     self.active_ctxs.insert(ctx);
                 }
 
-                pub fn remove_active_context(&mut self, ctx: &ActionContexts) {
-                    self.active_ctxs.remove(ctx);
+                pub fn remove_active_context(&mut self, ctx: ActionContexts) {
+                    self.active_ctxs.remove(&ctx);
+                }
+
+                pub fn is_context_active(&self, ctx: ActionContexts) -> bool {
+                    self.active_ctxs.contains(&ctx)
                 }
 
                 $(
                     pub fn [<is_ $ctx:snake _action_down>] (&self, mgr: &InputManager, action: [<$ctx Actions>]) -> bool {
+                        if !self.is_context_active(ActionContexts::$ctx) {
+                            return false;
+                        }
                         match self.[<$ctx:snake>].get(&action) {
                             Some(binding) => self.is_binding_down(binding, mgr),
                             None => false
@@ -94,6 +101,9 @@ macro_rules! define_contextual_action_bindings {
                     }
 
                     pub fn [<is_ $ctx:snake _action_hold>] (&self, mgr: &InputManager, action: [<$ctx Actions>]) -> bool {
+                        if !self.is_context_active(ActionContexts::$ctx) {
+                            return false;
+                        }
                         match self.[<$ctx:snake>].get(&action) {
                             Some(binding) => self.is_binding_hold(binding, mgr),
                             None => false
@@ -101,6 +111,9 @@ macro_rules! define_contextual_action_bindings {
                     }
 
                     pub fn [<get_ $ctx:snake _action_value>] (&self, mgr: &InputManager, action: [<$ctx Actions>]) -> f32 {
+                        if !self.is_context_active(ActionContexts::$ctx) {
+                            return 0.0;
+                        }
                         match self.[<$ctx:snake>].get(&action) {
                             Some(binding) => self.get_binding_value(binding, mgr),
                             None => 0.0
