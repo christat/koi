@@ -13,7 +13,7 @@ pub mod renderer;
 pub mod utils;
 //----------------------------------------------------------------------------------------------------------------------
 
-use ultraviolet::Vec3;
+use ultraviolet::{rotor::Rotor3, Vec3};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
@@ -108,6 +108,20 @@ fn main() {
 //----------------------------------------------------------------------------------------------------------------------
 
 fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputManager) {
+    let look_up = input_actions.get_in_game_action_value(mgr, InGameActions::LookUp);
+    let look_down = input_actions.get_in_game_action_value(mgr, InGameActions::LookDown);
+    let look_left = input_actions.get_in_game_action_value(mgr, InGameActions::LookLeft);
+    let look_right = input_actions.get_in_game_action_value(mgr, InGameActions::LookRight);
+
+    const ROT_MULTIPLIER: f32 = 0.3;
+
+    let rotor = Rotor3::from_euler_angles(
+        0.0,
+        (look_down - look_up) * ROT_MULTIPLIER,
+        (look_left - look_right) * ROT_MULTIPLIER,
+    );
+    camera.rotate(rotor);
+
     let fwd = input_actions.get_in_game_action_value(mgr, InGameActions::Forward);
     let bwd = input_actions.get_in_game_action_value(mgr, InGameActions::Backward);
     let left = input_actions.get_in_game_action_value(mgr, InGameActions::Left);
@@ -127,6 +141,5 @@ fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputM
         0.0,
         (fwd - bwd) * multiplier,
     ));
-    //camera.rotate();
 }
 //----------------------------------------------------------------------------------------------------------------------

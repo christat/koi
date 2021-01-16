@@ -25,7 +25,7 @@ impl Renderer {
 
         let camera = Camera::new(
             Vec3::new(0.0, 0.0, -2.0),
-            Vec3::new(0.0, 0.0, -1.0),
+            Vec3::new(0.0, 0.0, 1.0),
             f32::to_radians(70.0),
             aspect_ratio,
             0.1,

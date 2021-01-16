@@ -2,7 +2,7 @@ use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
 use ash::{version::DeviceV1_0, vk, Device};
-use ultraviolet::{rotor::Rotor3, Vec4};
+use ultraviolet::{Mat4, Vec4};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
@@ -382,9 +382,10 @@ impl RendererBackend for VkRenderer {
 
         let view = camera.view();
         let projection = camera.projection();
-        let model_rotor =
-            Rotor3::from_euler_angles(0.0, 0.0, -f32::to_radians(2.0 * self.frame_index as f32));
-        let model = model_rotor.into_matrix().into_homogeneous();
+        // let model_rotor =
+        //     Rotor3::from_euler_angles(0.0, 0.0, -f32::to_radians(2.0 * self.frame_index as f32));
+        // let model = model_rotor.into_matrix().into_homogeneous();
+        let model = Mat4::identity();
         let transform_matrix = projection * view * model;
 
         let stage_flags = MeshPushConstants::get_range().stage_flags;
