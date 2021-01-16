@@ -24,7 +24,7 @@ use crate::{
 pub struct InputManager {
     keyboard: HashMap<Key, (InputState, Instant)>,
     mouse: HashMap<Mouse, (InputState, Instant)>,
-    mouse_deltas: (f64, f64),
+    mouse_deltas: (f32, f32),
     scroll_delta: f64,
     //------------------------------------------------------------------------------------------------------------------
     gamepad_manager: Gilrs,
@@ -57,6 +57,12 @@ impl InputManager {
             last_input_update: Instant::now(),
             hold_time_millis: hold_time_millis.unwrap_or(500),
         }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn post_update(&mut self) {
+        // deltas need to be reset after every iteration, to prevent mouse drifting
+        self.update_mouse_deltas((0.0, 0.0));
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -148,7 +154,7 @@ impl InputManager {
                 self.update_mouse_scroll(delta);
             }
             _ => {}
-        }
+        };
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -175,7 +181,11 @@ impl InputManager {
     //------------------------------------------------------------------------------------------------------------------
 
     fn update_mouse_deltas(&mut self, delta: (f64, f64)) {
-        self.mouse_deltas = delta;
+        // TODO investigate meaning of these seemingly arbitrary delta units
+        const MOUSE_DELTA_DIVISOR: f32 = 5.0;
+        let dx = delta.0 as f32 / MOUSE_DELTA_DIVISOR;
+        let dy = delta.1 as f32 / MOUSE_DELTA_DIVISOR;
+        self.mouse_deltas = (dx, dy);
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -294,7 +304,7 @@ impl InputManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get_mouse_deltas(&self) -> (f64, f64) {
+    pub fn get_mouse_deltas(&self) -> (f32, f32) {
         self.mouse_deltas
     }
     //------------------------------------------------------------------------------------------------------------------

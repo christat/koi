@@ -98,6 +98,8 @@ fn main() {
                     update_camera(renderer.camera_mut(), &input_actions, &input_manager);
 
                     renderer.draw();
+
+                    input_manager.post_update();
                 }
             }
             Evt::LoopDestroyed => renderer.await_device_idle(),
