@@ -1,8 +1,5 @@
-use std::path::Path;
-//----------------------------------------------------------------------------------------------------------------------
-
 use ash::{version::DeviceV1_0, vk, Device};
-use ultraviolet::{Mat4, Vec4};
+use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
@@ -12,12 +9,10 @@ use crate::{
             handles::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{
-                MeshPushConstants, ResourceManager, VertexInputDescription, VkDepthBuffer, VkShader,
-            },
+            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer},
             VkRendererConfig,
         },
-        entities::{Camera, Mesh},
+        entities::{Camera, Material, Mesh, Renderable},
         hal::RendererBackend,
     },
     utils::{ffi, traits::Destroy},
@@ -97,8 +92,37 @@ impl VkRenderer {
         &self.device_handle.device
     }
     //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
 
-    pub fn init_resources(&mut self) {
+impl Drop for VkRenderer {
+    fn drop(&mut self) {
+        let VkRenderer {
+            resource_manager,
+            device_handle,
+            allocator_handle,
+            ..
+        } = self;
+
+        unsafe {
+            resource_manager.destroy(&device_handle.device, &allocator_handle.allocator);
+        }
+
+        self.allocator_handle.destroy();
+
+        self.surface_handle.destroy();
+        self.device_handle.destroy();
+
+        #[cfg(debug_assertions)]
+        self.debug_utils_manager.destroy();
+
+        self.instance_handle.destroy();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl RendererBackend for VkRenderer {
+    fn init_resources(&mut self, materials: Vec<Material>, meshes: Vec<Mesh>) {
         info!("----- VkBackend::init_resources -----");
 
         let VkRenderer {
@@ -152,106 +176,18 @@ impl VkRenderer {
             depth_attachment_format,
         );
 
-        let fragment_shader = resource_manager
-            .create_shader(
-                device,
-                "fragment",
-                Path::new("resources/shaders/dist/shader.frag.spv"),
-            )
-            .get();
+        for material in materials {
+            resource_manager.create_material(device, &render_pass, &material);
+        }
 
-        let vertex_shader = resource_manager
-            .create_shader(
-                device,
-                "vertex",
-                Path::new("resources/shaders/dist/shader.vert.spv"),
-            )
-            .get();
-
-        let surface_extent = swapchain.surface_extent();
-        let vk::Extent2D { width, height } = surface_extent;
-        let shader_entry_point = VkShader::get_default_shader_entry_point();
-
-        let vertex_description = VertexInputDescription::get();
-        let push_constant_ranges = [MeshPushConstants::get_range()];
-        let pipeline_layout =
-            resource_manager.create_pipeline_layout(device, "default", Some(&push_constant_ranges));
-
-        let pipeline_builder = ResourceManager::get_pipeline_builder()
-            .input_assembly_state(vk::PrimitiveTopology::TRIANGLE_LIST)
-            .viewport(
-                vk::Viewport::builder()
-                    .x(0.0)
-                    .y(0.0)
-                    .width(width as f32)
-                    .height(height as f32)
-                    .min_depth(0.0)
-                    .max_depth(1.0)
-                    .build(),
-            )
-            .scissor(
-                vk::Rect2D::builder()
-                    .offset(vk::Offset2D::default())
-                    .extent(surface_extent)
-                    .build(),
-            )
-            .rasterization_state(vk::PolygonMode::FILL)
-            .multisampling_state()
-            .color_blend_attachment_state()
-            .pipeline_layout(pipeline_layout.get())
-            .vertex_input_state(&vertex_description)
-            .shader_stage(
-                vertex_shader,
-                vk::ShaderStageFlags::VERTEX,
-                &shader_entry_point,
-            )
-            .shader_stage(
-                fragment_shader,
-                vk::ShaderStageFlags::FRAGMENT,
-                &shader_entry_point,
-            );
-
-        resource_manager.create_pipeline(device, "default", &pipeline_builder, &render_pass);
-
-        let meshes = Mesh::from_obj(Path::new("assets/models/monkey/monkey_smooth.obj"));
-        for (index, mesh) in meshes.into_iter().enumerate() {
-            let mesh_resource =
-                resource_manager.create_mesh(&format!("monkey{}", index), mesh, allocator_handle);
+        for mesh in meshes {
+            let mesh_resource = resource_manager.create_mesh(mesh, allocator_handle);
             mesh_resource.upload(allocator_handle);
         }
     }
     //------------------------------------------------------------------------------------------------------------------
-}
-//----------------------------------------------------------------------------------------------------------------------
 
-impl Drop for VkRenderer {
-    fn drop(&mut self) {
-        let VkRenderer {
-            resource_manager,
-            device_handle,
-            allocator_handle,
-            ..
-        } = self;
-
-        unsafe {
-            resource_manager.destroy(&device_handle.device, &allocator_handle.allocator);
-        }
-
-        self.allocator_handle.destroy();
-
-        self.surface_handle.destroy();
-        self.device_handle.destroy();
-
-        #[cfg(debug_assertions)]
-        self.debug_utils_manager.destroy();
-
-        self.instance_handle.destroy();
-    }
-}
-//----------------------------------------------------------------------------------------------------------------------
-
-impl RendererBackend for VkRenderer {
-    fn draw(&mut self, camera: &Camera) {
+    fn draw(&mut self, camera: &Camera, renderables: &[Renderable]) {
         let VkRenderer {
             device_handle,
             resource_manager,
@@ -357,49 +293,15 @@ impl RendererBackend for VkRenderer {
             );
         }
 
-        let pipeline = resource_manager.get_pipeline("default");
-        let pipeline_layout = resource_manager.get_pipeline_layout("default");
+        draw_renderables(
+            device,
+            command_buffer,
+            resource_manager,
+            camera,
+            renderables,
+        );
 
         unsafe {
-            device.cmd_bind_pipeline(
-                command_buffer,
-                vk::PipelineBindPoint::GRAPHICS,
-                pipeline.get(),
-            );
-        }
-
-        let triangle_mesh = resource_manager.get_mesh("monkey0");
-        let vertex_count = triangle_mesh.get_mesh().vertices.len() as u32;
-
-        unsafe {
-            device.cmd_bind_vertex_buffers(
-                command_buffer,
-                0,
-                &[triangle_mesh.get_buffer().get()],
-                &[0],
-            );
-        }
-
-        let view = camera.view();
-        let projection = camera.projection();
-        // let model_rotor =
-        //     Rotor3::from_euler_angles(0.0, 0.0, -f32::to_radians(2.0 * self.frame_index as f32));
-        // let model = model_rotor.into_matrix().into_homogeneous();
-        let model = Mat4::identity();
-        let transform_matrix = projection * view * model;
-
-        let stage_flags = MeshPushConstants::get_range().stage_flags;
-        let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
-
-        unsafe {
-            device.cmd_push_constants(
-                command_buffer,
-                pipeline_layout.get(),
-                stage_flags,
-                0,
-                ffi::any_as_u8_slice(&mesh_push_constants),
-            );
-            device.cmd_draw(command_buffer, vertex_count, 1, 0, 0);
             device.cmd_end_render_pass(command_buffer);
             device
                 .end_command_buffer(command_buffer)
@@ -450,5 +352,74 @@ impl RendererBackend for VkRenderer {
         }
     }
     //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+fn draw_renderables(
+    device: &Device,
+    command_buffer: vk::CommandBuffer,
+    resource_manager: &ResourceManager,
+    camera: &Camera,
+    renderables: &[Renderable],
+) {
+    let view = camera.view();
+    let projection = camera.projection();
+
+    let mut last_mesh = None;
+    let mut last_material = None;
+    for renderable in renderables {
+        let Renderable {
+            mesh_name,
+            material_name,
+            ..
+        } = renderable;
+
+        let material = resource_manager.get_material(material_name);
+
+        let material_cmp = Some(material_name.clone());
+        if material_cmp != last_material {
+            last_material = material_cmp;
+            unsafe {
+                device.cmd_bind_pipeline(
+                    command_buffer,
+                    vk::PipelineBindPoint::GRAPHICS,
+                    material.pipeline,
+                );
+            }
+        }
+
+        let transform_matrix = projection * view * renderable.transform;
+        let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
+
+        unsafe {
+            device.cmd_push_constants(
+                command_buffer,
+                material.pipeline_layout,
+                MeshPushConstants::get_range().stage_flags,
+                0,
+                ffi::any_as_u8_slice(&mesh_push_constants),
+            );
+        }
+
+        let mesh_resource = resource_manager.get_mesh(mesh_name);
+
+        let mesh_cmp = Some(mesh_name.clone());
+        if mesh_cmp != last_mesh {
+            last_mesh = mesh_cmp;
+            unsafe {
+                device.cmd_bind_vertex_buffers(
+                    command_buffer,
+                    0,
+                    &[mesh_resource.get_buffer().get()],
+                    &[0],
+                );
+            }
+        }
+
+        let vertex_count = mesh_resource.get_mesh().vertices.len() as u32;
+        unsafe {
+            device.cmd_draw(command_buffer, vertex_count, 1, 0, 0);
+        }
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------

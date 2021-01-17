@@ -4,19 +4,20 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::{MeshPushConstants, VertexInputDescription};
 use crate::renderer::{
     backend::vk::{
         handles::{
             AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
         },
         resources::{
-            VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence, VkFramebuffer, VkMesh,
-            VkPipeline, VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkSemaphore, VkShader,
-            VkSwapchain,
+            VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence, VkFramebuffer, VkMaterial,
+            VkMesh, VkPipeline, VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkSemaphore,
+            VkShader, VkSwapchain,
         },
         DeviceAllocatorDestroy, DeviceDestroy, VkRendererConfig,
     },
-    entities::Mesh,
+    entities::{Material, Mesh},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ pub struct ResourceManager {
     pipeline_layouts: HashMap<String, Rc<VkPipelineLayout>>,
     pipelines: HashMap<String, Rc<VkPipeline>>,
     shaders: HashMap<String, Rc<VkShader>>,
+    materials: HashMap<String, VkMaterial>,
 
     meshes: HashMap<String, Rc<VkMesh>>,
 }
@@ -60,6 +62,7 @@ impl ResourceManager {
             pipeline_layouts: HashMap::new(),
             pipelines: HashMap::new(),
             shaders: HashMap::new(),
+            materials: HashMap::new(),
             meshes: HashMap::new(),
         }
     }
@@ -297,6 +300,7 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    #[allow(dead_code)]
     pub fn get_pipeline_layout(&self, id: &str) -> Rc<VkPipelineLayout> {
         self.pipeline_layouts.get(id).unwrap().clone()
     }
@@ -326,19 +330,96 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    #[allow(dead_code)]
     pub fn get_pipeline(&self, id: &str) -> Rc<VkPipeline> {
         self.pipelines.get(id).unwrap().clone()
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn create_mesh(
+    pub fn create_material(
         &mut self,
-        id: &str,
-        mesh: Mesh,
-        allocator_handle: &AllocatorHandle,
-    ) -> Rc<VkMesh> {
+        device: &Device,
+        render_pass: &VkRenderPass,
+        material: &Material,
+    ) -> VkMaterial {
+        let Material {
+            name,
+            vertex_shader_path,
+            fragment_shader_path,
+        } = material;
+        let vert = self
+            .create_shader(device, &format!("{}_vert", name), vertex_shader_path)
+            .get();
+        let frag = self
+            .create_shader(device, &format!("{}_frag", name), fragment_shader_path)
+            .get();
+
+        let push_constant_ranges = [MeshPushConstants::get_range()];
+        let pipeline_layout = self
+            .create_pipeline_layout(
+                device,
+                &format!("{}_pipeline_layout", name),
+                Some(&push_constant_ranges),
+            )
+            .get();
+
+        let vertex_description = VertexInputDescription::get();
+        let shader_entry_point = VkShader::get_default_shader_entry_point();
+
+        let surface_extent = self.get_swapchain().unwrap().surface_extent();
+        let vk::Extent2D { width, height } = surface_extent;
+
+        let pipeline_builder = Self::get_pipeline_builder()
+            .input_assembly_state(vk::PrimitiveTopology::TRIANGLE_LIST)
+            .viewport(
+                vk::Viewport::builder()
+                    .x(0.0)
+                    .y(0.0)
+                    .width(width as f32)
+                    .height(height as f32)
+                    .min_depth(0.0)
+                    .max_depth(1.0)
+                    .build(),
+            )
+            .scissor(
+                vk::Rect2D::builder()
+                    .offset(vk::Offset2D::default())
+                    .extent(surface_extent)
+                    .build(),
+            )
+            .rasterization_state(vk::PolygonMode::FILL)
+            .multisampling_state()
+            .color_blend_attachment_state()
+            .pipeline_layout(pipeline_layout)
+            .vertex_input_state(&vertex_description)
+            .shader_stage(vert, vk::ShaderStageFlags::VERTEX, &shader_entry_point)
+            .shader_stage(frag, vk::ShaderStageFlags::FRAGMENT, &shader_entry_point);
+
+        let pipeline = self
+            .create_pipeline(
+                device,
+                &format!("{}_pipeline", name),
+                &pipeline_builder,
+                &render_pass,
+            )
+            .get();
+
+        let material = VkMaterial::new(pipeline, pipeline_layout);
+        self.materials.insert(name.clone(), material.clone());
+
+        material
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_material(&self, material_id: &str) -> VkMaterial {
+        self.materials.get(material_id).unwrap().clone()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn create_mesh(&mut self, mesh: Mesh, allocator_handle: &AllocatorHandle) -> Rc<VkMesh> {
+        let mesh_name = mesh.name.clone();
         let vk_mesh = Rc::new(VkMesh::new(mesh, allocator_handle));
-        self.meshes.insert(id.to_owned(), vk_mesh.clone());
+        self.meshes.insert(mesh_name, vk_mesh.clone());
 
         vk_mesh
     }

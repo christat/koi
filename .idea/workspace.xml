@@ -22,10 +22,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add active context checks to enable/disable action groups">
+      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/material.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/entities/material.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/entities/renderable.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/action_context.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/input_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/input/input_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/camera.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -414,7 +422,19 @@
       <option name="presentableId" value="LOCAL−00037" />
       <updated>1610801159837</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL−00038" summary="bound mouse motion to Look actions">
+      <created>1610802777581</created>
+      <option name="number" value="LOCAL−00038" />
+      <option name="presentableId" value="LOCAL−00038" />
+      <updated>1610802777581</updated>
+    </task>
+    <task id="LOCAL−00039" summary="add missing binding enums">
+      <created>1610802926477</created>
+      <option name="number" value="LOCAL−00039" />
+      <option name="presentableId" value="LOCAL−00039" />
+      <updated>1610802926477</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -446,8 +466,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="removed spirv-builder for now" />
-    <MESSAGE value="bound pipeline resource and set hardcoded triangle draw cmd" />
     <MESSAGE value="make bg clear flash less jarring" />
     <MESSAGE value="fix winit renderer integration to handle events" />
     <MESSAGE value="add dummy second pipeline and swap logic" />
@@ -471,7 +489,9 @@
     <MESSAGE value="finalized first (naive) implementation of input action system; setup camera movement with it" />
     <MESSAGE value="add active context checks to enable/disable action groups" />
     <MESSAGE value="Added free camera rotation mode" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added free camera rotation mode" />
+    <MESSAGE value="bound mouse motion to Look actions" />
+    <MESSAGE value="add missing binding enums" />
+    <option name="LAST_COMMIT_MESSAGE" value="add missing binding enums" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

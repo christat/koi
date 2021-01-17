@@ -29,6 +29,7 @@ impl Vertex {
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct Mesh {
+    pub name: String,
     pub vertices: Vec<Vertex>,
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -43,6 +44,7 @@ impl Mesh {
         };
 
         Self {
+            name: "test_triangle".into(),
             vertices: vec![
                 Vertex::new(Vec3::new(1.0, 1.0, 1.0), Vec3::default(), COLOR),
                 Vertex::new(Vec3::new(-1.0, 1.0, 1.0), Vec3::default(), COLOR),
@@ -52,43 +54,45 @@ impl Mesh {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn from_obj(file_path: &Path) -> Vec<Mesh> {
+    pub fn from_obj(file_path: &Path) -> Self {
         let (models, _materials) = tobj::load_obj(file_path, true).expect(&format!(
             "Mesh::from_obj - Failed to load model in path {}!",
             file_path.to_str().unwrap_or("<Failed to covert path>")
         ));
 
-        models
+        // Multi-mesh model loading not supported atm
+        assert_eq!(1, models.len());
+        let model = models.first().unwrap();
+
+        let tobj::Model { mesh, name } = model;
+        let tobj::Mesh {
+            indices,
+            positions: v,
+            normals: vn,
+            ..
+        } = mesh;
+
+        // ensure the model consists of tris
+        assert_eq!(0, v.len() % 3);
+
+        let vertices = indices
             .iter()
-            .map(|model| {
-                let tobj::Model { mesh, .. } = model;
-                let tobj::Mesh {
-                    indices,
-                    positions: v,
-                    normals: vn,
-                    ..
-                } = mesh;
+            .map(|i| {
+                let i = *i as usize;
+                let f = i * mesh.num_face_indices[i] as usize;
 
-                // ensure the model consists of tris
-                assert_eq!(0, v.len() % 3);
-
-                let vertices = indices
-                    .iter()
-                    .map(|i| {
-                        let i = *i as usize;
-                        let f = i * mesh.num_face_indices[i] as usize;
-
-                        let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
-                        let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);
-                        Vertex::new(position, normal, normal)
-                    })
-                    .collect::<Vec<Vertex>>();
-
-                assert_ne!(0, vertices.len());
-
-                Self { vertices }
+                let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
+                let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);
+                Vertex::new(position, normal, normal)
             })
-            .collect()
+            .collect::<Vec<Vertex>>();
+
+        assert_ne!(0, vertices.len());
+
+        Self {
+            name: name.to_owned(),
+            vertices,
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 }
