@@ -286,6 +286,11 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn get_shader(&self, id: &str) -> Option<Rc<VkShader>> {
+        self.shaders.get(id).cloned()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn create_pipeline_layout(
         &mut self,
         device: &Device,
@@ -347,12 +352,19 @@ impl ResourceManager {
             vertex_shader_path,
             fragment_shader_path,
         } = material;
-        let vert = self
-            .create_shader(device, &format!("{}_vert", name), vertex_shader_path)
-            .get();
-        let frag = self
-            .create_shader(device, &format!("{}_frag", name), fragment_shader_path)
-            .get();
+        let vert_id = vertex_shader_path.to_str().unwrap();
+        let vert = match self.get_shader(vert_id) {
+            Some(shader) => shader,
+            None => self.create_shader(device, vert_id, vertex_shader_path),
+        }
+        .get();
+
+        let frag_id = fragment_shader_path.to_str().unwrap();
+        let frag = match self.get_shader(frag_id) {
+            Some(shader) => shader,
+            None => self.create_shader(device, frag_id, fragment_shader_path),
+        }
+        .get();
 
         let push_constant_ranges = [MeshPushConstants::get_range()];
         let pipeline_layout = self

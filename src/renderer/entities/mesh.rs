@@ -46,9 +46,9 @@ impl Mesh {
         Self {
             name: "test_triangle".into(),
             vertices: vec![
-                Vertex::new(Vec3::new(1.0, 1.0, 1.0), Vec3::default(), COLOR),
-                Vertex::new(Vec3::new(-1.0, 1.0, 1.0), Vec3::default(), COLOR),
-                Vertex::new(Vec3::new(0.0, -1.0, 0.0), Vec3::default(), COLOR),
+                Vertex::new(Vec3::new(1.0, -1.0, 0.0), Vec3::default(), COLOR),
+                Vertex::new(Vec3::new(-1.0, -1.0, 0.0), Vec3::default(), COLOR),
+                Vertex::new(Vec3::new(0.0, 1.0, 0.0), Vec3::default(), COLOR),
             ],
         }
     }
