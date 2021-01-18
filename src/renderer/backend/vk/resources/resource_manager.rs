@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::{MeshPushConstants, VertexInputDescription};
+use crate::renderer::backend::vk::resources::{MeshPushConstants, VertexInputDescription, VkFrame};
 use crate::renderer::{
     backend::vk::{
         handles::{
@@ -30,14 +30,14 @@ pub struct ResourceManager {
     render_passes: HashMap<String, Rc<VkRenderPass>>,
 
     swapchain: Option<Rc<VkSwapchain>>,
-    depth_buffer: Option<Rc<VkDepthBuffer>>,
+    depth_buffers: Vec<Rc<VkDepthBuffer>>,
     framebuffers: Vec<Rc<VkFramebuffer>>,
 
     command_pools: HashMap<String, Rc<VkCommandPool>>,
     command_buffers: HashMap<String, Vec<Rc<VkCommandBuffer>>>,
-
     fences: HashMap<String, Rc<VkFence>>,
     semaphores: HashMap<String, Rc<VkSemaphore>>,
+    frames: Vec<VkFrame>,
 
     pipeline_layouts: HashMap<String, Rc<VkPipelineLayout>>,
     pipelines: HashMap<String, Rc<VkPipeline>>,
@@ -53,12 +53,13 @@ impl ResourceManager {
         Self {
             render_passes: HashMap::new(),
             swapchain: None,
-            depth_buffer: None,
-            framebuffers: vec![],
+            depth_buffers: Vec::new(),
+            framebuffers: Vec::new(),
             command_pools: HashMap::new(),
             command_buffers: HashMap::new(),
             fences: HashMap::new(),
             semaphores: HashMap::new(),
+            frames: Vec::new(),
             pipeline_layouts: HashMap::new(),
             pipelines: HashMap::new(),
             shaders: HashMap::new(),
@@ -136,7 +137,7 @@ impl ResourceManager {
             depth_attachment_format,
         ));
 
-        self.depth_buffer = Some(depth_buffer.clone());
+        self.depth_buffers.push(depth_buffer.clone());
 
         depth_buffer
     }
@@ -150,13 +151,22 @@ impl ResourceManager {
         render_pass: &VkRenderPass,
         depth_attachment_format: vk::Format,
     ) -> Vec<Rc<VkFramebuffer>> {
-        let depth_buffer =
-            self.create_depth_buffer(device, allocator_handle, swapchain, depth_attachment_format);
+        let swapchain_image_views = swapchain.image_views();
+        let depth_buffers = (0..swapchain_image_views.len())
+            .map(|_| {
+                self.create_depth_buffer(
+                    device,
+                    allocator_handle,
+                    swapchain,
+                    depth_attachment_format,
+                )
+            })
+            .collect::<Vec<Rc<VkDepthBuffer>>>();
 
-        let framebuffers = swapchain
-            .image_views()
+        let framebuffers = swapchain_image_views
             .iter()
-            .map(|image_view| {
+            .zip(depth_buffers)
+            .map(|(image_view, depth_buffer)| {
                 Rc::new(VkFramebuffer::new(
                     device,
                     image_view,
@@ -182,19 +192,17 @@ impl ResourceManager {
         &mut self,
         device: &Device,
         queue_family_index: u32,
-        id: Option<&str>,
+        id: String,
     ) -> Rc<VkCommandPool> {
         let command_pool = Rc::new(VkCommandPool::new(device, queue_family_index));
-        let pool_id = id.unwrap_or("default");
-        self.command_pools
-            .insert(pool_id.to_owned(), command_pool.clone());
+        self.command_pools.insert(id, command_pool.clone());
 
         command_pool
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get_command_pool(&self, id: Option<&str>) -> Option<Rc<VkCommandPool>> {
-        match self.command_pools.get(id.unwrap_or("default")) {
+    pub fn get_command_pool(&self, id: &str) -> Option<Rc<VkCommandPool>> {
+        match self.command_pools.get(id) {
             Some(cmd_pool) => Some(cmd_pool.clone()),
             None => None,
         }
@@ -205,14 +213,12 @@ impl ResourceManager {
         &mut self,
         device: &Device,
         count: u32,
-        pool_id: Option<&str>,
+        command_pool_id: String,
+        command_pool: vk::CommandPool,
         level: Option<vk::CommandBufferLevel>,
     ) -> Vec<Rc<VkCommandBuffer>> {
-        let id = pool_id.unwrap_or("default");
-        let command_pool = self.get_command_pool(Some(id)).expect(&format!("ResourceManager::create_command_buffer - Failed to find command buffer with pool_id {}!", id));
-
         let create_info = vk::CommandBufferAllocateInfo::builder()
-            .command_pool(command_pool.get())
+            .command_pool(command_pool)
             .command_buffer_count(count)
             .level(level.unwrap_or(vk::CommandBufferLevel::PRIMARY));
 
@@ -224,7 +230,12 @@ impl ResourceManager {
 
         let command_buffers = command_buffers
             .into_iter()
-            .map(|command_buffer| Rc::new(VkCommandBuffer::new(id, command_buffer)))
+            .map(|command_buffer| {
+                Rc::new(VkCommandBuffer::new(
+                    command_pool_id.clone(),
+                    command_buffer,
+                ))
+            })
             .collect::<Vec<Rc<VkCommandBuffer>>>();
 
         let command_buffer_vec = self
@@ -240,41 +251,84 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn get_command_buffers(&self, pool_id: Option<&str>) -> &[Rc<VkCommandBuffer>] {
-        self.command_buffers
-            .get(pool_id.unwrap_or("default"))
-            .unwrap()
+    #[allow(dead_code)]
+    pub fn get_command_buffers(&self, pool_id: &str) -> &[Rc<VkCommandBuffer>] {
+        self.command_buffers.get(pool_id).unwrap()
     }
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn create_fence(
         &mut self,
         device: &Device,
-        id: &str,
+        id: String,
         flags: vk::FenceCreateFlags,
     ) -> Rc<VkFence> {
         let fence = Rc::new(VkFence::new(device, flags));
-        self.fences.insert(id.to_owned(), fence.clone());
+        self.fences.insert(id, fence.clone());
 
         fence
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    #[allow(dead_code)]
     pub fn get_fence(&self, id: &str) -> Rc<VkFence> {
         self.fences.get(id).unwrap().clone()
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn create_semaphore(&mut self, device: &Device, id: &str) -> Rc<VkSemaphore> {
+    pub fn create_semaphore(&mut self, device: &Device, id: String) -> Rc<VkSemaphore> {
         let semaphore = Rc::new(VkSemaphore::new(device));
-        self.semaphores.insert(id.to_owned(), semaphore.clone());
+        self.semaphores.insert(id, semaphore.clone());
 
         semaphore
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    #[allow(dead_code)]
     pub fn get_semaphore(&self, id: &str) -> Rc<VkSemaphore> {
         self.semaphores.get(id).unwrap().clone()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn create_frame(&mut self, device: &Device, queue_family_index: u32) {
+        let index = self.frames.len();
+
+        let present_semaphore = self
+            .create_semaphore(device, format!("frame_{}_present", index))
+            .get();
+        let render_semaphore = self
+            .create_semaphore(device, format!("frame_{}_render", index))
+            .get();
+        let render_fence = self
+            .create_fence(
+                device,
+                format!("frame_{}_render", index),
+                vk::FenceCreateFlags::SIGNALED,
+            )
+            .get();
+
+        let pool_id = format!("frame_{}", index);
+        let command_pool = self
+            .create_command_pool(device, queue_family_index, pool_id.clone())
+            .get();
+        let command_buffer = self
+            .create_command_buffers(device, 1, pool_id, command_pool, None)
+            .first()
+            .unwrap()
+            .get();
+
+        self.frames.push(VkFrame::new(
+            present_semaphore,
+            render_semaphore,
+            render_fence,
+            command_pool,
+            command_buffer,
+        ));
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_current_frame(&self, frame_number: usize) -> &VkFrame {
+        unsafe { self.frames.get_unchecked(frame_number % self.frames.len()) }
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -460,7 +514,7 @@ impl ResourceManager {
             pipeline_layout.destroy(device);
         }
 
-        if let Some(depth_buffer) = &self.depth_buffer {
+        for depth_buffer in self.depth_buffers.iter() {
             depth_buffer.destroy(device, allocator);
         }
 

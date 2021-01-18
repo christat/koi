@@ -191,19 +191,14 @@ fn select_surface_format(
 //----------------------------------------------------------------------------------------------------------------------
 
 fn select_present_mode(
-    _physical_device_attributes: &PhysicalDeviceAttributes,
+    physical_device_attributes: &PhysicalDeviceAttributes,
 ) -> vk::PresentModeKHR {
-    #[cfg(not(debug_assertions))]
+    match physical_device_attributes
+        .present_modes
+        .contains(&vk::PresentModeKHR::MAILBOX)
     {
-        let PhysicalDeviceAttributes { present_modes, .. } = _physical_device_attributes;
-
-        for present_mode in present_modes.iter() {
-            if *present_mode == vk::PresentModeKHR::MAILBOX {
-                return present_mode.to_owned();
-            }
-        }
+        true => vk::PresentModeKHR::MAILBOX,
+        false => vk::PresentModeKHR::FIFO,
     }
-
-    vk::PresentModeKHR::FIFO_RELAXED
 }
 //----------------------------------------------------------------------------------------------------------------------

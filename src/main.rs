@@ -26,6 +26,7 @@ use crate::{
     },
     renderer::{entities::Camera, Renderer},
 };
+use std::time::Instant;
 //----------------------------------------------------------------------------------------------------------------------
 
 #[derive(Copy, Clone, Debug)]
@@ -40,6 +41,29 @@ const WIDTH: usize = 1280;
 const HEIGHT: usize = 720;
 //----------------------------------------------------------------------------------------------------------------------
 
+struct Timer {
+    last_instant: Instant,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+impl Timer {
+    pub fn new() -> Self {
+        Self {
+            last_instant: Instant::now(),
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    fn tick(&mut self) -> f32 {
+        let now = Instant::now();
+        let delta = now.duration_since(self.last_instant).as_secs_f32();
+        self.last_instant = now;
+        delta
+    }
+    //------------------------------------------------------------------------------------------------------------------
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 fn main() {
     info!("----- Logger::init -----");
     utils::Logger::init().unwrap();
@@ -51,6 +75,8 @@ fn main() {
     let mut renderer = Renderer::init(APP_NAME, &window_handle);
 
     input_actions.set_active_context(ActionContexts::InGame);
+
+    let mut timer = Timer::new();
 
     info!("----- EventLoopHandle::run -----");
     event_loop_handle.run(move |event, _, control_flow| {
@@ -83,6 +109,8 @@ fn main() {
             }
             Evt::MainEventsCleared => {
                 if is_focused {
+                    let frame_delta = timer.tick();
+
                     if let Some(evt) = input_manager.update_gamepad_input() {
                         if evt == GamepadEvent::Disconnected {
                             event_proxy.emit(CoreEvent::GamepadDisconnected);
@@ -95,7 +123,12 @@ fn main() {
                         event_proxy.emit(CoreEvent::CloseRequested);
                     }
 
-                    update_camera(renderer.camera_mut(), &input_actions, &input_manager);
+                    update_camera(
+                        renderer.camera_mut(),
+                        &input_actions,
+                        &input_manager,
+                        frame_delta,
+                    );
 
                     renderer.draw();
 
@@ -109,18 +142,23 @@ fn main() {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputManager) {
+fn update_camera(
+    camera: &mut Camera,
+    input_actions: &InputActions,
+    mgr: &InputManager,
+    frame_delta: f32,
+) {
     let look_up = input_actions.get_in_game_action_value(mgr, InGameActions::LookUp);
     let look_down = input_actions.get_in_game_action_value(mgr, InGameActions::LookDown);
     let look_left = input_actions.get_in_game_action_value(mgr, InGameActions::LookLeft);
     let look_right = input_actions.get_in_game_action_value(mgr, InGameActions::LookRight);
 
-    const ROT_MULTIPLIER: f32 = 0.3;
+    const ROT_MULTIPLIER: f32 = 10.0;
 
     let rotor = Rotor3::from_euler_angles(
         0.0,
-        (look_down - look_up) * ROT_MULTIPLIER,
-        (look_left - look_right) * ROT_MULTIPLIER,
+        (look_down - look_up) * ROT_MULTIPLIER * frame_delta,
+        (look_left - look_right) * ROT_MULTIPLIER * frame_delta,
     );
     camera.rotate(rotor);
 
@@ -130,8 +168,8 @@ fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputM
     let right = input_actions.get_in_game_action_value(mgr, InGameActions::Right);
     let lb_down = input_actions.is_in_game_action_down(mgr, InGameActions::Sprint);
 
-    const WALK_MULTIPLIER: f32 = 0.2;
-    const SPRINT_MULTIPLIER: f32 = 0.8;
+    const WALK_MULTIPLIER: f32 = 10.0;
+    const SPRINT_MULTIPLIER: f32 = 20.0;
     let multiplier = if lb_down {
         SPRINT_MULTIPLIER
     } else {
@@ -139,9 +177,9 @@ fn update_camera(camera: &mut Camera, input_actions: &InputActions, mgr: &InputM
     };
 
     camera.translate(Vec3::new(
-        (left - right) * multiplier,
+        (left - right) * multiplier * frame_delta,
         0.0,
-        (fwd - bwd) * multiplier,
+        (fwd - bwd) * multiplier * frame_delta,
     ));
 }
 //----------------------------------------------------------------------------------------------------------------------

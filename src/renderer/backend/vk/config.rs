@@ -30,7 +30,7 @@ impl VkRendererConfig {
 
         let device_extensions = vec![ffi::cstr_to_cstring(Swapchain::name())];
 
-        let buffering: u32 = 1;
+        let buffering: u32 = 3;
 
         #[cfg(debug_assertions)]
         {

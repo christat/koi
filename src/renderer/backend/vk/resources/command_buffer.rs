@@ -12,11 +12,11 @@ pub struct VkCommandBuffer {
 
 impl VkCommandBuffer {
     pub(in crate::renderer::backend::vk::resources) fn new(
-        pool_id: &str,
+        pool_id: String,
         command_buffer: vk::CommandBuffer,
     ) -> Self {
         Self {
-            pool_id: pool_id.to_owned(),
+            pool_id,
             command_buffer,
         }
     }
@@ -29,7 +29,7 @@ impl VkCommandBuffer {
 
 impl ResourceManagerDestroy for VkCommandBuffer {
     fn destroy(&self, device: &Device, resource_manager: &ResourceManager) {
-        let command_pool = resource_manager.get_command_pool(Some(&self.pool_id)).expect("VkCommandBuffer::destroy - Failed to obtain originating VkCommandPool from ResourceManager!");
+        let command_pool = resource_manager.get_command_pool(&self.pool_id).expect("VkCommandBuffer::destroy - Failed to obtain originating VkCommandPool from ResourceManager!");
         unsafe {
             device.free_command_buffers(command_pool.get(), &[self.command_buffer]);
         }

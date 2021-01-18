@@ -138,17 +138,9 @@ impl RendererBackend for VkRenderer {
 
         let device = device_handle.get_device();
 
-        resource_manager.create_fence(device, "render", vk::FenceCreateFlags::SIGNALED);
-        resource_manager.create_semaphore(device, "render");
-        resource_manager.create_semaphore(device, "present");
-
-        let PhysicalDeviceHandle {
-            graphics_queue_index,
-            ..
-        } = physical_device_handle;
-
-        resource_manager.create_command_pool(device, graphics_queue_index.to_owned(), None);
-        resource_manager.create_command_buffers(device, config.buffering, None, None);
+        (0..config.buffering).for_each(|_| {
+            resource_manager.create_frame(device, physical_device_handle.graphics_queue_index);
+        });
 
         let swapchain = resource_manager.create_swapchain(
             device,
@@ -194,14 +186,15 @@ impl RendererBackend for VkRenderer {
             ..
         } = self;
 
+        let frame_data = resource_manager.get_current_frame(self.frame_index as usize);
+
         let DeviceHandle {
             device,
             graphics_queue,
             present_queue,
         } = &device_handle;
 
-        let render_fence = resource_manager.get_fence("render").get();
-        let render_fences = [render_fence];
+        let render_fences = [frame_data.render_fence];
 
         unsafe {
             // wait for the GPU to finish rendering last frame. Timeout of 1s - fences need to be explicitly reset after use.
@@ -217,29 +210,25 @@ impl RendererBackend for VkRenderer {
         let swapchain = swapchain_resource.get();
         let swapchain_khr = swapchain_resource.khr();
 
-        let present_semaphore = resource_manager.get_semaphore("present").get();
         // Request image from swapchain. Timeout of 1s.
         let (swapchain_image_index, _is_suboptimal) = unsafe {
             swapchain
                 .acquire_next_image(
                     swapchain_khr,
                     1000000000,
-                    present_semaphore,
+                    frame_data.present_semaphore,
                     vk::Fence::null(),
                 )
                 .expect("VkBackend::draw - failed to acquire next swapchain image!")
         };
 
         // Cmd buffer should only be cleared once it is safe (i.e. GPU is done with it)
-        let command_buffers = resource_manager.get_command_buffers(None);
-        let command_buffer = command_buffers
-            .first()
-            .expect("VkBackend::draw - No command buffers allocated!")
-            .get();
-
         unsafe {
             device
-                .reset_command_buffer(command_buffer, vk::CommandBufferResetFlags::empty())
+                .reset_command_buffer(
+                    frame_data.command_buffer,
+                    vk::CommandBufferResetFlags::empty(),
+                )
                 .expect("VkBackend::draw - Failed to reset command buffer!");
         };
 
@@ -248,7 +237,7 @@ impl RendererBackend for VkRenderer {
 
         unsafe {
             device
-                .begin_command_buffer(command_buffer, &begin_info)
+                .begin_command_buffer(frame_data.command_buffer, &begin_info)
                 .expect("VkBackend::draw - Failed to begin command buffer!")
         };
 
@@ -287,7 +276,7 @@ impl RendererBackend for VkRenderer {
 
         unsafe {
             device.cmd_begin_render_pass(
-                command_buffer,
+                frame_data.command_buffer,
                 &render_pass_begin_info,
                 vk::SubpassContents::INLINE,
             );
@@ -295,35 +284,34 @@ impl RendererBackend for VkRenderer {
 
         draw_renderables(
             device,
-            command_buffer,
+            frame_data.command_buffer,
             resource_manager,
             camera,
             renderables,
         );
 
         unsafe {
-            device.cmd_end_render_pass(command_buffer);
+            device.cmd_end_render_pass(frame_data.command_buffer);
             device
-                .end_command_buffer(command_buffer)
+                .end_command_buffer(frame_data.command_buffer)
                 .expect("VkBackend::draw - Failed to end command buffer!");
         }
 
         let wait_dst_stage_mask = [vk::PipelineStageFlags::COLOR_ATTACHMENT_OUTPUT];
-        let present_semaphores = [present_semaphore];
+        let present_semaphores = [frame_data.present_semaphore];
 
-        let render_semaphore = resource_manager.get_semaphore("present").get();
-        let render_semaphores = [render_semaphore];
+        let render_semaphores = [frame_data.render_semaphore];
 
         let submits = [vk::SubmitInfo::builder()
             .wait_dst_stage_mask(&wait_dst_stage_mask)
             .wait_semaphores(&present_semaphores)
             .signal_semaphores(&render_semaphores)
-            .command_buffers(&[command_buffer])
+            .command_buffers(&[frame_data.command_buffer])
             .build()];
 
         unsafe {
             device
-                .queue_submit(*graphics_queue, &submits, render_fence)
+                .queue_submit(*graphics_queue, &submits, frame_data.render_fence)
                 .expect("VkBackend::DeviceHandle::draw - Failed to submit to queue!")
         }
 

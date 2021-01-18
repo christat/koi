@@ -21,13 +21,16 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="add renderable, material entities as well as VkMaterial for basic list-based renderable rendering">
-      <change afterPath="$PROJECT_DIR$/resources/shaders/src/black.frag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/shaders/src/white.frag" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders">
+      <change afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/renderable.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/entities/renderable.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -128,11 +131,6 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Cargo.Debug" />
       <item itemvalue="Cargo.Release" />
@@ -197,6 +195,9 @@
       <workItem from="1610179146741" duration="21404000" />
       <workItem from="1610376977765" duration="12678000" />
       <workItem from="1610465879730" duration="11111000" />
+      <workItem from="1610914607904" duration="745000" />
+      <workItem from="1610989216640" duration="66000" />
+      <workItem from="1610989296752" duration="5236000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -432,7 +433,13 @@
       <option name="presentableId" value="LOCAL−00039" />
       <updated>1610802926477</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL−00040" summary="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders">
+      <created>1610902161401</created>
+      <option name="number" value="LOCAL−00040" />
+      <option name="presentableId" value="LOCAL−00040" />
+      <updated>1610902161401</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -464,7 +471,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="make bg clear flash less jarring" />
     <MESSAGE value="fix winit renderer integration to handle events" />
     <MESSAGE value="add dummy second pipeline and swap logic" />
     <MESSAGE value="refactor for front/back renderer split" />
@@ -489,7 +495,8 @@
     <MESSAGE value="Added free camera rotation mode" />
     <MESSAGE value="bound mouse motion to Look actions" />
     <MESSAGE value="add missing binding enums" />
-    <option name="LAST_COMMIT_MESSAGE" value="add missing binding enums" />
+    <MESSAGE value="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders" />
+    <option name="LAST_COMMIT_MESSAGE" value="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
