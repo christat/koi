@@ -39,7 +39,7 @@ fn create_configured_instance(
     config: &VkRendererConfig,
 ) -> Instance {
     let application_name = ffi::CString::new(app_name).unwrap();
-    let engine_name = ffi::CString::new("Koi").unwrap();
+    let engine_name = ffi::CString::new("Kohaku").unwrap();
 
     let application_info = vk::ApplicationInfo::builder()
         .application_name(&application_name)

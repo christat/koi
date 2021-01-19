@@ -38,7 +38,7 @@ fn compile_glsl_shader(file: &DirEntry, mut out_pathbuf: PathBuf) {
 fn compile_shaders() {
     println!("build - Compiling shaders...");
 
-    let shaders_pathbuf: PathBuf = [env!("CARGO_MANIFEST_DIR"), "resources", "shaders"]
+    let shaders_pathbuf: PathBuf = [env!("CARGO_MANIFEST_DIR"), "..", "resources", "shaders"]
         .iter()
         .collect();
 
@@ -48,7 +48,9 @@ fn compile_shaders() {
     let mut dist_pathbuf = shaders_pathbuf.clone();
     dist_pathbuf.push("dist");
 
-    let shader_entries = fs::read_dir(src_pathbuf).expect("Failed to read shaders src folder!");
+    let dir = src_pathbuf.to_str().unwrap();
+    let shader_entries = fs::read_dir(src_pathbuf.clone())
+        .expect(&format!("Failed to read shaders src folder {}!", dir));
     let shaders = shader_entries
         .into_iter()
         .map(|entry| entry.unwrap())

@@ -1,20 +1,16 @@
-use std::collections::{HashMap, HashSet};
-//----------------------------------------------------------------------------------------------------------------------
-
-use paste::paste;
-//----------------------------------------------------------------------------------------------------------------------
-
-use crate::core::input::{
-    types::{
-        ActionBindings, Button, GamepadInput, InputMode, Key, KeyboardMouseInput, Mouse,
-        MouseMotion, Stick, Trigger,
-    },
-    InputManager,
-};
-//----------------------------------------------------------------------------------------------------------------------
-
+#[macro_export]
 macro_rules! define_contextual_action_bindings {
     ($($ctx:ident { $({ $action:ident, $gpe:ident$(::$gpi:ident)?, $gpe2:ident$(::$gpi2:ident)?, $kbme:ident$(::$kbmi:ident)?, $kbme2:ident$(::$kbmi2:ident)? })+ })+) => {
+        use std::collections::{HashMap, HashSet};
+        use paste::paste;
+        use kohaku::core::input::{
+            types::{
+                ActionBindings, Button, GamepadInput, InputMode, Key, KeyboardMouseInput, Mouse,
+                MouseMotion, Stick, Trigger,
+            },
+            InputManager,
+        };
+
         $(
             paste! {
                 #[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
@@ -253,23 +249,3 @@ macro_rules! define_contextual_action_bindings {
         }
     };
 }
-
-define_contextual_action_bindings!(
-    MainMenu {
-        { Up,           Button::DPadUp,         None,   Key::Up,                None        }
-        { Down,         Button::DPadDown,       None,   Key::Down,              None        }
-        { Left,         Button::DPadLeft,       None,   Key::Left,              None        }
-        { Right,        Button::DPadRight,      None,   Key::Right,             None        }
-    }
-    InGame {
-        { Forward,      Stick::LSUp,            None,   Key::W,                 None        }
-        { Backward,     Stick::LSDown,          None,   Key::S,                 None        }
-        { Left,         Stick::LSLeft,          None,   Key::A,                 None        }
-        { Right,        Stick::LSRight,         None,   Key::D,                 None        }
-        { LookUp,       Stick::RSUp,            None,   MouseMotion::YUp,       None        }
-        { LookDown,     Stick::RSDown,          None,   MouseMotion::YDown,     None        }
-        { LookLeft,     Stick::RSLeft,          None,   MouseMotion::XLeft,     None        }
-        { LookRight,    Stick::RSRight,         None,   MouseMotion::XRight,    None        }
-        { Sprint,       Button::LeftBumper,     None,   Key::LShift,            Key::RShift }
-    }
-);
