@@ -21,68 +21,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders">
-      <change afterPath="$PROJECT_DIR$/ike/src/input.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/kohaku/Cargo.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/kohaku/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/koi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/koi.iml" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="added missing deps">
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/build.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/input/action_context.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/input_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/input/input_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/input/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/input/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/input/types.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/core/window.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/debug_utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/debug_utils.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/allocator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/instance.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/instance.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/physical_device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/physical_device.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/handles/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/surface.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/platform/extensions.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/extensions.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/platform/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/platform/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/surface.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/command_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/command_pool.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/command_pool.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/depth_buffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/fence.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/fence.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/framebuffer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/image.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/image.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/material.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/material.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/pipeline.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/pipeline_layout.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/pipeline_layout.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/render_pass.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/semaphore.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/backend/vk/resources/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/swapchain.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/entities/camera.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/material.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/entities/material.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/entities/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/entities/renderable.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/entities/renderable.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/hal/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/hal/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/hal/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/renderer/renderer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/ffi.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/utils/ffi.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/logger.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/utils/logger.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/math.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/utils/math.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/utils/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/traits.rs" beforeDir="false" afterPath="$PROJECT_DIR$/kohaku/src/utils/traits.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,7 +199,7 @@
       <workItem from="1610914607904" duration="745000" />
       <workItem from="1610989216640" duration="66000" />
       <workItem from="1610989296752" duration="5236000" />
-      <workItem from="1611077457726" duration="3758000" />
+      <workItem from="1611077457726" duration="4701000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -500,7 +441,19 @@
       <option name="presentableId" value="LOCAL−00040" />
       <updated>1610902161401</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL−00041" summary="split renderer and application into separate workspace projects">
+      <created>1611082852364</created>
+      <option name="number" value="LOCAL−00041" />
+      <option name="presentableId" value="LOCAL−00041" />
+      <updated>1611082852364</updated>
+    </task>
+    <task id="LOCAL−00042" summary="added missing deps">
+      <created>1611083038919</created>
+      <option name="number" value="LOCAL−00042" />
+      <option name="presentableId" value="LOCAL−00042" />
+      <updated>1611083038919</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -532,8 +485,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix winit renderer integration to handle events" />
-    <MESSAGE value="add dummy second pipeline and swap logic" />
     <MESSAGE value="refactor for front/back renderer split" />
     <MESSAGE value="move renderer glue to own module" />
     <MESSAGE value="added vertex buffer to pipeline and push constants to layout" />
@@ -557,7 +508,9 @@
     <MESSAGE value="bound mouse motion to Look actions" />
     <MESSAGE value="add missing binding enums" />
     <MESSAGE value="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders" />
-    <option name="LAST_COMMIT_MESSAGE" value="added Renderable Ord impl for sorting by material/mesh and dummy b/w frag shaders" />
+    <MESSAGE value="split renderer and application into separate workspace projects" />
+    <MESSAGE value="added missing deps" />
+    <option name="LAST_COMMIT_MESSAGE" value="added missing deps" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
