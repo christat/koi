@@ -22,8 +22,71 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="added missing deps">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/koi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/koi.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ike/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/ike/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ike/src/input.rs" beforeDir="false" afterPath="$PROJECT_DIR$/ike/src/input.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ike/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/ike/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/build.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/input/action_context.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/input/action_context.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/input/input_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/input/input_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/input/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/input/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/input/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/input/types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/core/window.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/core/window.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/debug_utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/debug_utils.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/instance.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/instance.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/physical_device.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/physical_device.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/handles/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/surface.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/extensions.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/platform/extensions.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/platform/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/platform/surface.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/platform/surface.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/command_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/command_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/command_pool.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/command_pool.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/depth_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/depth_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/fence.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/fence.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/framebuffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/framebuffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/image.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/image.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/material.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/material.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/pipeline.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/pipeline.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/pipeline_layout.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/pipeline_layout.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/render_pass.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/render_pass.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/semaphore.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/semaphore.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/backend/vk/resources/swapchain.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/swapchain.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/camera.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/entities/material.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/material.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/entities/renderable.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/renderable.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/hal/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/hal/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/utils/ffi.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/utils/ffi.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/utils/logger.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/utils/logger.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/utils/math.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/utils/math.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/utils/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/utils/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kohaku/src/utils/traits.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/utils/traits.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/black.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/black.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/white.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/white.frag" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,24 +134,27 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/shaders/src" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/assets/models/monkey/monkey_smooth.mtl.rs" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/build.rs" value="true" />
+    <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/kohaku/src/renderer/entities/camera.rs" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/build.rs" value="true" />
     <property name="org.rust.disableDetachedFileInspectionC:/Users/chris/CLionProjects/koi/src/utils/logger.rs" value="true" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.tools" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\chris\CLionProjects\koi\resources\shaders\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\chris\CLionProjects\koi\kohaku" />
       <recent name="C:\Users\chris\CLionProjects\koi" />
+      <recent name="C:\Users\chris\CLionProjects\koi\kohaku" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\vk\handles" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer\backend\vk\resources" />
       <recent name="C:\Users\chris\CLionProjects\koi\src\renderer" />
@@ -99,6 +165,7 @@
       <option name="command" value="run --package ike --bin ike" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
@@ -115,6 +182,7 @@
       <option name="command" value="run --package ike --bin ike --release" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
@@ -127,15 +195,11 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="Cargo.Debug" />
-      <item itemvalue="Cargo.Release" />
-    </list>
   </component>
   <component name="RustProjectSettings">
     <option name="runRustfmtOnSave" value="true" />
@@ -200,6 +264,14 @@
       <workItem from="1610989216640" duration="66000" />
       <workItem from="1610989296752" duration="5236000" />
       <workItem from="1611077457726" duration="4701000" />
+      <workItem from="1618841575795" duration="25000" />
+      <workItem from="1618841606370" duration="62000" />
+      <workItem from="1618841687665" duration="328000" />
+      <workItem from="1618842023680" duration="2649000" />
+      <workItem from="1618848202067" duration="412000" />
+      <workItem from="1618848794742" duration="3910000" />
+      <workItem from="1621451356744" duration="30000" />
+      <workItem from="1621451412171" duration="1995000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -518,5 +590,9 @@
         <watch expression="info-&gt;extent.height" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

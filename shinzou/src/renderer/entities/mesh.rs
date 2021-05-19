@@ -55,7 +55,13 @@ impl Mesh {
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn from_obj(file_path: &Path) -> Self {
-        let (models, _materials) = tobj::load_obj(file_path, true).expect(&format!(
+        let options = tobj::LoadOptions {
+            single_index: false,
+            triangulate: true,
+            ignore_points: false,
+            ignore_lines: false,
+        };
+        let (models, _materials) = tobj::load_obj(file_path, &options).expect(&format!(
             "Mesh::from_obj - Failed to load model in path {}!",
             file_path.to_str().unwrap_or("<Failed to covert path>")
         ));
@@ -79,7 +85,7 @@ impl Mesh {
             .iter()
             .map(|i| {
                 let i = *i as usize;
-                let f = i * mesh.num_face_indices[i] as usize;
+                let f = i * 3 as usize;
 
                 let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
                 let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);

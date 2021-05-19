@@ -1,4 +1,4 @@
-use kohaku::define_contextual_action_bindings;
+use shinzou::define_contextual_action_bindings;
 //----------------------------------------------------------------------------------------------------------------------
 
 define_contextual_action_bindings!(

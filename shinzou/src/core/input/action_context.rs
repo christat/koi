@@ -3,7 +3,7 @@ macro_rules! define_contextual_action_bindings {
     ($($ctx:ident { $({ $action:ident, $gpe:ident$(::$gpi:ident)?, $gpe2:ident$(::$gpi2:ident)?, $kbme:ident$(::$kbmi:ident)?, $kbme2:ident$(::$kbmi2:ident)? })+ })+) => {
         use std::collections::{HashMap, HashSet};
         use paste::paste;
-        use kohaku::core::input::{
+        use shinzou::core::input::{
             types::{
                 ActionBindings, Button, GamepadInput, InputMode, Key, KeyboardMouseInput, Mouse,
                 MouseMotion, Stick, Trigger,

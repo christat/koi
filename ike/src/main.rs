@@ -14,7 +14,7 @@ mod input;
 use std::time::Instant;
 //----------------------------------------------------------------------------------------------------------------------
 
-use kohaku::{
+use shinzou::{
     core::{
         input::{
             types::{Button, GamepadEvent, Key},

@@ -16,7 +16,8 @@ pub struct InstanceHandle {
 
 impl InstanceHandle {
     pub fn init(app_name: &str) -> (Self, VkRendererConfig) {
-        let entry = Entry::new().expect("InstanceHandle::init - Failed to instantiate library!");
+        let entry =
+            unsafe { Entry::new().expect("InstanceHandle::init - Failed to instantiate library!") };
         let config = VkRendererConfig::init(&entry);
         let instance = create_configured_instance(&entry, app_name, &config);
         (Self { entry, instance }, config)
@@ -39,7 +40,7 @@ fn create_configured_instance(
     config: &VkRendererConfig,
 ) -> Instance {
     let application_name = ffi::CString::new(app_name).unwrap();
-    let engine_name = ffi::CString::new("Kohaku").unwrap();
+    let engine_name = ffi::CString::new("Koi").unwrap();
 
     let application_info = vk::ApplicationInfo::builder()
         .application_name(&application_name)
