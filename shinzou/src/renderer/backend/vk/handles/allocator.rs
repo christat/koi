@@ -86,7 +86,7 @@ impl AllocatorHandle {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn write_buffer<T>(&self, buffer: &VkBuffer, data: *const T, size: usize) {
+    pub fn write_buffer<T>(&self, buffer: &VkBuffer, data: *const T, count: usize) {
         let allocation = buffer.allocation();
 
         let mapped_memory = self
@@ -95,7 +95,7 @@ impl AllocatorHandle {
             .expect("VkBackend::AllocatorHandle::write_buffer - Failed to map buffer allocation!");
 
         unsafe {
-            copy_nonoverlapping(data, mapped_memory as *mut T, size);
+            copy_nonoverlapping(data, mapped_memory as *mut T, count);
         }
 
         self.allocator.unmap_memory(allocation).expect(

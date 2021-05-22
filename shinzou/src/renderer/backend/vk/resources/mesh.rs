@@ -3,7 +3,7 @@ use std::mem::size_of;
 
 use ash::vk;
 use field_offset::offset_of;
-use ultraviolet::{Mat4, Vec4};
+use ultraviolet::Mat4;
 use vk_mem::{Allocator, MemoryUsage};
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -66,8 +66,7 @@ impl VertexInputDescription {
 
 #[repr(C)]
 pub struct MeshPushConstants {
-    data: Vec4,
-    transform_matrix: Mat4,
+    render_matrix: Mat4,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -75,11 +74,8 @@ pub const MESH_PUSH_CONSTANTS_SIZE: u32 = size_of::<MeshPushConstants>() as u32;
 //----------------------------------------------------------------------------------------------------------------------
 
 impl MeshPushConstants {
-    pub fn new(data: Vec4, transform_matrix: Mat4) -> Self {
-        Self {
-            data,
-            transform_matrix,
-        }
+    pub fn new(render_matrix: Mat4) -> Self {
+        Self { render_matrix }
     }
     //------------------------------------------------------------------------------------------------------------------
 

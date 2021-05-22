@@ -1,5 +1,4 @@
 use ash::{version::DeviceV1_0, vk, Device};
-use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::{
@@ -9,10 +8,10 @@ use crate::{
             handles::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer},
+            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer, VkFrame},
             VkRendererConfig,
         },
-        entities::{Camera, Material, Mesh, Renderable},
+        entities::{Camera, CameraUBO, Material, Mesh, Renderable, CAMERA_UBO_SIZE},
         hal::RendererBackend,
     },
     utils::{ffi, traits::Destroy},
@@ -139,7 +138,11 @@ impl RendererBackend for VkRenderer {
         let device = device_handle.get_device();
 
         (0..config.buffering).for_each(|_| {
-            resource_manager.create_frame(device, physical_device_handle.graphics_queue_index);
+            resource_manager.create_frame(
+                device,
+                physical_device_handle.graphics_queue_index,
+                allocator_handle,
+            );
         });
 
         let swapchain = resource_manager.create_swapchain(
@@ -168,6 +171,8 @@ impl RendererBackend for VkRenderer {
             depth_attachment_format,
         );
 
+        resource_manager.create_descriptors(device);
+
         for material in materials {
             resource_manager.create_material(device, &render_pass, &material);
         }
@@ -183,6 +188,7 @@ impl RendererBackend for VkRenderer {
         let VkRenderer {
             device_handle,
             resource_manager,
+            allocator_handle,
             ..
         } = self;
 
@@ -282,12 +288,20 @@ impl RendererBackend for VkRenderer {
             );
         }
 
+        let camera_ubo = CameraUBO::new(camera);
+
+        allocator_handle.write_buffer(
+            &frame_data.camera_buffer,
+            &camera_ubo as *const CameraUBO,
+            1,
+        );
+
         draw_renderables(
             device,
             frame_data.command_buffer,
             resource_manager,
-            camera,
             renderables,
+            &[frame_data.global_descriptor],
         );
 
         unsafe {
@@ -347,12 +361,9 @@ fn draw_renderables(
     device: &Device,
     command_buffer: vk::CommandBuffer,
     resource_manager: &ResourceManager,
-    camera: &Camera,
     renderables: &[Renderable],
+    descriptor_sets: &[vk::DescriptorSet],
 ) {
-    let view = camera.view();
-    let projection = camera.projection();
-
     let mut last_mesh = None;
     let mut last_material = None;
     for renderable in renderables {
@@ -373,12 +384,18 @@ fn draw_renderables(
                     vk::PipelineBindPoint::GRAPHICS,
                     material.pipeline,
                 );
+                device.cmd_bind_descriptor_sets(
+                    command_buffer,
+                    vk::PipelineBindPoint::GRAPHICS,
+                    material.pipeline_layout,
+                    0,
+                    descriptor_sets,
+                    &[],
+                );
             }
         }
 
-        let transform_matrix = projection * view * renderable.transform;
-        let mesh_push_constants = MeshPushConstants::new(Vec4::default(), transform_matrix);
-
+        let mesh_push_constants = MeshPushConstants::new(renderable.transform);
         unsafe {
             device.cmd_push_constants(
                 command_buffer,

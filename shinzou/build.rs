@@ -60,7 +60,7 @@ fn compile_shaders() {
         compile_glsl_shader(&shader, dist_pathbuf.clone());
     }
 
-    println!("build - Shader compilation successful.")
+    println!("build - Shader compilation successful!")
 }
 //-----------------------------------------------------------------------------
 

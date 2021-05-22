@@ -89,6 +89,7 @@ impl Mesh {
 
                 let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
                 let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);
+
                 Vertex::new(position, normal, normal)
             })
             .collect::<Vec<Vertex>>();

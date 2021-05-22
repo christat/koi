@@ -5,6 +5,7 @@ use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
 use crate::renderer::backend::vk::resources::{MeshPushConstants, VertexInputDescription, VkFrame};
+use crate::renderer::entities::CAMERA_UBO_SIZE;
 use crate::renderer::{
     backend::vk::{
         handles::{
@@ -37,6 +38,10 @@ pub struct ResourceManager {
     command_buffers: HashMap<String, Vec<Rc<VkCommandBuffer>>>,
     fences: HashMap<String, Rc<VkFence>>,
     semaphores: HashMap<String, Rc<VkSemaphore>>,
+
+    descriptor_pool: vk::DescriptorPool,
+    global_descriptor_set_layout: vk::DescriptorSetLayout,
+
     frames: Vec<VkFrame>,
 
     pipeline_layouts: HashMap<String, Rc<VkPipelineLayout>>,
@@ -57,6 +62,8 @@ impl ResourceManager {
             framebuffers: Vec::new(),
             command_pools: HashMap::new(),
             command_buffers: HashMap::new(),
+            descriptor_pool: Default::default(),
+            global_descriptor_set_layout: Default::default(),
             fences: HashMap::new(),
             semaphores: HashMap::new(),
             frames: Vec::new(),
@@ -290,7 +297,12 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn create_frame(&mut self, device: &Device, queue_family_index: u32) {
+    pub fn create_frame(
+        &mut self,
+        device: &Device,
+        queue_family_index: u32,
+        allocator_handle: &AllocatorHandle,
+    ) {
         let index = self.frames.len();
 
         let present_semaphore = self
@@ -318,6 +330,7 @@ impl ResourceManager {
             .get();
 
         self.frames.push(VkFrame::new(
+            allocator_handle,
             present_semaphore,
             render_semaphore,
             render_fence,
@@ -345,13 +358,82 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn create_descriptors(&mut self, device: &Device) {
+        let pool_sizes = [vk::DescriptorPoolSize::builder()
+            .descriptor_count(10)
+            .build(); 10];
+
+        let pool_info = vk::DescriptorPoolCreateInfo::builder()
+            .max_sets(10)
+            .pool_sizes(&pool_sizes);
+
+        self.descriptor_pool = unsafe {
+            device
+                .create_descriptor_pool(&pool_info, None)
+                .expect("ResourceManager::create_descriptors - Failed to create descriptor pool!")
+        };
+
+        let camera_buffer_binding = [vk::DescriptorSetLayoutBinding::builder()
+            .binding(0)
+            .descriptor_count(1)
+            .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+            .stage_flags(vk::ShaderStageFlags::VERTEX)
+            .build()];
+
+        let set_layout_info =
+            vk::DescriptorSetLayoutCreateInfo::builder().bindings(&camera_buffer_binding);
+
+        self.global_descriptor_set_layout = unsafe {
+            device
+                .create_descriptor_set_layout(&set_layout_info, None)
+                .expect(
+                    "ResourceManager::create_descriptors - Failed to create descriptor set layout!",
+                )
+        };
+
+        // TODO untangle order dependency, frames must exist when this gets called!
+        let set_layouts = [self.global_descriptor_set_layout];
+        for frame in &mut self.frames {
+            let set_info = vk::DescriptorSetAllocateInfo::builder()
+                .descriptor_pool(self.descriptor_pool)
+                .set_layouts(&set_layouts);
+
+            frame.global_descriptor = unsafe {
+                device.allocate_descriptor_sets(&set_info).expect(
+                    "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
+                )[0]
+            };
+
+            let buffer_info = [vk::DescriptorBufferInfo::builder()
+                .buffer(frame.camera_buffer.get())
+                .offset(0)
+                .range(CAMERA_UBO_SIZE)
+                .build()];
+
+            let write_set = [vk::WriteDescriptorSet::builder()
+                .dst_binding(0)
+                .dst_set(frame.global_descriptor)
+                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+                .buffer_info(&buffer_info)
+                .build()];
+
+            unsafe { device.update_descriptor_sets(&write_set, &[]) };
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn create_pipeline_layout(
         &mut self,
         device: &Device,
         id: &str,
         push_constant_ranges: Option<&[vk::PushConstantRange]>,
+        descriptor_set_layouts: Option<&[vk::DescriptorSetLayout]>,
     ) -> Rc<VkPipelineLayout> {
-        let pipeline_layout = Rc::new(VkPipelineLayout::new(device, push_constant_ranges));
+        let pipeline_layout = Rc::new(VkPipelineLayout::new(
+            device,
+            push_constant_ranges,
+            descriptor_set_layouts,
+        ));
         self.pipeline_layouts
             .insert(id.to_owned(), pipeline_layout.clone());
 
@@ -421,11 +503,13 @@ impl ResourceManager {
         .get();
 
         let push_constant_ranges = [MeshPushConstants::get_range()];
+        let descriptor_set_layouts = [self.global_descriptor_set_layout];
         let pipeline_layout = self
             .create_pipeline_layout(
                 device,
                 &format!("{}_pipeline_layout", name),
                 Some(&push_constant_ranges),
+                Some(&descriptor_set_layouts),
             )
             .get();
 
@@ -505,6 +589,13 @@ impl ResourceManager {
         for shader in self.shaders.values() {
             shader.destroy(device);
         }
+
+        for frame in self.frames.iter() {
+            frame.free(allocator);
+        }
+
+        device.destroy_descriptor_set_layout(self.global_descriptor_set_layout, None);
+        device.destroy_descriptor_pool(self.descriptor_pool, None);
 
         for pipeline in self.pipelines.values() {
             pipeline.destroy(device);

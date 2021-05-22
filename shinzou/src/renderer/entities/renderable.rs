@@ -4,6 +4,7 @@ use std::cmp::Ordering;
 use ultraviolet::Mat4;
 //----------------------------------------------------------------------------------------------------------------------
 
+#[repr(C)]
 pub struct Renderable {
     pub mesh_name: String,
     pub material_name: String,

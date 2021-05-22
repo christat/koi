@@ -80,11 +80,6 @@ fn create_shader_module(device: &Device, path: &Path) -> ShaderModule {
             .expect("VkBackend::ShaderResource - Failed to create shader module!")
     };
 
-    info!(
-        "VkBackend::ShaderResource - Successfully loaded shader {}",
-        path.to_str().unwrap()
-    );
-
     shader_module
 }
 //----------------------------------------------------------------------------------------------------------------------

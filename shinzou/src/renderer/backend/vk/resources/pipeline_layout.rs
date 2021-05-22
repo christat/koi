@@ -13,10 +13,11 @@ impl VkPipelineLayout {
     pub(in crate::renderer::backend::vk::resources) fn new(
         device: &Device,
         push_constant_ranges: Option<&[vk::PushConstantRange]>,
+        descriptor_set_layouts: Option<&[vk::DescriptorSetLayout]>,
     ) -> Self {
         let create_info = vk::PipelineLayoutCreateInfo::builder()
             .flags(vk::PipelineLayoutCreateFlags::empty())
-            .set_layouts(&[])
+            .set_layouts(descriptor_set_layouts.unwrap_or(&[]))
             .push_constant_ranges(push_constant_ranges.unwrap_or(&[]));
 
         let pipeline_layout = unsafe {

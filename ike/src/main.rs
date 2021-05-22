@@ -74,6 +74,10 @@ fn main() {
         init_window(APP_NAME, WIDTH, HEIGHT);
     let mut input_manager = InputManager::init(None);
     let mut input_actions = InputActions::init();
+
+    let mut line = String::new();
+    std::io::stdin().read_line(&mut line).unwrap();
+
     let mut renderer = Renderer::init(APP_NAME, &window_handle);
 
     input_actions.set_active_context(ActionContexts::InGame);
@@ -95,9 +99,9 @@ fn main() {
                 }
             },
             Evt::WindowEvent { event, .. } => match event {
-                WinEvt::Focused(state) => {
-                    window_state.update(state);
-                }
+                // WinEvt::Focused(state) => {
+                //     window_state.update(state);
+                // }
                 WinEvt::CloseRequested => {
                     renderer.await_device_idle();
                     *control_flow = Flow::Exit;

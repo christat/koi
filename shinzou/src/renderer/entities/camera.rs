@@ -1,3 +1,6 @@
+use std::mem::size_of;
+//----------------------------------------------------------------------------------------------------------------------
+
 use ultraviolet::{projection, rotor::Rotor3, Mat4, Vec3, Vec4};
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -75,5 +78,30 @@ fn look_at(position: Vec3, direction: Vec3, up: Vec3) -> Mat4 {
     let rotation = Mat4::new(Vec4::from(x), Vec4::from(y), Vec4::from(z), w);
     let translation = Mat4::identity().translated(&position);
     rotation * translation
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+#[repr(C)]
+pub struct CameraUBO {
+    view: Mat4,
+    projection: Mat4,
+    view_projection: Mat4,
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+pub const CAMERA_UBO_SIZE: u64 = size_of::<CameraUBO>() as u64;
+//----------------------------------------------------------------------------------------------------------------------
+
+impl CameraUBO {
+    pub fn new(camera: &Camera) -> Self {
+        let view = camera.view();
+        let projection = camera.projection();
+        let view_projection = projection * view;
+        Self {
+            view,
+            projection,
+            view_projection,
+        }
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------

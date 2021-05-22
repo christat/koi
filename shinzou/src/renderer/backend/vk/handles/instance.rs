@@ -47,7 +47,7 @@ fn create_configured_instance(
         .application_version(vk::make_version(0, 1, 0))
         .engine_name(&engine_name)
         .engine_version(vk::make_version(0, 1, 0))
-        .api_version(vk::make_version(1, 2, 162));
+        .api_version(vk::make_version(1, 2, 176));
 
     let enabled_extension_names = ffi::vec_cstring_to_char_ptr(&config.instance_extensions);
 
