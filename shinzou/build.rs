@@ -1,4 +1,5 @@
 use std::fs::DirEntry;
+use std::io::Write;
 use std::{env, fs, path::PathBuf, process::Command};
 //-----------------------------------------------------------------------------
 
@@ -25,13 +26,18 @@ fn compile_glsl_shader(file: &DirEntry, mut out_pathbuf: PathBuf) {
     let infile = file.path().into_os_string().into_string().unwrap();
     let outfile = out_pathbuf.into_os_string().into_string().unwrap();
 
-    Command::new("glslangValidator")
+    let output = Command::new("glslangValidator")
         .arg("-V")
         .arg(&infile)
         .arg("-o")
         .arg(&outfile)
         .output()
         .expect(&format!("Failed to compile shader {} !", &infile));
+
+    println!("gslangValidator status: {}", output.status);
+    std::io::stdout().write_all(&output.stdout).unwrap();
+    std::io::stderr().write_all(&output.stderr).unwrap();
+    assert!(output.status.success());
 }
 //-----------------------------------------------------------------------------
 

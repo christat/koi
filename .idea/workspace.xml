@@ -22,13 +22,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets">
+      <change afterPath="$PROJECT_DIR$/resources/shaders/src/debug.frag" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/black.frag" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.frag" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/white.frag" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/build.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/camera.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -492,7 +498,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621878042696</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets">
+      <created>1621881889607</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1621881889607</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

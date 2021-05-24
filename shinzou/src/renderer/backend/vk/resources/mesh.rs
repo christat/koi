@@ -3,7 +3,7 @@ use std::mem::size_of;
 
 use ash::vk;
 use field_offset::offset_of;
-use ultraviolet::Mat4;
+use ultraviolet::{Mat4, Vec4};
 use vk_mem::{Allocator, MemoryUsage};
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -97,15 +97,17 @@ pub struct MeshSSBO {
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-impl MeshSSBO {
-    pub fn new(model_matrix: Mat4) -> Self {
-        Self { model_matrix }
-    }
+pub const MESH_SSBO_SIZE: u64 = size_of::<MeshSSBO>() as u64;
+pub const MESH_SSBO_MAX: u64 = 10000;
+//----------------------------------------------------------------------------------------------------------------------
+
+#[repr(C)]
+pub struct MeshMetaSSBO {
+    pub color: Vec4,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-pub const MESH_SSBO_SIZE: u64 = size_of::<MeshSSBO>() as u64;
-pub const MESH_SSBO_MAX: u64 = 10000;
+pub const MESH_META_SSBO_SIZE: u64 = size_of::<MeshMetaSSBO>() as u64;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VkMesh {

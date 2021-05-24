@@ -2,6 +2,7 @@ use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::MeshMetaSSBO;
 use crate::renderer::entities::CAMERA_UBO_SIZE;
 use crate::{
     core::window::WindowHandle,
@@ -298,12 +299,35 @@ impl RendererBackend for VkRenderer {
         // Write entity SSBO
         let ssbo_buffer_data = renderables
             .into_iter()
-            .map(|renderable| MeshSSBO::new(renderable.transform))
+            .map(|renderable| MeshSSBO {
+                model_matrix: renderable.transform,
+            })
             .collect::<Vec<MeshSSBO>>();
 
         allocator_handle.write_buffer(
             &frame_data.entity_buffer,
             ssbo_buffer_data.as_ptr() as *const MeshSSBO,
+            ssbo_buffer_data.len(),
+            None,
+        );
+
+        // Write entity meta SSBO
+        let ssbo_meta_buffer_data = renderables
+            .into_iter()
+            .enumerate()
+            .map(|(i, renderable)| {
+                let mut color = Vec4::new(f32::cos(i as f32), f32::sin(i as f32), 0.4, 1.0);
+                let pos = renderable.transform.cols[3];
+                if pos.x.abs() == pos.z.abs() {
+                    color = Vec4::one();
+                }
+                MeshMetaSSBO { color }
+            })
+            .collect::<Vec<MeshMetaSSBO>>();
+
+        allocator_handle.write_buffer(
+            &frame_data.entity_meta_buffer,
+            ssbo_meta_buffer_data.as_ptr() as *const MeshMetaSSBO,
             ssbo_buffer_data.len(),
             None,
         );
@@ -346,7 +370,7 @@ impl RendererBackend for VkRenderer {
             renderables,
             &[scene.descriptor_set],
             &[camera_ubo_offset, camera_ubo_offset],
-            &[frame_data.entity_descriptor],
+            &[frame_data.entity_descriptor_set],
         );
 
         unsafe {

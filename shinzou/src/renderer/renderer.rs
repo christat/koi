@@ -51,25 +51,18 @@ impl Renderer {
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn init_resources(&mut self) {
-        let material_name: String = "default".into();
-        let material = Material::new(
-            material_name.to_owned(),
+        let default_material_name: String = "default".into();
+        let default_material = Material::new(
+            default_material_name.to_owned(),
             PathBuf::from("resources/shaders/dist/shader.vert.spv"),
             PathBuf::from("resources/shaders/dist/shader.frag.spv"),
         );
 
-        let material_white_name: String = "white".into();
-        let material_white = Material::new(
-            material_white_name.to_owned(),
+        let debug_material_name: String = "debug".into();
+        let debug_material = Material::new(
+            debug_material_name.to_owned(),
             PathBuf::from("resources/shaders/dist/shader.vert.spv"),
-            PathBuf::from("resources/shaders/dist/white.frag.spv"),
-        );
-
-        let material_black_name: String = "black".into();
-        let material_black = Material::new(
-            material_black_name.to_owned(),
-            PathBuf::from("resources/shaders/dist/shader.vert.spv"),
-            PathBuf::from("resources/shaders/dist/black.frag.spv"),
+            PathBuf::from("resources/shaders/dist/debug.frag.spv"),
         );
 
         let monkey = Mesh::from_obj(Path::new("assets/models/monkey/monkey_smooth.obj"));
@@ -79,7 +72,7 @@ impl Renderer {
         let triangle_name = triangle.name.clone();
 
         self.backend.init_resources(
-            vec![material, material_white, material_black],
+            vec![default_material, debug_material],
             vec![monkey, triangle],
         );
 
@@ -87,7 +80,7 @@ impl Renderer {
 
         let monkey = Renderable::new(
             monkey_name.clone(),
-            material_name.to_owned(),
+            default_material_name.to_owned(),
             Mat4::identity(),
         );
 
@@ -97,15 +90,11 @@ impl Renderer {
             for z in -20..20 {
                 let translation = Mat4::identity().translated(&Vec3::new(x as f32, -3.0, z as f32));
                 let scale = (Mat3::identity() * 0.2).into_homogeneous();
-                let transform = translation * scale;
-                let material_name = if (x % 2 == 0 && z % 2 == 0) || (x % 2 != 0 && z % 2 != 0) {
-                    material_black_name.to_owned()
-                } else {
-                    material_white_name.to_owned()
-                };
-                let triangle =
-                    Renderable::new(triangle_name.clone(), material_name.to_owned(), transform);
-                self.scene.push(triangle);
+                self.scene.push(Renderable::new(
+                    triangle_name.clone(),
+                    debug_material_name.to_owned(),
+                    translation * scale,
+                ));
             }
         }
         self.scene.sort_unstable();

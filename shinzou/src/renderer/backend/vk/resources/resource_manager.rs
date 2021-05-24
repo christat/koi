@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::{MESH_SSBO_MAX, MESH_SSBO_SIZE};
+use crate::renderer::backend::vk::resources::{MESH_META_SSBO_SIZE, MESH_SSBO_MAX, MESH_SSBO_SIZE};
 use crate::renderer::{
     backend::vk::{
         handles::{
@@ -431,12 +431,20 @@ impl ResourceManager {
                 )
         };
 
-        let entity_bindings = [vk::DescriptorSetLayoutBinding::builder()
-            .binding(0)
-            .descriptor_count(1)
-            .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
-            .stage_flags(vk::ShaderStageFlags::VERTEX)
-            .build()];
+        let entity_bindings = [
+            vk::DescriptorSetLayoutBinding::builder()
+                .binding(0)
+                .descriptor_count(1)
+                .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
+                .stage_flags(vk::ShaderStageFlags::VERTEX)
+                .build(),
+            vk::DescriptorSetLayoutBinding::builder()
+                .binding(1)
+                .descriptor_count(1)
+                .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
+                .stage_flags(vk::ShaderStageFlags::VERTEX)
+                .build(),
+        ];
 
         self.entity_descriptor_set_layout = unsafe {
             device
@@ -467,7 +475,7 @@ impl ResourceManager {
                 .descriptor_pool(self.descriptor_pool)
                 .set_layouts(&entity_set_layouts);
 
-            frame.entity_descriptor = unsafe {
+            frame.entity_descriptor_set = unsafe {
                 device.allocate_descriptor_sets(&entity_set_info).expect(
                     "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
                 )[0]
@@ -491,6 +499,12 @@ impl ResourceManager {
                 .range(MESH_SSBO_SIZE * MESH_SSBO_MAX)
                 .build()];
 
+            let entity_meta_buffer_info = [vk::DescriptorBufferInfo::builder()
+                .buffer(frame.entity_meta_buffer.get())
+                .offset(0)
+                .range(MESH_META_SSBO_SIZE * MESH_SSBO_MAX)
+                .build()];
+
             let write_set = [
                 vk::WriteDescriptorSet::builder()
                     .dst_binding(0)
@@ -506,9 +520,15 @@ impl ResourceManager {
                     .build(),
                 vk::WriteDescriptorSet::builder()
                     .dst_binding(0)
-                    .dst_set(frame.entity_descriptor)
+                    .dst_set(frame.entity_descriptor_set)
                     .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
                     .buffer_info(&entity_buffer_info)
+                    .build(),
+                vk::WriteDescriptorSet::builder()
+                    .dst_binding(1)
+                    .dst_set(frame.entity_descriptor_set)
+                    .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
+                    .buffer_info(&entity_meta_buffer_info)
                     .build(),
             ];
 
