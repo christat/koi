@@ -2,6 +2,7 @@ use ash::vk;
 use vk_mem::Allocator;
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::{MESH_SSBO_MAX, MESH_SSBO_SIZE};
 use crate::renderer::{
     backend::vk::{
         handles::{AllocatorFree, AllocatorHandle},
@@ -19,8 +20,11 @@ pub struct VkFrame {
     pub command_pool: vk::CommandPool,
     pub command_buffer: vk::CommandBuffer,
 
-    pub camera_buffer: VkBuffer,
     pub global_descriptor: vk::DescriptorSet,
+    pub camera_buffer: VkBuffer,
+
+    pub entity_descriptor: vk::DescriptorSet,
+    pub entity_buffer: VkBuffer,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -39,14 +43,24 @@ impl VkFrame {
                 .usage(vk::BufferUsageFlags::UNIFORM_BUFFER),
             &AllocatorHandle::allocation_create_info(vk_mem::MemoryUsage::CpuToGpu, None, None),
         );
+
+        let entity_buffer = allocator_handle.create_buffer(
+            &vk::BufferCreateInfo::builder()
+                .size(MESH_SSBO_SIZE * MESH_SSBO_MAX)
+                .usage(vk::BufferUsageFlags::STORAGE_BUFFER),
+            &AllocatorHandle::allocation_create_info(vk_mem::MemoryUsage::CpuToGpu, None, None),
+        );
+
         Self {
             present_semaphore,
             render_semaphore,
             render_fence,
             command_pool,
             command_buffer,
-            camera_buffer,
             global_descriptor: Default::default(),
+            camera_buffer,
+            entity_descriptor: Default::default(),
+            entity_buffer,
         }
     }
 }
@@ -55,6 +69,7 @@ impl VkFrame {
 impl AllocatorFree for VkFrame {
     fn free(&self, allocator: &Allocator) {
         self.camera_buffer.free(allocator);
+        self.entity_buffer.free(allocator);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -21,16 +21,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="updated deps; renamed core from kohaku to shinzou">
-      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ike/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/ike/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/allocator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -481,7 +477,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621454385772</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="added dynamic descriptor for scene">
+      <created>1621873139942</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1621873139942</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -513,7 +516,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="move renderer glue to own module" />
     <MESSAGE value="added vertex buffer to pipeline and push constants to layout" />
     <MESSAGE value="refactored VkBackend to manage resources dynamically (ResourceManager struct)" />
     <MESSAGE value="fixed mesh triangle example" />
@@ -538,7 +540,8 @@
     <MESSAGE value="split renderer and application into separate workspace projects" />
     <MESSAGE value="added missing deps" />
     <MESSAGE value="updated deps; renamed core from kohaku to shinzou" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated deps; renamed core from kohaku to shinzou" />
+    <MESSAGE value="added dynamic descriptor for scene" />
+    <option name="LAST_COMMIT_MESSAGE" value="added dynamic descriptor for scene" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

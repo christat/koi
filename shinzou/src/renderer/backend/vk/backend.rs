@@ -1,7 +1,7 @@
 use ash::{version::DeviceV1_0, vk, Device};
+use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::{SceneUBO, VkBuffer, SCENE_UBO_SIZE};
 use crate::{
     core::window::WindowHandle,
     renderer::{
@@ -9,15 +9,16 @@ use crate::{
             handles::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer},
+            resources::{
+                MeshSSBO, ResourceManager, SceneUBO, VkBuffer, VkDepthBuffer, SCENE_UBO_SIZE,
+            },
             VkRendererConfig,
         },
         entities::{Camera, CameraUBO, Material, Mesh, Renderable},
         hal::RendererBackend,
     },
-    utils::{ffi, traits::Destroy},
+    utils::traits::Destroy,
 };
-use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub trait DeviceDestroy {
@@ -291,8 +292,21 @@ impl RendererBackend for VkRenderer {
             );
         }
 
-        let frame_index = resource_manager.get_current_frame_number(self.frame_counter as usize);
+        // Write entity SSBO
+        let ssbo_buffer_data = renderables
+            .into_iter()
+            .map(|renderable| MeshSSBO::new(renderable.transform))
+            .collect::<Vec<MeshSSBO>>();
 
+        allocator_handle.write_buffer(
+            &frame_data.entity_buffer,
+            ssbo_buffer_data.as_ptr() as *const MeshSSBO,
+            ssbo_buffer_data.len(),
+            None,
+        );
+
+        // Write Scene UBO
+        let frame_index = resource_manager.get_current_frame_number(self.frame_counter as usize);
         let framed = self.frame_counter as f32 / 120.0;
         let scene_ubo = SceneUBO::new(Vec4::new(f32::sin(framed), 0.0, f32::cos(framed), 1.0));
         let scene_buffer = resource_manager.get_scene();
@@ -308,8 +322,8 @@ impl RendererBackend for VkRenderer {
             Some(scene_ubo_offset as isize),
         );
 
+        // Write Camera UBO
         let camera_ubo = CameraUBO::new(camera);
-
         allocator_handle.write_buffer(
             &frame_data.camera_buffer,
             &camera_ubo as *const CameraUBO,
@@ -324,6 +338,7 @@ impl RendererBackend for VkRenderer {
             renderables,
             &[frame_data.global_descriptor],
             &[scene_ubo_offset],
+            &[frame_data.entity_descriptor],
         );
 
         unsafe {
@@ -384,12 +399,13 @@ fn draw_renderables(
     command_buffer: vk::CommandBuffer,
     resource_manager: &ResourceManager,
     renderables: &[Renderable],
-    descriptor_sets: &[vk::DescriptorSet],
-    dynamic_offsets: &[u32],
+    global_descriptor_sets: &[vk::DescriptorSet],
+    global_dynamic_offsets: &[u32],
+    entity_descriptor_sets: &[vk::DescriptorSet],
 ) {
     let mut last_mesh = None;
     let mut last_material = None;
-    for renderable in renderables {
+    for (i, renderable) in renderables.iter().enumerate() {
         let Renderable {
             mesh_name,
             material_name,
@@ -413,22 +429,30 @@ fn draw_renderables(
                     vk::PipelineBindPoint::GRAPHICS,
                     material.pipeline_layout,
                     0,
-                    descriptor_sets,
-                    dynamic_offsets,
+                    global_descriptor_sets,
+                    global_dynamic_offsets,
                 );
+                device.cmd_bind_descriptor_sets(
+                    command_buffer,
+                    vk::PipelineBindPoint::GRAPHICS,
+                    material.pipeline_layout,
+                    1,
+                    entity_descriptor_sets,
+                    &[],
+                )
             }
         }
 
-        let mesh_push_constants = MeshPushConstants::new(renderable.transform);
-        unsafe {
-            device.cmd_push_constants(
-                command_buffer,
-                material.pipeline_layout,
-                MeshPushConstants::get_range().stage_flags,
-                0,
-                ffi::any_as_u8_slice(&mesh_push_constants),
-            );
-        }
+        // let mesh_push_constants = MeshPushConstants::new(renderable.transform);
+        // unsafe {
+        //     device.cmd_push_constants(
+        //         command_buffer,
+        //         material.pipeline_layout,
+        //         MeshPushConstants::get_range().stage_flags,
+        //         0,
+        //         ffi::any_as_u8_slice(&mesh_push_constants),
+        //     );
+        // }
 
         let mesh_resource = resource_manager.get_mesh(mesh_name);
 
@@ -447,7 +471,7 @@ fn draw_renderables(
 
         let vertex_count = mesh_resource.get_mesh().vertices.len() as u32;
         unsafe {
-            device.cmd_draw(command_buffer, vertex_count, 1, 0, 0);
+            device.cmd_draw(command_buffer, vertex_count, 1, 0, i as u32);
         }
     }
 }

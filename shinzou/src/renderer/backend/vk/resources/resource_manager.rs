@@ -4,16 +4,17 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::{MESH_SSBO_MAX, MESH_SSBO_SIZE};
 use crate::renderer::{
     backend::vk::{
         handles::{
             AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
         },
         resources::{
-            MeshPushConstants, VertexInputDescription, VkCommandBuffer, VkCommandPool,
-            VkDepthBuffer, VkFence, VkFrame, VkFramebuffer, VkMaterial, VkMesh, VkPipeline,
-            VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkScene, VkSemaphore, VkShader,
-            VkSwapchain, SCENE_UBO_SIZE,
+            VertexInputDescription, VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence,
+            VkFrame, VkFramebuffer, VkMaterial, VkMesh, VkPipeline, VkPipelineBuilder,
+            VkPipelineLayout, VkRenderPass, VkScene, VkSemaphore, VkShader, VkSwapchain,
+            SCENE_UBO_SIZE,
         },
         DeviceAllocatorDestroy, DeviceDestroy, VkRendererConfig,
     },
@@ -40,6 +41,7 @@ pub struct ResourceManager {
 
     descriptor_pool: vk::DescriptorPool,
     global_descriptor_set_layout: vk::DescriptorSetLayout,
+    entity_descriptor_set_layout: vk::DescriptorSetLayout,
 
     frames: Vec<VkFrame>,
     scene: VkScene,
@@ -68,6 +70,7 @@ impl ResourceManager {
             command_buffers: HashMap::new(),
             descriptor_pool: Default::default(),
             global_descriptor_set_layout: Default::default(),
+            entity_descriptor_set_layout: Default::default(),
             fences: HashMap::new(),
             semaphores: HashMap::new(),
             frames: Vec::new(),
@@ -386,6 +389,10 @@ impl ResourceManager {
                 .ty(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
                 .descriptor_count(10)
                 .build(),
+            vk::DescriptorPoolSize::builder()
+                .ty(vk::DescriptorType::STORAGE_BUFFER)
+                .descriptor_count(10)
+                .build(),
         ];
 
         let pool_info = vk::DescriptorPoolCreateInfo::builder()
@@ -398,7 +405,7 @@ impl ResourceManager {
                 .expect("ResourceManager::create_descriptors - Failed to create descriptor pool!")
         };
 
-        let bindings = [
+        let global_bindings = [
             vk::DescriptorSetLayoutBinding::builder()
                 .binding(0)
                 .descriptor_count(1)
@@ -413,25 +420,55 @@ impl ResourceManager {
                 .build(),
         ];
 
-        let set_layout_info = vk::DescriptorSetLayoutCreateInfo::builder().bindings(&bindings);
-
         self.global_descriptor_set_layout = unsafe {
             device
-                .create_descriptor_set_layout(&set_layout_info, None)
+                .create_descriptor_set_layout(
+                    &vk::DescriptorSetLayoutCreateInfo::builder().bindings(&global_bindings),
+                    None,
+                )
                 .expect(
                     "ResourceManager::create_descriptors - Failed to create descriptor set layout!",
                 )
         };
 
-        // TODO untangle order dependency, frames must exist when this gets called!
-        let set_layouts = [self.global_descriptor_set_layout];
+        let entity_bindings = [vk::DescriptorSetLayoutBinding::builder()
+            .binding(0)
+            .descriptor_count(1)
+            .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
+            .stage_flags(vk::ShaderStageFlags::VERTEX)
+            .build()];
+
+        self.entity_descriptor_set_layout = unsafe {
+            device
+                .create_descriptor_set_layout(
+                    &vk::DescriptorSetLayoutCreateInfo::builder().bindings(&entity_bindings),
+                    None,
+                )
+                .expect(
+                    "ResourceManager::create_descriptors - Failed to create descriptor set layout!",
+                )
+        };
+
+        // TODO untangle implicit order dependency, frames must exist when this gets called!
+        let global_set_layouts = [self.global_descriptor_set_layout];
+        let entity_set_layouts = [self.entity_descriptor_set_layout];
         for frame in &mut self.frames {
-            let set_info = vk::DescriptorSetAllocateInfo::builder()
+            let global_set_info = vk::DescriptorSetAllocateInfo::builder()
                 .descriptor_pool(self.descriptor_pool)
-                .set_layouts(&set_layouts);
+                .set_layouts(&global_set_layouts);
 
             frame.global_descriptor = unsafe {
-                device.allocate_descriptor_sets(&set_info).expect(
+                device.allocate_descriptor_sets(&global_set_info).expect(
+                    "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
+                )[0]
+            };
+
+            let entity_set_info = vk::DescriptorSetAllocateInfo::builder()
+                .descriptor_pool(self.descriptor_pool)
+                .set_layouts(&entity_set_layouts);
+
+            frame.entity_descriptor = unsafe {
+                device.allocate_descriptor_sets(&entity_set_info).expect(
                     "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
                 )[0]
             };
@@ -448,6 +485,12 @@ impl ResourceManager {
                 .range(SCENE_UBO_SIZE as u64)
                 .build()];
 
+            let entity_buffer_info = [vk::DescriptorBufferInfo::builder()
+                .buffer(frame.entity_buffer.get())
+                .offset(0)
+                .range(MESH_SSBO_SIZE * MESH_SSBO_MAX)
+                .build()];
+
             let write_set = [
                 vk::WriteDescriptorSet::builder()
                     .dst_binding(0)
@@ -460,6 +503,12 @@ impl ResourceManager {
                     .dst_set(frame.global_descriptor)
                     .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
                     .buffer_info(&scene_buffer_info)
+                    .build(),
+                vk::WriteDescriptorSet::builder()
+                    .dst_binding(0)
+                    .dst_set(frame.entity_descriptor)
+                    .descriptor_type(vk::DescriptorType::STORAGE_BUFFER)
+                    .buffer_info(&entity_buffer_info)
                     .build(),
             ];
 
@@ -548,13 +597,16 @@ impl ResourceManager {
         }
         .get();
 
-        let push_constant_ranges = [MeshPushConstants::get_range()];
-        let descriptor_set_layouts = [self.global_descriptor_set_layout];
+        // let push_constant_ranges = [MeshPushConstants::get_range()];
+        let descriptor_set_layouts = [
+            self.global_descriptor_set_layout,
+            self.entity_descriptor_set_layout,
+        ];
         let pipeline_layout = self
             .create_pipeline_layout(
                 device,
                 &format!("{}_pipeline_layout", name),
-                Some(&push_constant_ranges),
+                None, //Some(&push_constant_ranges),
                 Some(&descriptor_set_layouts),
             )
             .get();
