@@ -2,6 +2,7 @@ use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::entities::CAMERA_UBO_SIZE;
 use crate::{
     core::window::WindowHandle,
     renderer::{
@@ -292,6 +293,8 @@ impl RendererBackend for VkRenderer {
             );
         }
 
+        let frame_index = resource_manager.get_current_frame_number(self.frame_counter as usize);
+
         // Write entity SSBO
         let ssbo_buffer_data = renderables
             .into_iter()
@@ -305,30 +308,35 @@ impl RendererBackend for VkRenderer {
             None,
         );
 
-        // Write Scene UBO
-        let frame_index = resource_manager.get_current_frame_number(self.frame_counter as usize);
-        let framed = self.frame_counter as f32 / 120.0;
-        let scene_ubo = SceneUBO::new(Vec4::new(f32::sin(framed), 0.0, f32::cos(framed), 1.0));
-        let scene_buffer = resource_manager.get_scene();
-
-        let scene_ubo_offset: u32 =
-            (VkBuffer::pad_ubo_size(&self.physical_device_handle, SCENE_UBO_SIZE)
-                * frame_index as u64) as u32;
-
-        allocator_handle.write_buffer(
-            &scene_buffer.buffer,
-            &scene_ubo as *const SceneUBO,
-            1,
-            Some(scene_ubo_offset as isize),
+        let scene = resource_manager.get_scene();
+        let scene_buffer_stride = VkBuffer::pad_ubo_size(
+            &self.physical_device_handle,
+            SCENE_UBO_SIZE + CAMERA_UBO_SIZE,
         );
 
         // Write Camera UBO
+        let camera_ubo_offset: u32 = (scene_buffer_stride * frame_index as u64) as u32;
+
         let camera_ubo = CameraUBO::new(camera);
         allocator_handle.write_buffer(
-            &frame_data.camera_buffer,
+            &scene.buffer,
             &camera_ubo as *const CameraUBO,
             1,
-            None,
+            Some(camera_ubo_offset as isize),
+        );
+
+        // Write Scene UBO
+        let framed = self.frame_counter as f32 / 120.0;
+        let scene_ubo = SceneUBO::new(Vec4::new(f32::sin(framed), 0.0, f32::cos(framed), 1.0));
+
+        let scene_ubo_offset: u32 =
+            ((scene_buffer_stride) * frame_index as u64) as u32 + CAMERA_UBO_SIZE as u32;
+
+        allocator_handle.write_buffer(
+            &scene.buffer,
+            &scene_ubo as *const SceneUBO,
+            1,
+            Some(scene_ubo_offset as isize),
         );
 
         draw_renderables(
@@ -336,8 +344,8 @@ impl RendererBackend for VkRenderer {
             frame_data.command_buffer,
             &resource_manager,
             renderables,
-            &[frame_data.global_descriptor],
-            &[scene_ubo_offset],
+            &[scene.descriptor_set],
+            &[camera_ubo_offset, camera_ubo_offset],
             &[frame_data.entity_descriptor],
         );
 

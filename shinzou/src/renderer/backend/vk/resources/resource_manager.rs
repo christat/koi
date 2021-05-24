@@ -409,7 +409,7 @@ impl ResourceManager {
             vk::DescriptorSetLayoutBinding::builder()
                 .binding(0)
                 .descriptor_count(1)
-                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
                 .stage_flags(vk::ShaderStageFlags::VERTEX)
                 .build(),
             vk::DescriptorSetLayoutBinding::builder()
@@ -449,20 +449,20 @@ impl ResourceManager {
                 )
         };
 
-        // TODO untangle implicit order dependency, frames must exist when this gets called!
         let global_set_layouts = [self.global_descriptor_set_layout];
+        let global_set_info = vk::DescriptorSetAllocateInfo::builder()
+            .descriptor_pool(self.descriptor_pool)
+            .set_layouts(&global_set_layouts);
+
+        self.scene.descriptor_set = unsafe {
+            device.allocate_descriptor_sets(&global_set_info).expect(
+                "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
+            )[0]
+        };
+
+        // TODO untangle implicit order dependency, frames must exist when this gets called!
         let entity_set_layouts = [self.entity_descriptor_set_layout];
         for frame in &mut self.frames {
-            let global_set_info = vk::DescriptorSetAllocateInfo::builder()
-                .descriptor_pool(self.descriptor_pool)
-                .set_layouts(&global_set_layouts);
-
-            frame.global_descriptor = unsafe {
-                device.allocate_descriptor_sets(&global_set_info).expect(
-                    "ResourceManager::create_descriptors - Failed to create frame descriptor set!",
-                )[0]
-            };
-
             let entity_set_info = vk::DescriptorSetAllocateInfo::builder()
                 .descriptor_pool(self.descriptor_pool)
                 .set_layouts(&entity_set_layouts);
@@ -474,14 +474,14 @@ impl ResourceManager {
             };
 
             let camera_buffer_info = [vk::DescriptorBufferInfo::builder()
-                .buffer(frame.camera_buffer.get())
-                .offset(0)
-                .range(CAMERA_UBO_SIZE)
+                .buffer(self.scene.buffer.get())
+                .offset(0) // dynamically offset at bind point
+                .range(CAMERA_UBO_SIZE as u64)
                 .build()];
 
             let scene_buffer_info = [vk::DescriptorBufferInfo::builder()
                 .buffer(self.scene.buffer.get())
-                .offset(0) // dynamically offset at bind point
+                .offset(CAMERA_UBO_SIZE as u64) // dynamically offset at bind point
                 .range(SCENE_UBO_SIZE as u64)
                 .build()];
 
@@ -494,13 +494,13 @@ impl ResourceManager {
             let write_set = [
                 vk::WriteDescriptorSet::builder()
                     .dst_binding(0)
-                    .dst_set(frame.global_descriptor)
-                    .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+                    .dst_set(self.scene.descriptor_set)
+                    .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
                     .buffer_info(&camera_buffer_info)
                     .build(),
                 vk::WriteDescriptorSet::builder()
                     .dst_binding(1)
-                    .dst_set(frame.global_descriptor)
+                    .dst_set(self.scene.descriptor_set)
                     .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
                     .buffer_info(&scene_buffer_info)
                     .build(),

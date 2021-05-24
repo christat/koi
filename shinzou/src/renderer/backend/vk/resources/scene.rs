@@ -8,6 +8,7 @@ use crate::renderer::backend::vk::{
     resources::VkBuffer,
     VkRendererConfig,
 };
+use crate::renderer::entities::CAMERA_UBO_SIZE;
 //----------------------------------------------------------------------------------------------------------------------
 
 // TODO pack correctly, instead of booking always full vec4/mat4
@@ -28,6 +29,7 @@ pub const SCENE_UBO_SIZE: usize = std::mem::size_of::<SceneUBO>();
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VkScene {
+    pub descriptor_set: vk::DescriptorSet,
     pub buffer: VkBuffer,
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -41,13 +43,19 @@ impl VkScene {
         let buffer = allocator.create_buffer(
             &VkBuffer::create_info(
                 config.buffering as vk::DeviceSize
-                    * VkBuffer::pad_ubo_size(physical_device_handle, SCENE_UBO_SIZE),
+                    * VkBuffer::pad_ubo_size(
+                        physical_device_handle,
+                        CAMERA_UBO_SIZE + SCENE_UBO_SIZE,
+                    ),
                 vk::BufferUsageFlags::UNIFORM_BUFFER,
             ),
             &AllocatorHandle::allocation_create_info(vk_mem::MemoryUsage::CpuToGpu, None, None),
         );
 
-        Self { buffer }
+        Self {
+            buffer,
+            descriptor_set: Default::default(),
+        }
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

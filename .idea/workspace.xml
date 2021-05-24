@@ -21,13 +21,14 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="">
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/camera.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/camera.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -484,7 +485,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621873139942</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="added storage buffers for renderable entities; commented out push constant logic for entity transforms">
+      <created>1621878042696</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1621878042696</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -494,12 +502,12 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.frag" />
   </component>
   <component name="Vcs.Log.History.Properties">
-    <option name="COLUMN_ORDER">
+    <option name="COLUMN_ID_ORDER">
       <list>
-        <option value="0" />
-        <option value="2" />
-        <option value="3" />
-        <option value="1" />
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
       </list>
     </option>
   </component>
@@ -508,7 +516,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -516,8 +530,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added vertex buffer to pipeline and push constants to layout" />
-    <MESSAGE value="refactored VkBackend to manage resources dynamically (ResourceManager struct)" />
     <MESSAGE value="fixed mesh triangle example" />
     <MESSAGE value="cleanup unused import and dead code warnings" />
     <MESSAGE value="added obj loading and monkey 3D model files" />
@@ -541,7 +553,9 @@
     <MESSAGE value="added missing deps" />
     <MESSAGE value="updated deps; renamed core from kohaku to shinzou" />
     <MESSAGE value="added dynamic descriptor for scene" />
-    <option name="LAST_COMMIT_MESSAGE" value="added dynamic descriptor for scene" />
+    <MESSAGE value="added storage buffers for renderable entities; commented out push constant logic for entity transforms" />
+    <MESSAGE value="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
