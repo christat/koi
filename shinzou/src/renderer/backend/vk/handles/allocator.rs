@@ -86,13 +86,23 @@ impl AllocatorHandle {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn write_buffer<T>(&self, buffer: &VkBuffer, data: *const T, count: usize) {
+    pub fn write_buffer<T>(
+        &self,
+        buffer: &VkBuffer,
+        data: *const T,
+        count: usize,
+        offset_unsafe: Option<isize>,
+    ) {
         let allocation = buffer.allocation();
 
-        let mapped_memory = self
+        let mut mapped_memory = self
             .allocator
             .map_memory(allocation)
             .expect("VkBackend::AllocatorHandle::write_buffer - Failed to map buffer allocation!");
+
+        if let Some(offset) = offset_unsafe {
+            unsafe { mapped_memory = mapped_memory.offset(offset) };
+        }
 
         unsafe {
             copy_nonoverlapping(data, mapped_memory as *mut T, count);

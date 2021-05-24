@@ -1,6 +1,7 @@
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
+use crate::renderer::backend::vk::resources::{SceneUBO, VkBuffer, SCENE_UBO_SIZE};
 use crate::{
     core::window::WindowHandle,
     renderer::{
@@ -8,14 +9,15 @@ use crate::{
             handles::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
-            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer, VkFrame},
+            resources::{MeshPushConstants, ResourceManager, VkDepthBuffer},
             VkRendererConfig,
         },
-        entities::{Camera, CameraUBO, Material, Mesh, Renderable, CAMERA_UBO_SIZE},
+        entities::{Camera, CameraUBO, Material, Mesh, Renderable},
         hal::RendererBackend,
     },
     utils::{ffi, traits::Destroy},
 };
+use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub trait DeviceDestroy {
@@ -41,7 +43,7 @@ pub struct VkRenderer {
 
     pub resource_manager: ResourceManager,
     //------------------------------------------------------------------------------------------------------------------
-    frame_index: u32,
+    frame_counter: u32,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +67,8 @@ impl VkRenderer {
             &config,
         );
 
-        let resource_manager = ResourceManager::init();
+        let resource_manager =
+            ResourceManager::init(&allocator_handle, &physical_device_handle, &config);
 
         Self {
             #[cfg(debug_assertions)]
@@ -82,7 +85,7 @@ impl VkRenderer {
             allocator_handle,
             resource_manager,
             //----------------------------------------------------------------------------------------------------------
-            frame_index: 0,
+            frame_counter: 0,
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -192,7 +195,7 @@ impl RendererBackend for VkRenderer {
             ..
         } = self;
 
-        let frame_data = resource_manager.get_current_frame(self.frame_index as usize);
+        let frame_data = resource_manager.get_current_frame(self.frame_counter as usize);
 
         let DeviceHandle {
             device,
@@ -288,20 +291,39 @@ impl RendererBackend for VkRenderer {
             );
         }
 
+        let frame_index = resource_manager.get_current_frame_number(self.frame_counter as usize);
+
+        let framed = self.frame_counter as f32 / 120.0;
+        let scene_ubo = SceneUBO::new(Vec4::new(f32::sin(framed), 0.0, f32::cos(framed), 1.0));
+        let scene_buffer = resource_manager.get_scene();
+
+        let scene_ubo_offset: u32 =
+            (VkBuffer::pad_ubo_size(&self.physical_device_handle, SCENE_UBO_SIZE)
+                * frame_index as u64) as u32;
+
+        allocator_handle.write_buffer(
+            &scene_buffer.buffer,
+            &scene_ubo as *const SceneUBO,
+            1,
+            Some(scene_ubo_offset as isize),
+        );
+
         let camera_ubo = CameraUBO::new(camera);
 
         allocator_handle.write_buffer(
             &frame_data.camera_buffer,
             &camera_ubo as *const CameraUBO,
             1,
+            None,
         );
 
         draw_renderables(
             device,
             frame_data.command_buffer,
-            resource_manager,
+            &resource_manager,
             renderables,
             &[frame_data.global_descriptor],
+            &[scene_ubo_offset],
         );
 
         unsafe {
@@ -342,7 +364,7 @@ impl RendererBackend for VkRenderer {
                 .expect("VkBackend::draw - Failed to present swapchain image!");
         }
 
-        self.frame_index += 1;
+        self.frame_counter += 1;
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -363,6 +385,7 @@ fn draw_renderables(
     resource_manager: &ResourceManager,
     renderables: &[Renderable],
     descriptor_sets: &[vk::DescriptorSet],
+    dynamic_offsets: &[u32],
 ) {
     let mut last_mesh = None;
     let mut last_material = None;
@@ -378,6 +401,7 @@ fn draw_renderables(
         let material_cmp = Some(material_name.clone());
         if material_cmp != last_material {
             last_material = material_cmp;
+
             unsafe {
                 device.cmd_bind_pipeline(
                     command_buffer,
@@ -390,7 +414,7 @@ fn draw_renderables(
                     material.pipeline_layout,
                     0,
                     descriptor_sets,
-                    &[],
+                    dynamic_offsets,
                 );
             }
         }

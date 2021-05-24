@@ -118,7 +118,7 @@ impl VkMesh {
 
     pub fn upload(&self, allocator_handle: &AllocatorHandle) {
         let vertices = &self.mesh.vertices;
-        allocator_handle.write_buffer(&self.vertex_buffer, vertices.as_ptr(), vertices.len());
+        allocator_handle.write_buffer(&self.vertex_buffer, vertices.as_ptr(), vertices.len(), None);
     }
     //------------------------------------------------------------------------------------------------------------------
 

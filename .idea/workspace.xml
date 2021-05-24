@@ -22,14 +22,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="updated deps; renamed core from kohaku to shinzou">
+      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/scene.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ike/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/ike/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.frag" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/handles/allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/buffer.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/shader.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/shader.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

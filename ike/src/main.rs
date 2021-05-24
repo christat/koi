@@ -75,8 +75,9 @@ fn main() {
     let mut input_manager = InputManager::init(None);
     let mut input_actions = InputActions::init();
 
-    let mut line = String::new();
-    std::io::stdin().read_line(&mut line).unwrap();
+    // Hacky pause for Renderdoc injection :D
+    // let mut line = String::new();
+    // std::io::stdin().read_line(&mut line).unwrap();
 
     let mut renderer = Renderer::init(APP_NAME, &window_handle);
 

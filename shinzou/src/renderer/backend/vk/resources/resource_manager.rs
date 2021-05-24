@@ -4,21 +4,20 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::{MeshPushConstants, VertexInputDescription, VkFrame};
-use crate::renderer::entities::CAMERA_UBO_SIZE;
 use crate::renderer::{
     backend::vk::{
         handles::{
             AllocatorFree, AllocatorHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
         },
         resources::{
-            VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence, VkFramebuffer, VkMaterial,
-            VkMesh, VkPipeline, VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkSemaphore,
-            VkShader, VkSwapchain,
+            MeshPushConstants, VertexInputDescription, VkCommandBuffer, VkCommandPool,
+            VkDepthBuffer, VkFence, VkFrame, VkFramebuffer, VkMaterial, VkMesh, VkPipeline,
+            VkPipelineBuilder, VkPipelineLayout, VkRenderPass, VkScene, VkSemaphore, VkShader,
+            VkSwapchain, SCENE_UBO_SIZE,
         },
         DeviceAllocatorDestroy, DeviceDestroy, VkRendererConfig,
     },
-    entities::{Material, Mesh},
+    entities::{Material, Mesh, CAMERA_UBO_SIZE},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -43,6 +42,7 @@ pub struct ResourceManager {
     global_descriptor_set_layout: vk::DescriptorSetLayout,
 
     frames: Vec<VkFrame>,
+    scene: VkScene,
 
     pipeline_layouts: HashMap<String, Rc<VkPipelineLayout>>,
     pipelines: HashMap<String, Rc<VkPipeline>>,
@@ -54,7 +54,11 @@ pub struct ResourceManager {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl ResourceManager {
-    pub fn init() -> Self {
+    pub fn init(
+        allocator_handle: &AllocatorHandle,
+        physical_device_handle: &PhysicalDeviceHandle,
+        config: &VkRendererConfig,
+    ) -> Self {
         Self {
             render_passes: HashMap::new(),
             swapchain: None,
@@ -67,6 +71,7 @@ impl ResourceManager {
             fences: HashMap::new(),
             semaphores: HashMap::new(),
             frames: Vec::new(),
+            scene: VkScene::new(allocator_handle, physical_device_handle, config),
             pipeline_layouts: HashMap::new(),
             pipelines: HashMap::new(),
             shaders: HashMap::new(),
@@ -340,8 +345,21 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn get_current_frame_number(&self, frame_number: usize) -> usize {
+        frame_number % self.frames.len()
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
     pub fn get_current_frame(&self, frame_number: usize) -> &VkFrame {
-        unsafe { self.frames.get_unchecked(frame_number % self.frames.len()) }
+        unsafe {
+            self.frames
+                .get_unchecked(self.get_current_frame_number(frame_number))
+        }
+    }
+    //------------------------------------------------------------------------------------------------------------------
+
+    pub fn get_scene(&self) -> &VkScene {
+        &self.scene
     }
     //------------------------------------------------------------------------------------------------------------------
 
@@ -359,9 +377,16 @@ impl ResourceManager {
     //------------------------------------------------------------------------------------------------------------------
 
     pub fn create_descriptors(&mut self, device: &Device) {
-        let pool_sizes = [vk::DescriptorPoolSize::builder()
-            .descriptor_count(10)
-            .build(); 10];
+        let pool_sizes = [
+            vk::DescriptorPoolSize::builder()
+                .ty(vk::DescriptorType::UNIFORM_BUFFER)
+                .descriptor_count(10)
+                .build(),
+            vk::DescriptorPoolSize::builder()
+                .ty(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
+                .descriptor_count(10)
+                .build(),
+        ];
 
         let pool_info = vk::DescriptorPoolCreateInfo::builder()
             .max_sets(10)
@@ -373,15 +398,22 @@ impl ResourceManager {
                 .expect("ResourceManager::create_descriptors - Failed to create descriptor pool!")
         };
 
-        let camera_buffer_binding = [vk::DescriptorSetLayoutBinding::builder()
-            .binding(0)
-            .descriptor_count(1)
-            .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
-            .stage_flags(vk::ShaderStageFlags::VERTEX)
-            .build()];
+        let bindings = [
+            vk::DescriptorSetLayoutBinding::builder()
+                .binding(0)
+                .descriptor_count(1)
+                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+                .stage_flags(vk::ShaderStageFlags::VERTEX)
+                .build(),
+            vk::DescriptorSetLayoutBinding::builder()
+                .binding(1)
+                .descriptor_count(1)
+                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
+                .stage_flags(vk::ShaderStageFlags::VERTEX | vk::ShaderStageFlags::FRAGMENT)
+                .build(),
+        ];
 
-        let set_layout_info =
-            vk::DescriptorSetLayoutCreateInfo::builder().bindings(&camera_buffer_binding);
+        let set_layout_info = vk::DescriptorSetLayoutCreateInfo::builder().bindings(&bindings);
 
         self.global_descriptor_set_layout = unsafe {
             device
@@ -404,18 +436,32 @@ impl ResourceManager {
                 )[0]
             };
 
-            let buffer_info = [vk::DescriptorBufferInfo::builder()
+            let camera_buffer_info = [vk::DescriptorBufferInfo::builder()
                 .buffer(frame.camera_buffer.get())
                 .offset(0)
                 .range(CAMERA_UBO_SIZE)
                 .build()];
 
-            let write_set = [vk::WriteDescriptorSet::builder()
-                .dst_binding(0)
-                .dst_set(frame.global_descriptor)
-                .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
-                .buffer_info(&buffer_info)
+            let scene_buffer_info = [vk::DescriptorBufferInfo::builder()
+                .buffer(self.scene.buffer.get())
+                .offset(0) // dynamically offset at bind point
+                .range(SCENE_UBO_SIZE as u64)
                 .build()];
+
+            let write_set = [
+                vk::WriteDescriptorSet::builder()
+                    .dst_binding(0)
+                    .dst_set(frame.global_descriptor)
+                    .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER)
+                    .buffer_info(&camera_buffer_info)
+                    .build(),
+                vk::WriteDescriptorSet::builder()
+                    .dst_binding(1)
+                    .dst_set(frame.global_descriptor)
+                    .descriptor_type(vk::DescriptorType::UNIFORM_BUFFER_DYNAMIC)
+                    .buffer_info(&scene_buffer_info)
+                    .build(),
+            ];
 
             unsafe { device.update_descriptor_sets(&write_set, &[]) };
         }
@@ -593,6 +639,8 @@ impl ResourceManager {
         for frame in self.frames.iter() {
             frame.free(allocator);
         }
+
+        self.scene.free(allocator);
 
         device.destroy_descriptor_set_layout(self.global_descriptor_set_layout, None);
         device.destroy_descriptor_pool(self.descriptor_pool, None);
