@@ -8,6 +8,7 @@ mod config;
 mod handles;
 mod platform;
 mod resources;
+mod utils;
 
 #[cfg(debug_assertions)]
 mod debug_utils;

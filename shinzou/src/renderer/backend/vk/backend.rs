@@ -143,6 +143,14 @@ impl RendererBackend for VkRenderer {
 
         let device = device_handle.get_device();
 
+        // Immediate upload resources
+        resource_manager.create_fence(&device, "upload".into(), vk::FenceCreateFlags::default());
+        resource_manager.create_command_pool(
+            &device,
+            physical_device_handle.graphics_queue_index,
+            "upload".into(),
+        );
+
         (0..config.buffering).for_each(|_| {
             resource_manager.create_frame(
                 device,
@@ -185,7 +193,16 @@ impl RendererBackend for VkRenderer {
 
         for mesh in meshes {
             let mesh_resource = resource_manager.create_mesh(mesh, allocator_handle);
-            mesh_resource.upload(allocator_handle);
+            mesh_resource.upload(
+                allocator_handle,
+                device,
+                resource_manager
+                    .get_command_pool("upload".into())
+                    .unwrap()
+                    .get(),
+                resource_manager.get_fence("upload".into()).unwrap().get(),
+                &device_handle.graphics_queue,
+            );
         }
     }
     //------------------------------------------------------------------------------------------------------------------

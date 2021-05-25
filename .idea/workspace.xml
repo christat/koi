@@ -21,20 +21,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets">
-      <change afterPath="$PROJECT_DIR$/resources/shaders/src/debug.frag" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute">
+      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/utils.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/black.frag" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/shader.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/src/shader.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/shaders/src/white.frag" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/build.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/build.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/frame.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mesh.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +102,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package ike --bin ike" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -141,11 +139,6 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
   </component>
@@ -224,6 +217,7 @@
       <workItem from="1621537020095" duration="759000" />
       <workItem from="1621670747416" duration="2322000" />
       <workItem from="1621689597622" duration="11556000" />
+      <workItem from="1621965283117" duration="5351000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -505,7 +499,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621881889607</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute">
+      <created>1621888140175</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1621888140175</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -543,7 +544,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed mesh triangle example" />
     <MESSAGE value="cleanup unused import and dead code warnings" />
     <MESSAGE value="added obj loading and monkey 3D model files" />
     <MESSAGE value="added depth buffer" />
@@ -568,7 +568,8 @@
     <MESSAGE value="added dynamic descriptor for scene" />
     <MESSAGE value="added storage buffers for renderable entities; commented out push constant logic for entity transforms" />
     <MESSAGE value="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets" />
-    <option name="LAST_COMMIT_MESSAGE" value="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets" />
+    <MESSAGE value="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute" />
+    <option name="LAST_COMMIT_MESSAGE" value="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

@@ -1,7 +1,7 @@
 use std::mem::size_of;
 //----------------------------------------------------------------------------------------------------------------------
 
-use ash::vk;
+use ash::{vk, Device};
 use field_offset::offset_of;
 use ultraviolet::{Mat4, Vec4};
 use vk_mem::{Allocator, MemoryUsage};
@@ -11,9 +11,11 @@ use crate::renderer::{
     backend::vk::{
         handles::{AllocatorFree, AllocatorHandle},
         resources::VkBuffer,
+        utils::immediate_submit,
     },
     entities::{Mesh, Vertex, VERTEX_SIZE},
 };
+use ash::version::DeviceV1_0;
 //----------------------------------------------------------------------------------------------------------------------
 
 pub struct VertexInputDescription {
@@ -124,9 +126,9 @@ impl VkMesh {
         let vertex_buffer = allocator_handle.create_buffer(
             &VkBuffer::create_info(
                 (mesh.vertices.len() * VERTEX_SIZE) as vk::DeviceSize,
-                vk::BufferUsageFlags::VERTEX_BUFFER,
+                vk::BufferUsageFlags::VERTEX_BUFFER | vk::BufferUsageFlags::TRANSFER_DST,
             ),
-            &AllocatorHandle::allocation_create_info(MemoryUsage::CpuToGpu, None, None),
+            &AllocatorHandle::allocation_create_info(MemoryUsage::GpuOnly, None, None),
         );
 
         Self {
@@ -136,9 +138,42 @@ impl VkMesh {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn upload(&self, allocator_handle: &AllocatorHandle) {
-        let vertices = &self.mesh.vertices;
-        allocator_handle.write_buffer(&self.vertex_buffer, vertices.as_ptr(), vertices.len(), None);
+    pub fn upload(
+        &self,
+        allocator_handle: &AllocatorHandle,
+        device: &Device,
+        command_pool: vk::CommandPool,
+        fence: vk::Fence,
+        queue: &vk::Queue,
+    ) {
+        let buffer_size = (self.mesh.vertices.len() * VERTEX_SIZE) as vk::DeviceSize;
+        let staging_buffer = allocator_handle.create_buffer(
+            &VkBuffer::create_info(buffer_size, vk::BufferUsageFlags::TRANSFER_SRC),
+            &AllocatorHandle::allocation_create_info(MemoryUsage::CpuOnly, None, None),
+        );
+
+        allocator_handle.write_buffer(
+            &staging_buffer,
+            self.mesh.vertices.as_ptr(),
+            self.mesh.vertices.len(),
+            None,
+        );
+
+        let upload = |cmd: &vk::CommandBuffer| {
+            let copy_regions = [vk::BufferCopy::builder().size(buffer_size).build()];
+            unsafe {
+                device.cmd_copy_buffer(
+                    *cmd,
+                    staging_buffer.get(),
+                    self.vertex_buffer.get(),
+                    &copy_regions,
+                )
+            }
+        };
+
+        immediate_submit(device, command_pool, fence, queue, &upload);
+
+        staging_buffer.free(&allocator_handle.allocator);
     }
     //------------------------------------------------------------------------------------------------------------------
 

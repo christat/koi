@@ -285,9 +285,11 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    #[allow(dead_code)]
-    pub fn get_fence(&self, id: &str) -> Rc<VkFence> {
-        self.fences.get(id).unwrap().clone()
+    pub fn get_fence(&self, id: &str) -> Option<Rc<VkFence>> {
+        match self.fences.get(id) {
+            Some(fence) => Some(fence.clone()),
+            None => None,
+        }
     }
     //------------------------------------------------------------------------------------------------------------------
 
