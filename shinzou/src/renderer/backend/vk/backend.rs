@@ -2,8 +2,6 @@ use ash::{version::DeviceV1_0, vk, Device};
 use ultraviolet::Vec4;
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::MeshMetaSSBO;
-use crate::renderer::entities::CAMERA_UBO_SIZE;
 use crate::{
     core::window::WindowHandle,
     renderer::{
@@ -12,11 +10,12 @@ use crate::{
                 AllocatorHandle, DeviceHandle, InstanceHandle, PhysicalDeviceHandle, SurfaceHandle,
             },
             resources::{
-                MeshSSBO, ResourceManager, SceneUBO, VkBuffer, VkDepthBuffer, SCENE_UBO_SIZE,
+                MeshMetaSSBO, MeshSSBO, ResourceManager, SceneUBO, VkBuffer, VkDepthBuffer,
+                SCENE_UBO_SIZE,
             },
             VkRendererConfig,
         },
-        entities::{Camera, CameraUBO, Material, Mesh, Renderable},
+        entities::{Camera, CameraUBO, Material, Mesh, Renderable, Texture, CAMERA_UBO_SIZE},
         hal::RendererBackend,
     },
     utils::traits::Destroy,
@@ -97,6 +96,33 @@ impl VkRenderer {
         &self.device_handle.device
     }
     //------------------------------------------------------------------------------------------------------------------
+
+    fn load_texture(&mut self, texture: Texture) {
+        let VkRenderer {
+            device_handle,
+            resource_manager,
+            allocator_handle,
+            ..
+        } = self;
+
+        let command_pool = resource_manager
+            .get_command_pool("upload".into())
+            .expect("Failed to obtain upload command pool!")
+            .get();
+        let fence = resource_manager
+            .get_fence("upload".into())
+            .expect("Failed to obtain upload fence!")
+            .get();
+
+        resource_manager.create_texture(
+            texture,
+            &device_handle.device,
+            command_pool,
+            fence,
+            &device_handle.graphics_queue,
+            allocator_handle,
+        );
+    }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -127,7 +153,12 @@ impl Drop for VkRenderer {
 //----------------------------------------------------------------------------------------------------------------------
 
 impl RendererBackend for VkRenderer {
-    fn init_resources(&mut self, materials: Vec<Material>, meshes: Vec<Mesh>) {
+    fn init_resources(
+        &mut self,
+        materials: Vec<Material>,
+        meshes: Vec<Mesh>,
+        textures: Vec<Texture>,
+    ) {
         info!("----- VkBackend::init_resources -----");
 
         let VkRenderer {
@@ -203,6 +234,10 @@ impl RendererBackend for VkRenderer {
                 resource_manager.get_fence("upload".into()).unwrap().get(),
                 &device_handle.graphics_queue,
             );
+        }
+
+        for texture in textures {
+            self.load_texture(texture);
         }
     }
     //------------------------------------------------------------------------------------------------------------------

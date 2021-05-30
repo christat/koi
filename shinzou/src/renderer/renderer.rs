@@ -8,7 +8,7 @@ use crate::{
     core::window::WindowHandle,
     renderer::{
         backend::vk::VkRenderer,
-        entities::{Camera, Material, Mesh, Renderable},
+        entities::{Camera, Material, Mesh, Renderable, Texture},
         hal::RendererBackend,
     },
 };
@@ -71,9 +71,17 @@ impl Renderer {
         let triangle = Mesh::test_triangle();
         let triangle_name = triangle.name.clone();
 
+        let empire_diffuse_name = "empire_diffuse".into();
+        let empire_diffuse = Texture::new(
+            &empire_diffuse_name,
+            PathBuf::from("assets/textures/lost_empire/lost_empire-RGBA.png"),
+            None,
+        );
+
         self.backend.init_resources(
             vec![default_material, debug_material],
             vec![monkey, triangle],
+            vec![empire_diffuse],
         );
 
         self.scene.clear();

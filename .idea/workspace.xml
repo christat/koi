@@ -21,13 +21,18 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute">
-      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/utils.rs" afterDir="false" />
+    <list default="true" id="01d3a9b6-89cd-4d01-8823-cd911802d71d" name="Default Changelist" comment="refactor mesh upload to use copy buffer commands from cpu staging to gpu memory">
+      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/texture.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/texture.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/backend.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mesh.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/mod.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/backend/vk/resources/resource_manager.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/entities/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/entities/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/hal/backend.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/hal/backend.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/shinzou/src/renderer/renderer.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,11 +107,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Debug">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="run --package ike --bin ike" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -139,6 +139,11 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
   </component>
@@ -217,7 +222,10 @@
       <workItem from="1621537020095" duration="759000" />
       <workItem from="1621670747416" duration="2322000" />
       <workItem from="1621689597622" duration="11556000" />
-      <workItem from="1621965283117" duration="5351000" />
+      <workItem from="1621965283117" duration="6753000" />
+      <workItem from="1622047505776" duration="8823000" />
+      <workItem from="1622306648805" duration="908000" />
+      <workItem from="1622392421915" duration="8631000" />
     </task>
     <task id="LOCAL−00001" summary="Initial commit">
       <created>1600592591676</created>
@@ -506,7 +514,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621888140175</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="refactor mesh upload to use copy buffer commands from cpu staging to gpu memory">
+      <created>1621973785273</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1621973785273</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -544,7 +559,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="cleanup unused import and dead code warnings" />
     <MESSAGE value="added obj loading and monkey 3D model files" />
     <MESSAGE value="added depth buffer" />
     <MESSAGE value="cleanup hardcoded pipelines" />
@@ -569,7 +583,8 @@
     <MESSAGE value="added storage buffers for renderable entities; commented out push constant logic for entity transforms" />
     <MESSAGE value="merge camera and scene UBO buffers/descriptor sets into shared ones with dynamic offsets" />
     <MESSAGE value="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute" />
-    <option name="LAST_COMMIT_MESSAGE" value="replace hardcoded white/black fragment shaders with debug shader utilizing ssbo entity meta color attribute" />
+    <MESSAGE value="refactor mesh upload to use copy buffer commands from cpu staging to gpu memory" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor mesh upload to use copy buffer commands from cpu staging to gpu memory" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

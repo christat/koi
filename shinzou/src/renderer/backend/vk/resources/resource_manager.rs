@@ -4,7 +4,6 @@ use std::{collections::HashMap, path::Path, rc::Rc};
 use ash::{version::DeviceV1_0, vk, Device};
 //----------------------------------------------------------------------------------------------------------------------
 
-use crate::renderer::backend::vk::resources::{MESH_META_SSBO_SIZE, MESH_SSBO_MAX, MESH_SSBO_SIZE};
 use crate::renderer::{
     backend::vk::{
         handles::{
@@ -13,12 +12,12 @@ use crate::renderer::{
         resources::{
             VertexInputDescription, VkCommandBuffer, VkCommandPool, VkDepthBuffer, VkFence,
             VkFrame, VkFramebuffer, VkMaterial, VkMesh, VkPipeline, VkPipelineBuilder,
-            VkPipelineLayout, VkRenderPass, VkScene, VkSemaphore, VkShader, VkSwapchain,
-            SCENE_UBO_SIZE,
+            VkPipelineLayout, VkRenderPass, VkScene, VkSemaphore, VkShader, VkSwapchain, VkTexture,
+            MESH_META_SSBO_SIZE, MESH_SSBO_MAX, MESH_SSBO_SIZE, SCENE_UBO_SIZE,
         },
         DeviceAllocatorDestroy, DeviceDestroy, VkRendererConfig,
     },
-    entities::{Material, Mesh, CAMERA_UBO_SIZE},
+    entities::{Material, Mesh, Texture, CAMERA_UBO_SIZE},
 };
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -52,6 +51,7 @@ pub struct ResourceManager {
     materials: HashMap<String, VkMaterial>,
 
     meshes: HashMap<String, Rc<VkMesh>>,
+    textures: HashMap<String, Rc<VkTexture>>,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -80,6 +80,7 @@ impl ResourceManager {
             shaders: HashMap::new(),
             materials: HashMap::new(),
             meshes: HashMap::new(),
+            textures: HashMap::new(),
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -700,8 +701,37 @@ impl ResourceManager {
     }
     //------------------------------------------------------------------------------------------------------------------
 
+    pub fn create_texture(
+        &mut self,
+        texture: Texture,
+        device: &Device,
+        command_pool: vk::CommandPool,
+        fence: vk::Fence,
+        queue: &vk::Queue,
+        allocator_handle: &AllocatorHandle,
+    ) -> Rc<VkTexture> {
+        let texture_name = texture.name.clone();
+
+        let vk_texture = Rc::new(VkTexture::new(
+            texture,
+            device,
+            command_pool,
+            fence,
+            queue,
+            allocator_handle,
+        ));
+
+        self.textures.insert(texture_name, vk_texture.clone());
+
+        vk_texture
+    }
+
     // NB! Not a trait impl because we need custom cleanup logic (i.e. allocator and Vulkan object destructors).
     pub unsafe fn destroy(&mut self, device: &Device, allocator: &vk_mem::Allocator) {
+        for texture in self.textures.values() {
+            texture.destroy(device, allocator);
+        }
+
         for mesh in self.meshes.values() {
             mesh.free(allocator);
         }
@@ -717,6 +747,7 @@ impl ResourceManager {
         self.scene.free(allocator);
 
         device.destroy_descriptor_set_layout(self.global_descriptor_set_layout, None);
+        device.destroy_descriptor_set_layout(self.entity_descriptor_set_layout, None);
         device.destroy_descriptor_pool(self.descriptor_pool, None);
 
         for pipeline in self.pipelines.values() {

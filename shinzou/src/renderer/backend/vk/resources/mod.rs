@@ -16,8 +16,10 @@ mod scene;
 mod semaphore;
 mod shader;
 mod swapchain;
+mod texture;
 //----------------------------------------------------------------------------------------------------------------------
 
+pub(in crate::renderer::backend::vk) use self::image::*;
 pub(in crate::renderer::backend::vk) use buffer::*;
 pub(in crate::renderer::backend::vk) use command_buffer::*;
 pub(in crate::renderer::backend::vk) use command_pool::*;
@@ -25,7 +27,6 @@ pub(in crate::renderer::backend::vk) use depth_buffer::*;
 pub(in crate::renderer::backend::vk) use fence::*;
 pub(in crate::renderer::backend::vk) use frame::*;
 pub(in crate::renderer::backend::vk) use framebuffer::*;
-pub(in crate::renderer::backend::vk) use image::*;
 pub(in crate::renderer::backend::vk) use material::*;
 pub(in crate::renderer::backend::vk) use mesh::*;
 pub(in crate::renderer::backend::vk) use pipeline::*;
@@ -36,4 +37,5 @@ pub(in crate::renderer::backend::vk) use scene::*;
 pub(in crate::renderer::backend::vk) use semaphore::*;
 pub(in crate::renderer::backend::vk) use shader::*;
 pub(in crate::renderer::backend::vk) use swapchain::*;
+pub(in crate::renderer::backend::vk) use texture::*;
 //----------------------------------------------------------------------------------------------------------------------
