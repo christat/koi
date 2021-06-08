@@ -2,6 +2,7 @@
 
 layout(location = 0) in vec3 inColor;
 layout (location = 1) in vec3 dbgColor;
+layout (location = 2) in vec2 texCoord;
 
 layout(location = 0) out vec4 outColor;
 
@@ -21,6 +22,9 @@ layout(std140, set = 1, binding = 1) readonly buffer EntityMetaBuffer
     EntityMetaSSBO entityMetas[];
 } entityMetaBuffer;
 
+layout(set = 2, binding = 0) uniform sampler2D tex1;
+
 void main() {
-    outColor = vec4(inColor + sceneUBO.ambientColor.xyz, 1.0);
+    vec3 color = texture(tex1, texCoord).xyz;
+    outColor = vec4(color, 1.0);
 }

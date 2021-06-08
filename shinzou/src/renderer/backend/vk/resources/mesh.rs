@@ -52,6 +52,12 @@ impl VertexInputDescription {
                 .format(vk::Format::R32G32_SFLOAT)
                 .offset(offset_of!(Vertex => color).get_byte_offset() as u32)
                 .build(),
+            vk::VertexInputAttributeDescription::builder()
+                .binding(0)
+                .location(3)
+                .format(vk::Format::R32G32_SFLOAT)
+                .offset(offset_of!(Vertex => uv).get_byte_offset() as u32)
+                .build(),
         ];
 
         let flags = vk::PipelineVertexInputStateCreateFlags::empty();

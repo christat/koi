@@ -2,7 +2,7 @@ use std::path::Path;
 //----------------------------------------------------------------------------------------------------------------------
 
 use tobj;
-use ultraviolet::Vec3;
+use ultraviolet::{Vec2, Vec3};
 //----------------------------------------------------------------------------------------------------------------------
 
 #[repr(C)]
@@ -11,6 +11,7 @@ pub struct Vertex {
     pub position: Vec3,
     pub normal: Vec3,
     pub color: Vec3,
+    pub uv: Vec2,
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -18,11 +19,12 @@ pub const VERTEX_SIZE: usize = std::mem::size_of::<Vertex>();
 //----------------------------------------------------------------------------------------------------------------------
 
 impl Vertex {
-    pub fn new(position: Vec3, normal: Vec3, color: Vec3) -> Self {
+    pub fn new(position: Vec3, normal: Vec3, color: Vec3, uv: Vec2) -> Self {
         Self {
             position,
             normal,
             color,
+            uv,
         }
     }
 }
@@ -46,17 +48,32 @@ impl Mesh {
         Self {
             name: "test_triangle".into(),
             vertices: vec![
-                Vertex::new(Vec3::new(1.0, -1.0, 0.0), Vec3::default(), COLOR),
-                Vertex::new(Vec3::new(-1.0, -1.0, 0.0), Vec3::default(), COLOR),
-                Vertex::new(Vec3::new(0.0, 1.0, 0.0), Vec3::default(), COLOR),
+                Vertex::new(
+                    Vec3::new(1.0, -1.0, 0.0),
+                    Vec3::default(),
+                    COLOR,
+                    Vec2::new(0.0, 1.0),
+                ),
+                Vertex::new(
+                    Vec3::new(-1.0, -1.0, 0.0),
+                    Vec3::default(),
+                    COLOR,
+                    Vec2::new(1.0, 1.0),
+                ),
+                Vertex::new(
+                    Vec3::new(0.0, 1.0, 0.0),
+                    Vec3::default(),
+                    COLOR,
+                    Vec2::new(0.5, 0.0),
+                ),
             ],
         }
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    pub fn from_obj(file_path: &Path) -> Self {
+    pub fn from_obj(file_path: &Path, flip_vertical_uv: bool) -> Self {
         let options = tobj::LoadOptions {
-            single_index: false,
+            single_index: true,
             triangulate: true,
             ignore_points: false,
             ignore_lines: false,
@@ -66,40 +83,43 @@ impl Mesh {
             file_path.to_str().unwrap_or("<Failed to covert path>")
         ));
 
-        // Multi-mesh model loading not supported atm
-        assert_eq!(1, models.len());
-        let model = models.first().unwrap();
+        let mut vertices = vec![];
+        let name = models.first().unwrap().name.clone();
 
-        let tobj::Model { mesh, name } = model;
-        let tobj::Mesh {
-            indices,
-            positions: v,
-            normals: vn,
-            ..
-        } = mesh;
+        for model in models {
+            let tobj::Mesh {
+                indices,
+                positions: v,
+                normals: vn,
+                texcoords: vt,
+                ..
+            } = model.mesh;
 
-        // ensure the model consists of tris
-        assert_eq!(0, v.len() % 3);
+            let has_uv = !vt.is_empty();
 
-        let vertices = indices
-            .iter()
-            .map(|i| {
-                let i = *i as usize;
+            // ensure the model consists of tris
+            assert_eq!(0, v.len() % 3);
+
+            for i in indices {
+                let i = i as usize;
                 let f = i * 3 as usize;
 
                 let position = Vec3::new(v[f], v[f + 1], v[f + 2]);
                 let normal = Vec3::new(vn[f], vn[f + 1], vn[f + 2]);
 
-                Vertex::new(position, normal, normal)
-            })
-            .collect::<Vec<Vertex>>();
+                let uv = if has_uv {
+                    let t = i * 2 as usize;
+                    let v = vt[t + 1];
+                    Vec2::new(vt[t], if flip_vertical_uv { 1.0 - v } else { v })
+                } else {
+                    Vec2::zero()
+                };
 
-        assert_ne!(0, vertices.len());
-
-        Self {
-            name: name.to_owned(),
-            vertices,
+                vertices.push(Vertex::new(position, normal, normal, uv));
+            }
         }
+
+        Self { name, vertices }
     }
     //------------------------------------------------------------------------------------------------------------------
 }

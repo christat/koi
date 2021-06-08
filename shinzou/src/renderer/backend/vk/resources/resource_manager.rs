@@ -41,6 +41,7 @@ pub struct ResourceManager {
     descriptor_pool: vk::DescriptorPool,
     global_descriptor_set_layout: vk::DescriptorSetLayout,
     entity_descriptor_set_layout: vk::DescriptorSetLayout,
+    texture_descriptor_set_layout: vk::DescriptorSetLayout,
 
     frames: Vec<VkFrame>,
     scene: VkScene,
@@ -71,6 +72,7 @@ impl ResourceManager {
             descriptor_pool: Default::default(),
             global_descriptor_set_layout: Default::default(),
             entity_descriptor_set_layout: Default::default(),
+            texture_descriptor_set_layout: Default::default(),
             fences: HashMap::new(),
             semaphores: HashMap::new(),
             frames: Vec::new(),
@@ -396,6 +398,10 @@ impl ResourceManager {
                 .ty(vk::DescriptorType::STORAGE_BUFFER)
                 .descriptor_count(10)
                 .build(),
+            vk::DescriptorPoolSize::builder()
+                .ty(vk::DescriptorType::COMBINED_IMAGE_SAMPLER)
+                .descriptor_count(10)
+                .build(),
         ];
 
         let pool_info = vk::DescriptorPoolCreateInfo::builder()
@@ -458,6 +464,20 @@ impl ResourceManager {
                 .expect(
                     "ResourceManager::create_descriptors - Failed to create descriptor set layout!",
                 )
+        };
+
+        let texture_bindings = [vk::DescriptorSetLayoutBinding::builder()
+            .binding(0)
+            .descriptor_count(1)
+            .descriptor_type(vk::DescriptorType::COMBINED_IMAGE_SAMPLER)
+            .stage_flags(vk::ShaderStageFlags::FRAGMENT)
+            .build()];
+
+        self.texture_descriptor_set_layout = unsafe {
+            device.create_descriptor_set_layout(
+                &vk::DescriptorSetLayoutCreateInfo::builder().bindings(&texture_bindings),
+                None
+            ).expect("ResourceManager::create_descriptors - Failed to create texture descriptor set layout!")
         };
 
         let global_set_layouts = [self.global_descriptor_set_layout];
@@ -624,6 +644,7 @@ impl ResourceManager {
         let descriptor_set_layouts = [
             self.global_descriptor_set_layout,
             self.entity_descriptor_set_layout,
+            self.texture_descriptor_set_layout,
         ];
         let pipeline_layout = self
             .create_pipeline_layout(
@@ -675,7 +696,46 @@ impl ResourceManager {
             )
             .get();
 
-        let material = VkMaterial::new(pipeline, pipeline_layout);
+        let texture_set_layouts = [self.texture_descriptor_set_layout];
+        let texture_set_info = vk::DescriptorSetAllocateInfo::builder()
+            .descriptor_pool(self.descriptor_pool)
+            .set_layouts(&texture_set_layouts);
+
+        let descriptor_set = unsafe {
+            device
+                .allocate_descriptor_sets(&texture_set_info)
+                .expect("Failed to allocate texture descriptor set!")[0]
+        };
+
+        let sampler_info = vk::SamplerCreateInfo::builder()
+            .mag_filter(vk::Filter::NEAREST)
+            .min_filter(vk::Filter::NEAREST)
+            .address_mode_u(vk::SamplerAddressMode::REPEAT)
+            .address_mode_v(vk::SamplerAddressMode::REPEAT)
+            .address_mode_w(vk::SamplerAddressMode::REPEAT);
+
+        let sampler = unsafe {
+            device
+                .create_sampler(&sampler_info, None)
+                .expect("Failed to create texture sampler!")
+        };
+
+        let image_info = [vk::DescriptorImageInfo::builder()
+            .sampler(sampler)
+            .image_view(self.textures.get("empire_diffuse").unwrap().image_view())
+            .image_layout(vk::ImageLayout::SHADER_READ_ONLY_OPTIMAL)
+            .build()];
+
+        let texture_descriptor_set_write = [vk::WriteDescriptorSet::builder()
+            .dst_set(descriptor_set)
+            .dst_binding(0)
+            .descriptor_type(vk::DescriptorType::COMBINED_IMAGE_SAMPLER)
+            .image_info(&image_info)
+            .build()];
+
+        unsafe { device.update_descriptor_sets(&texture_descriptor_set_write, &[]) };
+
+        let material = VkMaterial::new(pipeline, pipeline_layout, descriptor_set);
         self.materials.insert(name.clone(), material.clone());
 
         material

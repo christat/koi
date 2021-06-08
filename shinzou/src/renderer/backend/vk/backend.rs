@@ -96,33 +96,6 @@ impl VkRenderer {
         &self.device_handle.device
     }
     //------------------------------------------------------------------------------------------------------------------
-
-    fn load_texture(&mut self, texture: Texture) {
-        let VkRenderer {
-            device_handle,
-            resource_manager,
-            allocator_handle,
-            ..
-        } = self;
-
-        let command_pool = resource_manager
-            .get_command_pool("upload".into())
-            .expect("Failed to obtain upload command pool!")
-            .get();
-        let fence = resource_manager
-            .get_fence("upload".into())
-            .expect("Failed to obtain upload fence!")
-            .get();
-
-        resource_manager.create_texture(
-            texture,
-            &device_handle.device,
-            command_pool,
-            fence,
-            &device_handle.graphics_queue,
-            allocator_handle,
-        );
-    }
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -218,10 +191,6 @@ impl RendererBackend for VkRenderer {
 
         resource_manager.create_descriptors(device);
 
-        for material in materials {
-            resource_manager.create_material(device, &render_pass, &material);
-        }
-
         for mesh in meshes {
             let mesh_resource = resource_manager.create_mesh(mesh, allocator_handle);
             mesh_resource.upload(
@@ -237,7 +206,27 @@ impl RendererBackend for VkRenderer {
         }
 
         for texture in textures {
-            self.load_texture(texture);
+            let command_pool = resource_manager
+                .get_command_pool("upload".into())
+                .expect("Failed to obtain upload command pool!")
+                .get();
+            let fence = resource_manager
+                .get_fence("upload".into())
+                .expect("Failed to obtain upload fence!")
+                .get();
+
+            resource_manager.create_texture(
+                texture,
+                &device_handle.device,
+                command_pool,
+                fence,
+                &device_handle.graphics_queue,
+                allocator_handle,
+            );
+        }
+
+        for material in materials {
+            resource_manager.create_material(device, &render_pass, &material);
         }
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -524,6 +513,19 @@ fn draw_renderables(
                     entity_descriptor_sets,
                     &[],
                 )
+            }
+        }
+
+        if material.descriptor_set != Default::default() {
+            unsafe {
+                device.cmd_bind_descriptor_sets(
+                    command_buffer,
+                    vk::PipelineBindPoint::GRAPHICS,
+                    material.pipeline_layout,
+                    2,
+                    &[material.descriptor_set],
+                    &[],
+                );
             }
         }
 
